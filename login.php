@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
+/*diego/*
 /* Remove o brancão de fundo e centraliza a caixa de login na tela verticalmente */
 body {
     background-color: #121212 !important;
