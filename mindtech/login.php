@@ -96,7 +96,7 @@ h3 {
     <div class="row justify-content-center">   <!-- Bootstrap: Linha + centraliza horizontalmente o conteúdo -->
         <div class="col-md-4">   <!-- Bootstrap: Coluna responsiva (4 de 12 colunas em telas médias/grandes) -->
             
-            <div class="card shadow">   <!-- Bootstrap: Card com sombra padrão -->
+            <div class="card shadow">   <!-- Bootstrap: Card com sombra padrão diego -->
                 <div class="card-body">   <!-- Bootstrap: Corpo do card (área interna) -->
                     
                     <h3 class="text-center mb-4">MindTech</h3>   <!-- Bootstrap: Centralizado + margem inferior -->
