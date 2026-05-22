@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <style>
 /*diego/*
 /*Vitor/*
-/*sergio*/
+/*gabriel*/
 /* Remove o brancão de fundo e centraliza a caixa de login na tela verticalmente */
 body {
     background-color: #121212 !important;
