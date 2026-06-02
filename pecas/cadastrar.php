@@ -52,7 +52,7 @@ include '../includes/header.php';
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Cadastrar Nova Peça</h1>
-        <a href="listar.php" class="btn btn-outline-secondary">Voltar para a Lista</a>
+        <a href="listar.php" class="btn btn-warning">Voltar para a Lista</a>
     </div>
 
     <?php if ($mensagem != '') { ?>
