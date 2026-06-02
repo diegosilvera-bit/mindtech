@@ -24,7 +24,7 @@ include '../includes/header.php';
         <h1 class="fw-bold">Ordens de Serviço</h1>
         <div>
         <a href="/mindtech/dashboard/index.php" class="btn btn-secondary me-2">Voltar</a>            
-        <a href="cadastrar.php" class="btn btn-primary">+ Nova OS</a>
+        <a href="cadastrar.php" class="btn btn-success">+ Nova OS</a>
         </div>
     </div>
 

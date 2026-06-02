@@ -17,7 +17,7 @@ include '../includes/header.php';
         <h1>Catálogo de Peças</h1>
         <div>
             <a href="../dashboard/index.php" class="btn btn-secondary me-2">Voltar</a>
-            <a href="cadastrar.php" class="btn btn-danger">+ Nova Peça</a>
+            <a href="cadastrar.php" class="btn btn-success">+ Nova Peça</a>
         </div>
     </div>
 

@@ -17,7 +17,7 @@ include '../includes/header.php';
         <h1>Equipamentos Cadastrados</h1>
         <div>
             <a href="../dashboard/index.php" class="btn btn-secondary me-2">Voltar</a>
-            <a href="cadastrar.php" class="btn btn-info text-white">+ Novo Equipamento</a>
+            <a href="cadastrar.php" class="btn btn-success">+ Novo Equipamento</a>
         </div>
     </div>
 

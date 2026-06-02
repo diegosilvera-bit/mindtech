@@ -36,7 +36,7 @@ include '../includes/header.php';
         <div>
             <a href="../dashboard/index.php" class="btn btn-outline-secondary me-2">Voltar</a>
             
-            <a href="cadastrar.php" class="btn btn-success shadow-sm">+ Novo</a>
+            <a href="cadastrar.php" class="btn btn-success">+ Novo Fornecedor</a>
         </div>
     </div>
 

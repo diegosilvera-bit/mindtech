@@ -17,7 +17,7 @@ include '../includes/header.php';
         <h1>Usuários do Sistema</h1>
         <div>
             <a href="../dashboard/index.php" class="btn btn-secondary me-2">Voltar</a>
-            <a href="cadastrar.php" class="btn btn-dark">+ Novo Usuário</a>
+            <a href="cadastrar.php" class="btn btn-success">+ Novo Usuário</a>
         </div>
     </div>
 
