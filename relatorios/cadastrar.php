@@ -19,7 +19,7 @@ include '../includes/header.php';
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Gerar Relatório</h1>
-        <a href="../dashboard/index.php" class="btn btn-outline-secondary">Voltar ao Painel</a>
+        <a href="../dashboard/index.php" class="btn btn-secondary me-2">Voltar ao Dashboard</a>
     </div>
 
     <div class="card shadow-sm border-0 border-start border-4 border-success">

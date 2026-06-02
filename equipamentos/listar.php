@@ -16,7 +16,7 @@ include '../includes/header.php';
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Equipamentos Cadastrados</h1>
         <div>
-            <a href="../dashboard/index.php" class="btn btn-secondary me-2">Voltar</a>
+            <a href="../dashboard/index.php" class="btn btn-secondary me-2">Voltar ao Dashboard</a>
             <a href="cadastrar.php" class="btn btn-success">+ Novo Equipamento</a>
         </div>
     </div>
