@@ -49,7 +49,7 @@ include '../includes/header.php';
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Cadastrar Fornecedor</h1>
-        <a href="listar.php" class="btn btn-outline-secondary">Voltar</a>
+        <a href="listar.php" class="btn btn-secondary me-2">Voltar para a Lista</a>
     </div>
 
     <?php if (!empty($mensagem)): ?>

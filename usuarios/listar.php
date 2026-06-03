@@ -2,6 +2,14 @@
 require_once __DIR__ . '/../includes/functions.php'; 
 require_once '../includes/auth.php'; 
 
+// Garante que a sessão está ativa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Recupera o perfil do utilizador logado através da sessão que criaste no login.php
+$perfil_logado = isset($_SESSION['usuario']['perfil']) ? $_SESSION['usuario']['perfil'] : 'A';
+
 // Inclui a conexão com o banco de dados
 include '../config/conexao.php'; 
 
@@ -14,10 +22,13 @@ include '../includes/header.php';
 
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Usuários do Sistema</h1>
+        <h1>Usuarios do Sistema</h1>
         <div>
             <a href="../dashboard/index.php" class="btn btn-secondary me-2">Voltar ao Dashboard</a>
-            <a href="cadastrar.php" class="btn btn-success">+ Novo Usuário</a>
+            
+            <?php if ($perfil_logado === 'G'): ?>
+                <a href="cadastrar.php" class="btn btn-success">+ Novo Usuário</a>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -35,37 +46,20 @@ include '../includes/header.php';
                 </thead>
                 <tbody>
                     <?php 
-                    // Verifica se encontrou algum usuário cadastrado
                     if ($result && mysqli_num_rows($result) > 0) {
-                        
-                        // Passa linha por linha dos resultados
-                        while ($usuario = mysqli_fetch_assoc($result)) { 
+                        while ($usuario = mysqli_fetch_assoc($result)) {
                             
-                            // Traduz a letra do banco de dados para o nome completo e escolhe uma cor
-                            $nome_perfil = '';
-                            $cor_badge = '';
-                            
-                            if ($usuario['perfil'] == 'G') {
-                                $nome_perfil = 'Gerente';
-                                $cor_badge = 'bg-dark'; // Preto
-                            } elseif ($usuario['perfil'] == 'T') {
-                                $nome_perfil = 'Técnico';
-                                $cor_badge = 'bg-primary'; // Azul
-                            } elseif ($usuario['perfil'] == 'A') {
-                                $nome_perfil = 'Atendimento';
-                                $cor_badge = 'bg-info text-dark'; // Ciano
-                            } elseif ($usuario['perfil'] == 'E') {
-                                $nome_perfil = 'Estoquista';
-                                $cor_badge = 'bg-warning text-dark'; // Amarelo
-                            }
+                            // Determina o texto amigável do perfil
+                            $nome_perfil = 'Atendimento';
+                            $cor_badge = 'bg-secondary';
+                            if ($usuario['perfil'] == 'G') { $nome_perfil = 'Gerente'; $cor_badge = 'bg-danger'; }
+                            if ($usuario['perfil'] == 'T') { $nome_perfil = 'Técnico'; $cor_badge = 'bg-primary'; }
+                            if ($usuario['perfil'] == 'E') { $nome_perfil = 'Estoquista'; $cor_badge = 'bg-warning text-dark'; }
                     ?>
                             <tr>
                                 <td class="ps-3 text-muted">#<?php echo $usuario['id_usuario']; ?></td>
-                                
                                 <td class="fw-bold"><?php echo $usuario['nome']; ?></td>
-                                
                                 <td><?php echo $usuario['login']; ?></td>
-                                
                                 <td>
                                     <span class="badge <?php echo $cor_badge; ?>">
                                         <?php echo $nome_perfil; ?>
@@ -73,7 +67,11 @@ include '../includes/header.php';
                                 </td>
                                 
                                 <td class="text-center pe-3">
-                                    <a href="editar.php?id=<?php echo $usuario['id_usuario']; ?>" class="btn btn-sm btn-outline-dark">Editar</a>
+                                    <?php if ($perfil_logado === 'G'): ?>
+                                        <a href="editar.php?id=<?php echo $usuario['id_usuario']; ?>" class="btn btn-sm btn-outline-dark">Editar</a>
+                                    <?php else: ?>
+                                        <span class="text-muted small">Apenas Leitura</span>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                     <?php 

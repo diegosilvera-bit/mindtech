@@ -4,15 +4,16 @@ require_once '../includes/auth.php';
 
 // Inclui a conexão com o banco de dados
 include '../config/conexao.php'; 
+include '../includes/header.php'; 
+
 
 $mensagem = ''; 
 
 // Pega o ID da Ordem de Serviço pela URL (ex: orcamento.php?id=1)
 $id_os = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// ==========================================
--- PROCESSO DE SALVAR AS ALTERAÇÕES (POST)
-// ==========================================
+// PROCESSO DE SALVAR AS ALTERAÇÕES (POST)
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $id_usuario_responsavel = $_POST['id_usuario_responsavel'];
     $observacoes = mysqli_real_escape_string($conn, $_POST['observacoes']);
@@ -37,9 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// ==========================================
--- BUSCA OS DADOS DA OS E DO CLIENTE/EQUIPAMENTO
-// ==========================================
+// BUSCA OS DADOS DA OS E DO CLIENTE/EQUIPAMENTO
+
 $sql_os = "SELECT os.*, c.nome AS nome_cliente, e.marca, e.modelo, e.tipo 
            FROM ordens_servico os
            JOIN clientes c ON os.id_cliente = c.id_cliente
@@ -55,20 +55,18 @@ if (!$os) {
     exit;
 }
 
-// ==========================================
--- BUSCA OS TÉCNICOS E GERENTES PARA O SELECT
-// ==========================================
+// BUSCA OS TÉCNICOS E GERENTES PARA O SELECT
 // Filtra apenas quem é Técnico (T) ou Gerente (G) para não listar atendentes no orçamento
+
 $sql_usuarios = "SELECT id_usuario, nome FROM usuarios WHERE perfil IN ('T', 'G') ORDER BY nome ASC";
 $result_usuarios = mysqli_query($conn, $sql_usuarios);
 
-include '../includes/header.php'; 
 ?>
 
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Orçamento / Gerenciar OS #<?php echo $os['id_os']; ?></h1>
-        <a href="listar.php" class="btn btn-outline-secondary">Voltar para a Lista</a>
+        <a href="listar.php" class="btn btn-secondary me-2">Voltar para a Lista</a>
     </div>
 
     <?php if ($mensagem != '') { ?>

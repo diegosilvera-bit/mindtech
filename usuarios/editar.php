@@ -7,6 +7,24 @@ include '../config/conexao.php';
 
 $mensagem = ''; 
 
+// Pega o ID do usuário que veio pela URL
+$id_usuario = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+// --- BLOQUEIO DE SEGURANÇA CONTRA INVASÃO DE LINK ---
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+if (!isset($_SESSION['usuario']['perfil']) || $_SESSION['usuario']['perfil'] !== 'G') {
+    echo "<script>
+            alert('Acesso negado! Você não tem permissão para editar dados de funcionários.'); 
+            window.location.href = 'listar.php';
+          </script>";
+    exit();
+}
+// -----------------------------------------------------
+
+// ... Resto do teu código original do editar.php continua igual daqui para baixo
+
 // Pega o ID do usuário que veio pela URL (ex: editar.php?id=2)
 $id_usuario = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 

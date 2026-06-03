@@ -5,7 +5,21 @@ require_once '../includes/auth.php';
 // Inclui a conexão com o banco de dados
 include '../config/conexao.php'; 
 
+// --- BLOQUEIO DE SEGURANÇA CONTRA INVASÃO DE LINK ---
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+if (!isset($_SESSION['usuario']['perfil']) || $_SESSION['usuario']['perfil'] !== 'G') {
+    echo "<script>
+            alert('Acesso negado! Apenas Gerentes podem cadastrar novos funcionários.'); 
+            window.location.href = 'listar.php';
+          </script>";
+    exit();
+}
+// -----------------------------------------------------
+
 $mensagem = ''; 
+// ... Resto do teu código original do cadastrar.php continua igual daqui para baixo
 
 // Verifica se o formulário foi enviado
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
