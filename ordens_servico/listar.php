@@ -2,10 +2,11 @@
 require_once __DIR__ . '/../includes/functions.php'; 
 require_once '../includes/auth.php'; 
 
-// Inclui a conexão com o banco de dados
+// TRAVA DE SEGURANÇA
+verificarAcesso(['G', 'A', 'T']);
+
 include '../config/conexao.php'; 
 
-// Consulta SQL inteligente: traz a OS e faz JOIN para buscar os nomes reais de Clientes e Equipamentos
 $sql = "SELECT os.id_os, os.data_entrada, os.status, 
                c.nome AS nome_cliente, 
                CONCAT(e.marca, ' ', e.modelo) AS equipamento
@@ -33,12 +34,12 @@ include '../includes/header.php';
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-dark">
                     <tr>
-                        <th style="width: 10%;">N° OS</th>
-                        <th style="width: 25%;">ID Cliente</th>
-                        <th style="width: 25%;">ID Equip.</th>
+                        <th class="ps-3" style="width: 10%;">N° OS</th>
+                        <th style="width: 25%;">Cliente</th>
+                        <th style="width: 25%;">Equipamento</th>
                         <th style="width: 15%;">Data de Entrada</th>
-                        <th style="width: 10%;">Status</th>
-                        <th style="width: 15%; text-align: center;">Ações</th>
+                        <th style="width: 15%;">Etapa Atual</th>
+                        <th style="width: 10%; text-align: center;" class="pe-3">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,18 +47,30 @@ include '../includes/header.php';
                     if ($result && mysqli_num_rows($result) > 0) {
                         while ($row = mysqli_fetch_assoc($result)) { 
                             
-                            // Define a cor da etiqueta de status dinamicamente baseada no seu ENUM
+                            // Traduz e colore o status ENUM que vem do banco de dados
                             $badgeColor = 'bg-secondary';
                             $statusTexto = $row['status'];
                             
-                            if ($row['status'] == 'EM_ANDAMENTO') {
+                            if ($statusTexto === 'EM_ANALISE') {
+                                $badgeColor = 'bg-info text-dark';
+                                $statusTexto = 'Em Análise';
+                            } elseif ($statusTexto === 'EM_REPARO') {
                                 $badgeColor = 'bg-warning text-dark';
-                                $statusTexto = 'Em Andamento';
+                                $statusTexto = 'Em Reparo';
+                            } elseif ($statusTexto === 'AGUARDANDO_PECA') {
+                                $badgeColor = 'bg-secondary';
+                                $statusTexto = 'Aguarda Peça';
+                            } elseif ($statusTexto === 'FINALIZADO') {
+                                $badgeColor = 'bg-success';
+                                $statusTexto = 'Finalizado';
+                            } elseif ($statusTexto === 'CANCELADO') {
+                                $badgeColor = 'bg-danger';
+                                $statusTexto = 'Cancelado';
                             }
                     ?>
                         <tr>
-                            <td class="fw-bold">#<?php echo $row['id_os']; ?></td>
-                            <td><?php echo htmlspecialchars($row['nome_cliente']); ?></td>
+                            <td class="ps-3 fw-bold text-muted">#<?php echo $row['id_os']; ?></td>
+                            <td class="fw-bold"><?php echo htmlspecialchars($row['nome_cliente']); ?></td>
                             <td><?php echo htmlspecialchars($row['equipamento']); ?></td>
                             <td><?php echo date('d/m/Y', strtotime($row['data_entrada'])); ?></td>
                             <td>
@@ -65,16 +78,10 @@ include '../includes/header.php';
                                     <?php echo $statusTexto; ?>
                                 </span>
                             </td>
-                            <td>
-                                <div class="d-flex justify-content-center gap-2">
-                                    <a href="visualizar.php?id=<?php echo $row['id_os']; ?>" class="btn btn-sm btn-outline-info">
-                                        Ver Detalhes
-                                    </a>
-                                    
-                                    <a href="../orcamentos/cadastrar.php?id=<?php echo $row['id_os']; ?>" class="btn btn-sm btn-outline-primary">
-                                        Editar
-                                    </a>
-                                </div>
+                            <td class="text-center pe-3">
+                                <a href="visualizar.php?id=<?php echo $row['id_os']; ?>" class="btn btn-sm btn-dark">
+                                    Visualizar
+                                </a>
                             </td>
                         </tr>
                     <?php 
@@ -82,7 +89,7 @@ include '../includes/header.php';
                     } else { 
                     ?>
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">Nenhuma Ordem de Serviço encontrada.</td>
+                            <td colspan="6" class="text-center text-muted py-4">Nenhuma Ordem de Serviço encontrada no sistema.</td>
                         </tr>
                     <?php } ?>
                 </tbody>

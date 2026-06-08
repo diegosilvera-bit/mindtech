@@ -2,10 +2,11 @@
 require_once __DIR__ . '/../includes/functions.php'; 
 require_once '../includes/auth.php'; 
 
-// Inclui a conexão com o banco de dados
+// TRAVA DE SEGURANÇA
+verificarAcesso(['G', 'A', 'T']);
+
 include '../config/conexao.php'; 
 
-// Pega o ID da OS vindo da URL (?id=X)
 $id_os = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($id_os <= 0) {
@@ -13,7 +14,6 @@ if ($id_os <= 0) {
     exit;
 }
 
-// Consulta robusta para trazer os dados da OS, do Cliente, do Equipamento e do Técnico Responsável
 $sql = "SELECT os.*, 
                c.nome AS nome_cliente, c.cpf, c.telefone, c.endereco,
                e.tipo AS eq_tipo, e.marca AS eq_marca, e.modelo AS eq_modelo, e.numero_serie,
@@ -27,11 +27,19 @@ $sql = "SELECT os.*,
 $result = mysqli_query($conn, $sql);
 $os = mysqli_fetch_assoc($result);
 
-// Se não encontrar a OS no banco, volta para a lista
 if (!$os) {
     header("Location: listar.php");
     exit;
 }
+
+// Formatação do status
+$statusDisplay = $os['status'];
+$badgeColor = 'bg-secondary';
+if ($statusDisplay === 'EM_ANALISE') { $statusDisplay = 'Em Análise'; $badgeColor = 'bg-info text-dark'; }
+if ($statusDisplay === 'EM_REPARO') { $statusDisplay = 'Em Reparo'; $badgeColor = 'bg-warning text-dark'; }
+if ($statusDisplay === 'AGUARDANDO_PECA') { $statusDisplay = 'Aguardando Peça'; }
+if ($statusDisplay === 'FINALIZADO') { $statusDisplay = 'Finalizado'; $badgeColor = 'bg-success'; }
+if ($statusDisplay === 'CANCELADO') { $statusDisplay = 'Cancelado'; $badgeColor = 'bg-danger'; }
 
 include '../includes/header.php'; 
 ?>
@@ -41,6 +49,7 @@ include '../includes/header.php';
         <h2><i class="bi bi-file-earmark-text"></i> Detalhes da Ordem de Serviço #<?php echo $os['id_os']; ?></h2>
         <div>
             <a href="listar.php" class="btn btn-secondary me-2">Voltar para Lista</a>
+            <a href="editar.php?id=<?php echo $os['id_os']; ?>" class="btn btn-outline-dark me-2">Alterar Etapa</a>
             <a href="../orcamentos/cadastrar.php?id=<?php echo $os['id_os']; ?>" class="btn btn-primary">Gerar/Ver Orçamento</a>
         </div>
     </div>
@@ -68,13 +77,13 @@ include '../includes/header.php';
         </div>
 
         <div class="col-md-6">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-dark text-white fw-bold">Acompanhamento Técnico</div>
+            <div class="card shadow-sm border-0 h-100 border-top border-4 border-warning">
+                <div class="card-header bg-white fw-bold text-dark">Acompanhamento Técnico</div>
                 <div class="card-body">
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label class="fw-bold text-muted d-block mb-1">Status Atual</label>
-                        <span class="badge bg-warning text-dark fs-6 px-3 py-2">
-                            <?php echo $os['status'] == 'EM_ANDAMENTO' ? 'Em Andamento' : $os['status']; ?>
+                        <span class="badge <?php echo $badgeColor; ?> fs-6 px-3 py-2">
+                            <?php echo $statusDisplay; ?>
                         </span>
                     </div>
 
@@ -92,7 +101,7 @@ include '../includes/header.php';
 
                     <div class="mb-0">
                         <label class="fw-bold text-muted d-block mb-1">Observações / Relato do Defeito</label>
-                        <div class="p-3 bg-light rounded border text-secondary" style="white-space: pre-wrap; min-height: 120px;"><?php echo htmlspecialchars($os['observacoes']); ?></div>
+                        <div class="p-3 bg-light rounded border text-secondary" style="white-space: pre-wrap; min-height: 100px;"><?php echo htmlspecialchars($os['observacoes']); ?></div>
                     </div>
                 </div>
             </div>
