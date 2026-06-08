@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $numero_serie = $_POST['numero_serie'];
     $observacoes = $_POST['observacoes'];
 
-    // Validação básica (Cliente e Tipo são obrigatórios)
+    // Validação básica (Cliente e Tipo são obrigatórios))))
     if ($id_cliente == '' || $tipo == '') {
         $mensagem = "Os campos ID do Cliente e Tipo são obrigatórios.";
     } else {

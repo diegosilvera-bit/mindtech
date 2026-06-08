@@ -5,160 +5,173 @@ require_once '../includes/auth.php';
 // Define o fuso horário correto para o Brasil (Brasília)
 date_default_timezone_set('America/Sao_Paulo');
 
+// Captura o perfil do utilizador logado para exibir apenas os links permitidos na barra lateral
+$perfil = $_SESSION['usuario']['perfil'] ?? '';
+
 include '../includes/header.php'; 
 ?>
 
 <style>
-    .card-hover {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    /* Estilos para o Menu Lateral */
+    .sidebar {
+        min-height: calc(100vh - 56px); /* Ocupa a altura da tela descontando o header se houver */
+        background-color: #1e1e24;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
     }
-    .card-hover:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    .sidebar .nav-link {
+        color: #b3b3b3;
+        padding: 12px 20px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        border-radius: 5px;
+        margin-bottom: 5px;
+    }
+    .sidebar .nav-link:hover {
+        color: #ffffff;
+        background-color: #2d2d35;
+    }
+    .sidebar .nav-link.active {
+        color: #ffffff;
+        background-color: #ecc245; /* Dourado do sistema */
+        color: #121212 !important;
+        font-weight: bold;
+    }
+
+    /* Área reservada para renderizar o Gráfico de Processo */
+    .area-grafico-processo {
+        min-height: 450px;
+        background-color: #fdfdfd;
+        border: 2px dashed #dee2e6;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 </style>
 
-<div class="container mt-4 mb-5">
-    
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800 fw-bold">Painel de Controle</h1>
-        <span class="text-muted"><i class="bi bi-calendar-event me-1"></i> <?= date('d/m/Y') ?></span>
-    </div>
-
-    <div class="alert alert-success border-0 shadow-sm border-start border-4 border-success mb-4" role="alert">
-        <i class="bi bi-person-check-fill me-2 fs-5"></i>
-        Bem-vindo(a) de volta, <strong><?= htmlspecialchars($_SESSION['usuario']['nome'] ?? 'Usuário') ?></strong>. O que vamos fazer hoje?
-    </div>
-
-    <div class="row g-4">
+<div class="container-fluid">
+    <div class="row">
         
-        <div class="col-md-4">
-            <a href="/mindtech/usuarios/listar.php" class="text-decoration-none">
-                <div class="card h-100 border-0 shadow-sm border-start border-4 border-primary card-hover">
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <div>
-                            <h5 class="mb-0 fw-bold text-dark">Usuários</h5>
-                            <small class="text-muted">Acessos do sistema</small>
-                        </div>
-                        <i class="bi bi-people-fill fs-1 text-primary opacity-50"></i>
-                    </div>
-                </div>
-            </a>
+        <div class="col-md-3 col-lg-2 px-0 sidebar d-none d-md-block p-3">
+            <div class="position-sticky pt-3">
+                <span class="text-muted px-3 text-uppercase px-3 small fw-bold d-block mb-3">Navegação</span>
+                <ul class="nav flex-column px-2">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/mindtech/dashboard/index.php">
+                            <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                        </a>
+                    </li>
+                    
+                    <?php if (in_array($perfil, ['G'])): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/mindtech/usuarios/listar.php">
+                            <i class="bi bi-people-fill me-2"></i> Usuários
+                        </a>
+                    </li>
+                    <?php endif; ?>
+
+                    <?php if (in_array($perfil, ['G', 'A'])): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/mindtech/clientes/listar.php">
+                            <i class="bi bi-person-vcard-fill me-2"></i> Clientes
+                        </a>
+                    </li>
+                    <?php endif; ?>
+
+                    <?php if (in_array($perfil, ['G', 'A', 'T'])): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/mindtech/equipamentos/listar.php">
+                            <i class="bi bi-pc-display me-2"></i> Equipamentos
+                        </a>
+                    </li>
+                    <?php endif; ?>
+
+                    <?php if (in_array($perfil, ['G', 'E', 'T'])): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/mindtech/fornecedores/listar.php">
+                            <i class="bi bi-truck me-2"></i> Fornecedores
+                        </a>
+                    </li>
+                    <?php endif; ?>
+
+                    <?php if (in_array($perfil, ['G', 'A', 'E', 'T'])): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/mindtech/pecas/listar.php">
+                            <i class="bi bi-cpu-fill me-2"></i> Peças
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/mindtech/estoque/listar.php">
+                            <i class="bi bi-boxes me-2"></i> Estoque
+                        </a>
+                    </li>
+                    <?php endif; ?>
+
+                    <?php if (in_array($perfil, ['G', 'A', 'T'])): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/mindtech/ordens_servico/listar.php">
+                            <i class="bi bi-tools me-2"></i> Ordens de Serviço
+                        </a>
+                    </li>
+                    <?php endif; ?>
+
+                    <?php if (in_array($perfil, ['G', 'A'])): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/mindtech/orcamentos/listar.php">
+                            <i class="bi bi-cash-coin me-2"></i> Orçamentos
+                        </a>
+                    </li>
+                    <?php endif; ?>
+
+                    <?php if (in_array($perfil, ['G'])): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/mindtech/relatorios/listar.php">
+                            <i class="bi bi-bar-chart-fill me-2"></i> Relatórios
+                        </a>
+                    </li>
+                    <?php endif; ?>
+                </ul>
+                
+                <hr class="text-secondary mx-3 my-4">
+                
+                <ul class="nav flex-column px-2">
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="/mindtech/logout.php">
+                            <i class="bi bi-box-arrow-right me-2"></i> Sair do Sistema
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
 
-        <div class="col-md-4">
-            <a href="/mindtech/clientes/listar.php" class="text-decoration-none">
-                <div class="card h-100 border-0 shadow-sm border-start border-4 border-success card-hover">
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <div>
-                            <h5 class="mb-0 fw-bold text-dark">Clientes</h5>
-                            <small class="text-muted">Carteira de clientes</small>
-                        </div>
-                        <i class="bi bi-person-vcard-fill fs-1 text-success opacity-50"></i>
-                    </div>
+        <div class="col-md-9 col-lg-10 ms-sm-auto px-md-4 py-4">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800 fw-bold">Painel de Controle</h1>
+                <span class="text-muted"><i class="bi bi-calendar-event me-1"></i> <?= date('d/m/Y') ?></span>
+            </div>
+
+            <div class="alert alert-success border-0 shadow-sm border-start border-4 border-success mb-4" role="alert">
+                <i class="bi bi-person-check-fill me-2 fs-5"></i>
+                Bem-vindo(a) de volta, <strong><?= htmlspecialchars($_SESSION['usuario']['nome'] ?? 'Usuário') ?></strong>.
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white fw-bold py-3">
+                    <i class="bi bi-diagram-3-fill me-2"></i> Gráfico de Processos e Fluxo de Trabalho
                 </div>
-            </a>
-        </div>
-
-        <div class="col-md-4">
-            <a href="/mindtech/equipamentos/listar.php" class="text-decoration-none">
-                <div class="card h-100 border-0 shadow-sm border-start border-4 border-info card-hover">
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <div>
-                            <h5 class="mb-0 fw-bold text-dark">Equipamentos</h5>
-                            <small class="text-muted">Aparelhos cadastrados</small>
+                <div class="card-body p-4">
+                    
+                    <div class="area-grafico-processo">
+                        <div class="text-center text-muted">
+                            <i class="bi bi-bar-chart-line fs-1 mb-2 d-block text-secondary"></i>
+                            <h5>Área Disponível para o Gráfico</h5>
+                            <p class="small text-secondary px-3">
+                                Insira aqui a sua tag &lt;canvas&gt; para Chart.js ou os elementos HTML/SVG do seu fluxo de processo.
+                            </p>
                         </div>
-                        <i class="bi bi-pc-display fs-1 text-info opacity-50"></i>
                     </div>
+                    
                 </div>
-            </a>
-        </div>
-
-        <div class="col-md-4">
-            <a href="/mindtech/fornecedores/listar.php" class="text-decoration-none">
-                <div class="card h-100 border-0 shadow-sm border-start border-4 border-warning card-hover">
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <div>
-                            <h5 class="mb-0 fw-bold text-dark">Fornecedores</h5>
-                            <small class="text-muted">Parceiros de negócios</small>
-                        </div>
-                        <i class="bi bi-truck fs-1 text-warning opacity-50"></i>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-md-4">
-            <a href="/mindtech/pecas/listar.php" class="text-decoration-none">
-                <div class="card h-100 border-0 shadow-sm border-start border-4 border-danger card-hover">
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <div>
-                            <h5 class="mb-0 fw-bold text-dark">Peças</h5>
-                            <small class="text-muted">Catálogo de componentes</small>
-                        </div>
-                        <i class="bi bi-cpu-fill fs-1 text-danger opacity-50"></i>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-md-4">
-            <a href="/mindtech/estoque/listar.php" class="text-decoration-none">
-                <div class="card h-100 border-0 shadow-sm border-start border-4 border-secondary card-hover">
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <div>
-                            <h5 class="mb-0 fw-bold text-dark">Estoque</h5>
-                            <small class="text-muted">Controle de inventário</small>
-                        </div>
-                        <i class="bi bi-boxes fs-1 text-secondary opacity-50"></i>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-md-4">
-            <a href="/mindtech/ordens_servico/listar.php" class="text-decoration-none">
-                <div class="card h-100 border-0 shadow-sm border-start border-4 border-dark card-hover">
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <div>
-                            <h5 class="mb-0 fw-bold text-dark">Ordens de Serviço</h5>
-                            <small class="text-muted">Gerenciar manutenções</small>
-                        </div>
-                        <i class="bi bi-tools fs-1 text-dark opacity-50"></i>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-md-4">
-            <a href="/mindtech/orcamentos/listar.php" class="text-decoration-none">
-                <div class="card h-100 border-0 shadow-sm border-start border-4 border-primary card-hover">
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <div>
-                            <h5 class="mb-0 fw-bold text-dark">Orçamentos</h5>
-                            <small class="text-muted">Valores e aprovações</small>
-                        </div>
-                        <i class="bi bi-cash-coin fs-1 text-primary opacity-50"></i>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-md-4">
-            <a href="/mindtech/relatorios/listar.php" class="text-decoration-none">
-                <div class="card h-100 border-0 shadow-sm border-start border-4 border-success card-hover">
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <div>
-                            <h5 class="mb-0 fw-bold text-dark">Relatórios</h5>
-                            <small class="text-muted">Métricas e finanças</small>
-                        </div>
-                        <i class="bi bi-bar-chart-fill fs-1 text-success opacity-50"></i>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-    </div>
-</div>
-
-<?php include '../includes/footer.php'; ?>
+            </div>
+            </div> </div> </div> <?php include '../includes/footer.php'; ?>
