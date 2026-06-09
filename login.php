@@ -23,45 +23,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Login - MindTech</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
-
-/* Remove o brancão de fundo e centraliza a caixa de login na tela verticalmente */
 body {
     background-color: #121212 !important;
     color: #ffffff !important;
     height: 100vh;
     display: flex;
     align-items: center;
-    justify-content: center;
 }
 
-/* Força o container a não sumir com o flex do body */
-.container {
-    margin-top: 0 !important;
-}
-
-/* Transforma o quadrado branco em um bloco escuro premium */
+/* Caixa de Login */
 .card {
     background-color: #1e1e1e !important;
     border: 1px solid #2d2d2d !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
 }
 
-/* Título MindTech brilhando em Dourado */
-h3 {
-    color: #ecc245 !important;
-    font-weight: bold !important;
-}
-
-/* Caixas de input para Usuário e Senha escuras */
+/* Campos de digitação escuros */
 .form-control {
-    background-color: #262626 !important;
+    background-color: #252525 !important;
+    border: 1px solid #3d3d3d !important;
     color: #ffffff !important;
-    border: 1px solid #2d2d2d !important;
+    padding: 12px !important;
 }
 
-/* Efeito de foco ao clicar para digitar */
+.form-control::placeholder {
+    color: #757575 !important;
+}
+
 .form-control:focus {
     background-color: #2d2d2d !important;
     color: #ffffff !important;
@@ -69,7 +61,7 @@ h3 {
     box-shadow: 0 0 0 0.25rem rgba(236, 194, 69, 0.2) !important;
 }
 
-/* Botão "Entrar" Dourado com texto escuro de alta leitura */
+/* Botão "Entrar" Dourado */
 .btn-primary {
     background-color: #ecc245 !important;
     border-color: #ecc245 !important;
@@ -77,6 +69,8 @@ h3 {
     font-weight: bold !important;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    padding: 12px !important;
+    transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
@@ -85,7 +79,6 @@ h3 {
     color: #121212 !important;
 }
 
-/* Texto de ajuda "admin / admin" em cinza discreto */
 .text-muted {
     color: #b3b3b3 !important;
     text-align: center;
@@ -94,17 +87,43 @@ h3 {
 </head>
 <body>
 <div class="container">
-<div class="row justify-content-center">
-<div class="col-md-4">
-<div class="card shadow">
-<div class="card-body">
-<h3 class="text-center mb-4">MindTech</h3>
-<?php if ($erro): ?><div class="alert alert-danger"><?= $erro ?></div><?php endif; ?>
-<form method="post">
-<input class="form-control mb-3" name="login" placeholder="Login" required>
-<input class="form-control mb-3" type="password" name="senha" placeholder="Senha" required>
-<button class="btn btn-primary w-100">Entrar</button>
-</form>
-<p class="small text-muted mt-3">admin / admin</p>
-</div></div></div></div></div>
-</body></html>
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            
+            <div class="text-center mb-4">
+                <img src="assets/img/logo.png" alt="Mindtech" class="img-fluid" style="max-width: 220px; filter: drop-shadow(0px 4px 15px rgba(236, 194, 69, 0.15));">
+            </div>
+
+            <div class="card p-4">
+                <h4 class="text-center fw-bold mb-4 text-uppercase tracking-wide" style="color: #ecc245; font-size: 1.1rem;">Acesso ao Sistema</h4>
+                
+                <?php if ($erro): ?>
+                    <div class="alert alert-danger border-0 bg-danger bg-opacity-20 text-danger text-center py-2 small mb-3 rounded">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i><?= $erro ?>
+                    </div>
+                <?php endif; ?>
+
+                <form method="POST" action="">
+                    <div class="mb-3">
+                        <label for="login" class="form-label small fw-bold text-muted">Usuário / Login</label>
+                        <input type="text" class="form-control" id="login" name="login" placeholder="Digite seu usuário" required autocomplete="off">
+                    </div>
+                    <div class="mb-4">
+                        <label for="senha" class="form-label small fw-bold text-muted">Senha </label>
+                        <input type="password" class="form-control" id="senha" name="senha" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 rounded-3">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Entrar no Sistema
+                    </button>
+                </form>
+                
+                <div class="mt-4 pt-2 border-top border-secondary border-opacity-20">
+                    <p class="text-muted small mb-0">Mindtech &copy; <?= date('Y') ?> — Todos os direitos reservados.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

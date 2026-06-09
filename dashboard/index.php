@@ -101,7 +101,6 @@ include '../includes/header.php';
         
         <div class="col-md-3 col-lg-2 px-0 sidebar d-none d-md-block p-3">
             <div class="position-sticky pt-3">
-                <span class="text-muted px-3 text-uppercase small fw-bold d-block mb-3">Navegação</span>
                 <ul class="nav flex-column px-2">
                     <li class="nav-item"><a class="nav-link active" href="/mindtech/dashboard/index.php"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
                     <?php if (in_array($perfil, ['G'])): ?>
