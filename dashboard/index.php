@@ -7,9 +7,8 @@ require_once '../config/conexao.php';
 date_default_timezone_set('America/Sao_Paulo');
 $perfil = $_SESSION['usuario']['perfil'] ?? '';
 
-// =========================================================================
 // LÓGICA DO GRÁFICO: Contar O.S. por Status
-// =========================================================================
+
 $contagem = [
     'analise' => 0,
     'reparo' => 0,
@@ -36,9 +35,9 @@ if ($resultado_status && mysqli_num_rows($resultado_status) > 0) {
     }
 }
 
-// =========================================================================
+
 // BUSCA DA TABELA DE ALERTA: O.S. com status 'AGUARDANDO_PECA'
-// =========================================================================
+
 $sql_aguardando_peca = "SELECT os.id_os, os.data_entrada, 
                                c.nome AS nome_cliente, 
                                CONCAT(e.marca, ' ', e.modelo) AS equipamento
@@ -140,8 +139,7 @@ include '../includes/header.php';
             
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="h3 mb-0 text-gray-800 fw-bold">Painel de Controle</h1>
-                <span class="text-muted"><i class="bi bi-calendar-event me-1"></i> <?= date('d/m/Y') ?></span>
-            </div>
+                <span class="text-white-50"><i class="bi bi-calendar-event me-1"></i> <?= date('d/m/Y') ?></span>            </div>
 
             <div class="card shadow-sm border-0 border-top border-4 border-warning mb-4">
                 <div class="card-header bg-white fw-bold py-3">

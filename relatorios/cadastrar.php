@@ -4,60 +4,77 @@ require_once '../includes/auth.php';
 
 // Se o utilizador clicar em "Gerar Relatório"
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $tipo_relatorio = $_POST['tipo_relatorio'];
-    $data_inicio = $_POST['data_inicio'];
-    $data_fim = $_POST['data_fim'];
+    $tipo_relatorio = $_POST['tipo_relatorio'] ?? '';
+    $data_inicio = $_POST['data_inicio'] ?? '';
+    $data_fim = $_POST['data_fim'] ?? '';
 
-    // Redireciona para a página listar.php passando as datas escolhidas pela URL
-    header("Location: listar.php?tipo=$tipo_relatorio&inicio=$data_inicio&fim=$data_fim");
-    exit;
+    if (!empty($tipo_relatorio)) {
+        // Redireciona para a página listar.php passando as datas escolhidas pela URL
+        header("Location: listar.php?tipo=$tipo_relatorio&inicio=$data_inicio&fim=$data_fim");
+        exit;
+    }
 }
 
 include '../includes/header.php'; 
 ?>
 
 <div class="container mt-4 mb-5">
+    
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Gerar Relatório</h1>
-        <a href="../dashboard/index.php" class="btn btn-secondary me-2">Voltar ao Dashboard</a>
+        <div>
+            <h1 class="h3 mb-1 text-gray-800 fw-bold">
+                <i class="bi bi-file-earmark-bar-graph-fill text-success me-2"></i>Relatórios Gerenciais
+            </h1>
+        </div>
+        <a href="../dashboard/index.php" class="btn btn-sm btn-outline-secondary fw-bold px-3">
+            <i class="bi bi-arrow-left me-1"></i> Painel Principal
+        </a>
     </div>
 
     <div class="card shadow-sm border-0 border-start border-4 border-success">
         <div class="card-body p-4">
-            <p class="text-muted mb-4">Escolha os filtros abaixo para gerar um relatório atualizado do sistema.</p>
             
-            <form method="post" action="">
+            <form method="post" action="cadastrar.php">
                 
-                <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label fw-bold">Tipo de Relatório *</label>
-                        <select class="form-select" name="tipo_relatorio" required>
-                            <option value="">Selecione...</option>
-                            <option value="faturamento">Faturamento (Receitas)</option>
-                            <option value="ordens_servico">Ordens de Serviço por Período</option>
-                            <option value="pecas_baixo_estoque">Peças com Baixo Estoque</option>
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold text-dark">
+                            <i class="bi bi-layers-half me-1 text-muted"></i> 1. O que deseja analisar? 
+                        </label>
+                        <select class="form-select form-select-lg fw-bold text-secondary" name="tipo_relatorio" required style="border-radius: 8px;">
+                            <option value="" disabled selected>Escolha uma opção de relatório...</option>
+                            <option value="faturamento">💰 Faturamento (Receitas e Lucros)</option>
+                            <option value="ordens_servico">📋 Ordens de Serviço por Período</option>
+                            <option value="pecas_baixo_estoque">⚠️ Peças com Baixo Estoque (Alerta)</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Data Inicial</label>
-                        <input type="date" class="form-control" name="data_inicio">
+                <div class="row p-3 bg-light rounded-3 mb-4 mx-0 border">
+                    <div class="col-12 mb-2 px-0">
+                        <label class="form-label fw-bold text-dark mb-0">
+                            <i class="bi bi-calendar3 me-1 text-muted"></i> 2. Defina o intervalo de tempo (Opcional)
+                        </label>
+                        <small class="text-muted d-block mb-2">Se deixar em branco, o sistema mostrará o histórico completo.</small>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3 mb-md-0 px-md-2 px-0">
+                        <label class="form-label small fw-bold text-secondary">Data Inicial</label>
+                        <input type="date" class="form-control form-control-lg" name="data_inicio" style="border-radius: 8px;">
                     </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Data Final</label>
-                        <input type="date" class="form-control" name="data_fim">
+                    <div class="col-md-6 px-md-2 px-0">
+                        <label class="form-label small fw-bold text-secondary">Data Final</label>
+                        <input type="date" class="form-control form-control-lg" name="data_fim" style="border-radius: 8px;">
                     </div>
                 </div>
 
-                <hr class="mt-4">
+                <hr class="my-4 text-muted opacity-20">
                 
                 <div class="d-flex justify-content-end gap-2">
-                    <a href="../dashboard/index.php" class="btn btn-light border">Cancelar</a>
-                    <button class="btn btn-success" type="submit">
-                        <i class="bi bi-file-earmark-bar-graph me-1"></i> Gerar Relatório
+                    <a href="../dashboard/index.php" class="btn btn-lg btn-light border fw-bold px-4" style="font-size: 0.95rem;">Cancelar</a>
+                    <button class="btn btn-lg btn-success fw-bold px-5 shadow-sm" type="submit" style="font-size: 0.95rem;">
+                        <i class="bi bi-printer me-2"></i> Gerar Relatório
                     </button>
                 </div>
 

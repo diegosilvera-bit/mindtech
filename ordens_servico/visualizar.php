@@ -49,7 +49,7 @@ include '../includes/header.php';
         <h2><i class="bi bi-file-earmark-text"></i> Detalhes da Ordem de Serviço #<?php echo $os['id_os']; ?></h2>
         <div>
             <a href="listar.php" class="btn btn-secondary me-2">Voltar para Lista</a>
-            <a href="editar.php?id=<?php echo $os['id_os']; ?>" class="btn btn-outline-dark me-2">Alterar Etapa</a>
+            <a href="editar.php?id=<?php echo $os['id_os']; ?>" class="btn btn-secondary me-2">Alterar Etapa</a>
             <a href="../orcamentos/cadastrar.php?id=<?php echo $os['id_os']; ?>" class="btn btn-primary">Gerar/Ver Orçamento</a>
         </div>
     </div>
