@@ -9,18 +9,22 @@ $fornecedores = [];
 $erro = '';
 
 // =========================================================================
-// BUSCA REAL NA BASE DE DADOS (Usando MySQLi)
+// BUSCA REAL COM CONTAGEM DE PEÇAS (Une fornecedores às suas peças vinculadas)
 // =========================================================================
-$sql = "SELECT id_fornecedor, nome, cnpj, email, telefone FROM fornecedores ORDER BY nome ASC";
+$sql = "SELECT f.id_fornecedor, f.nome, f.cnpj, f.email, f.telefone, 
+               COUNT(p.id_peca) AS total_pecas
+        FROM fornecedores f
+        LEFT JOIN pecas p ON f.id_fornecedor = p.id_fornecedor
+        GROUP BY f.id_fornecedor
+        ORDER BY f.nome ASC";
+
 $result = mysqli_query($conn, $sql);
 
 if ($result) {
-    // Transforma o resultado num array para podermos listar no HTML
     while ($row = mysqli_fetch_assoc($result)) {
         $fornecedores[] = $row;
     }
 } else {
-    // Se der erro no SQL, captura a mensagem
     $erro = "Erro ao carregar dados da base de dados: " . mysqli_error($conn);
 }
 
@@ -30,57 +34,64 @@ mysqli_close($conn);
 include '../includes/header.php'; 
 ?>
 
-<div class="container mt-4">
+<div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Fornecedores</h1>
+        <h1 class="fw-bold">Fornecedores Homologados</h1>
         <div>
             <a href="../dashboard/index.php" class="btn btn-secondary me-2">Voltar ao Dashboard</a>
-            
             <a href="cadastrar.php" class="btn btn-success">+ Novo Fornecedor</a>
         </div>
     </div>
 
     <?php if (!empty($erro)): ?>
-        <div class="alert alert-danger shadow-sm">
-            <i class="bi bi-exclamation-triangle"></i> <?= $erro ?>
-        </div>
+        <div class="alert alert-danger fw-bold shadow-sm"><?= $erro ?></div>
     <?php endif; ?>
 
-    <div class="card shadow-sm border-0">
+    <div class="card shadow-sm border-0 border-start border-4 border-success">
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-dark">
                         <tr>
-                            <th class="ps-4">ID</th>
-                            <th>Nome / CNPJ</th>
-                            <th>Contatos</th>
-                            <th class="text-center pe-4">Ações</th>
+                            <th class="ps-4" style="width: 40%;">Empresa / Fornecedor</th>
+                            <th style="width: 35%;">Contato Comercial</th>
+                            <th class="text-center pe-4" style="width: 25%;">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (empty($fornecedores) && empty($erro)): ?>
+                        <?php if (empty($fornecedores)): ?>
                             <tr>
-                                <td colspan="4" class="text-center py-4 text-muted">
-                                    Nenhum fornecedor cadastrado na base de dados ainda.
+                                <td colspan="3" class="text-center py-4 text-muted">
+                                    Nenhum fornecedor cadastrado no sistema.
                                 </td>
                             </tr>
                         <?php else: ?>
                             <?php foreach ($fornecedores as $f): ?>
                                 <tr>
-                                    <td class="ps-4 fw-bold text-muted">#<?= $f['id_fornecedor'] ?></td>
-                                    <td>
-                                        <div class="fw-bold"><?= htmlspecialchars($f['nome']) ?></div>
-                                        <div class="text-muted" style="font-size: 0.85em;">CNPJ: <?= htmlspecialchars($f['cnpj'] ?? 'Não informado') ?></div>
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-dark fs-5"><?= htmlspecialchars($f['nome']) ?></div>
+                                        <div class="d-flex gap-2 mt-1 align-items-center">
+                                            <span class="text-muted small">CNPJ: <?= htmlspecialchars($f['cnpj'] ?? 'Não informado') ?></span>
+                                            
+                                            <?php if ($f['total_pecas'] > 0): ?>
+                                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-2">
+                                                    <?= $f['total_pecas'] ?> <?= $f['total_pecas'] == 1 ? 'peça vinculada' : 'peças no estoque' ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="badge bg-light text-muted border rounded-pill px-2">
+                                                    Nenhuma peça vinculada
+                                                </span>
+                                            <?php endif; ?>
+                                        </div>
                                     </td>
                                     <td>
-                                        <div><?= htmlspecialchars($f['telefone'] ?? 'Sem telefone') ?></div>
-                                        <div class="text-muted" style="font-size: 0.85em;"><?= htmlspecialchars($f['email'] ?? 'Sem e-mail') ?></div>
+                                        <div class="fw-semibold text-secondary"><?= htmlspecialchars($f['telefone'] ?? 'Sem telefone') ?></div>
+                                        <div class="text-muted small"><?= htmlspecialchars($f['email'] ?? 'Sem e-mail') ?></div>
                                     </td>
                                     <td class="text-center pe-4">
-                                        <div class="btn-group">
-                                            <a href="editar.php?id=<?= $f['id_fornecedor'] ?>" class="btn btn-sm btn-outline-secondary">Editar</a>
-                                            <a href="deletar.php?id=<?= $f['id_fornecedor'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Tem certeza que deseja excluir?');">Excluir</a>
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <a href="editar.php?id=<?= $f['id_fornecedor'] ?>" class="btn btn-sm btn-outline-secondary px-3">Editar</a>
+                                            <a href="deletar.php?id=<?= $f['id_fornecedor'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Tem certeza que deseja excluir este fornecedor?');">Excluir</a>
                                         </div>
                                     </td>
                                 </tr>

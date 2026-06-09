@@ -1,7 +1,7 @@
 <?php 
 require_once __DIR__ . '/../includes/functions.php'; 
 require_once '../includes/auth.php'; 
-require_once '../config/conexao.php'; // Adicionado para puxar os dados do banco
+require_once '../config/conexao.php'; 
 
 // Define o fuso horário correto
 date_default_timezone_set('America/Sao_Paulo');
@@ -13,10 +13,10 @@ $perfil = $_SESSION['usuario']['perfil'] ?? '';
 $contagem = [
     'analise' => 0,
     'reparo' => 0,
-    'finalizado' => 0
+    'finalizado' => 0,
+    'aguardando' => 0
 ];
 
-// Busca no banco as contagens agrupadas por status
 $sql_status = "SELECT status, COUNT(*) as total FROM ordens_servico GROUP BY status";
 $resultado_status = mysqli_query($conn, $sql_status);
 
@@ -24,16 +24,31 @@ if ($resultado_status && mysqli_num_rows($resultado_status) > 0) {
     while ($row = mysqli_fetch_assoc($resultado_status)) {
         $status = strtolower(trim($row['status']));
         
-        // Mapeia o status do banco para as nossas variáveis (ajuste se no seu banco estiver escrito diferente)
         if (strpos($status, 'análise') !== false || strpos($status, 'analise') !== false || strpos($status, 'aberto') !== false) {
             $contagem['analise'] += $row['total'];
         } elseif (strpos($status, 'reparo') !== false || strpos($status, 'andamento') !== false) {
             $contagem['reparo'] += $row['total'];
         } elseif (strpos($status, 'finalizado') !== false || strpos($status, 'concluído') !== false || strpos($status, 'concluido') !== false) {
             $contagem['finalizado'] += $row['total'];
+        } elseif (strpos($status, 'aguardando') !== false || strpos($status, 'peca') !== false || strpos($status, 'peça') !== false) {
+            $contagem['aguardando'] += $row['total'];
         }
     }
 }
+
+// =========================================================================
+// BUSCA DA TABELA DE ALERTA: O.S. com status 'AGUARDANDO_PECA'
+// =========================================================================
+$sql_aguardando_peca = "SELECT os.id_os, os.data_entrada, 
+                               c.nome AS nome_cliente, 
+                               CONCAT(e.marca, ' ', e.modelo) AS equipamento
+                        FROM ordens_servico os
+                        INNER JOIN clientes c ON os.id_cliente = c.id_cliente
+                        INNER JOIN equipamentos e ON os.id_equipamento = e.id_equipamento
+                        WHERE os.status = 'AGUARDANDO_PECA' 
+                        ORDER BY os.id_os ASC"; 
+
+$res_aguardando = mysqli_query($conn, $sql_aguardando_peca);
 
 include '../includes/header.php'; 
 ?>
@@ -67,7 +82,6 @@ include '../includes/header.php';
     }
     .etapa-fluxo:hover {
         transform: translateY(-5px);
-        border-color: #ecc245;
         box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
     .seta-fluxo {
@@ -130,7 +144,7 @@ include '../includes/header.php';
                 <span class="text-muted"><i class="bi bi-calendar-event me-1"></i> <?= date('d/m/Y') ?></span>
             </div>
 
-            <div class="card shadow-sm border-0 border-top border-4 border-warning">
+            <div class="card shadow-sm border-0 border-top border-4 border-warning mb-4">
                 <div class="card-header bg-white fw-bold py-3">
                     <i class="bi bi-diagram-3-fill text-warning me-2"></i> Fluxo de Ordens de Serviço
                 </div>
@@ -139,7 +153,6 @@ include '../includes/header.php';
                     <p class="text-muted mb-4">Acompanhamento em tempo real do status das manutenções na assistência técnica.</p>
 
                     <div class="fluxo-container">
-                        
                         <div class="etapa-fluxo border-primary bg-primary bg-opacity-10">
                             <i class="bi bi-search fs-3 text-primary"></i>
                             <div class="numero-destaque text-primary"><?= $contagem['analise'] ?></div>
@@ -164,7 +177,62 @@ include '../includes/header.php';
                             <h6 class="fw-bold mb-0 text-success">Finalizado</h6>
                             <small class="text-muted">Pronto para entrega</small>
                         </div>
+                    </div>
+                </div>
+            </div>
 
+            <div class="card shadow-sm border-0 border-start border-4 border-danger mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-0">
+                    <h5 class="fw-bold text-danger mb-0">
+                        <i class="bi bi-hourglass-split me-2"></i>Ordens de Serviço — Aguardando Peças
+                    </h5>
+                    <span class="badge bg-danger fs-6 rounded-pill">
+                        <?= mysqli_num_rows($res_aguardando) ?> Pendente(s)
+                    </span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4" style="width: 12%;">Nº O.S.</th>
+                                    <th style="width: 28%;">Cliente</th>
+                                    <th style="width: 35%;">Equipamento</th>
+                                    <th style="width: 13%;">Aguardando Desde</th>
+                                    <th class="text-center pe-4" style="width: 12%;">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                if ($res_aguardando && mysqli_num_rows($res_aguardando) > 0) {
+                                    while ($os = mysqli_fetch_assoc($res_aguardando)) { 
+                                        $data_formatada = date('d/m/Y', strtotime($os['data_entrada']));
+                                ?>
+                                    <tr>
+                                        <td class="ps-4 fw-bold text-danger fs-5">#<?= $os['id_os'] ?></td>
+                                        <td class="fw-bold text-dark"><?= htmlspecialchars($os['nome_cliente']) ?></td>
+                                        <td class="text-muted"><?= htmlspecialchars($os['equipamento']) ?></td>
+                                        <td><?= $data_formatada ?></td>
+                                        <td class="text-center pe-4">
+                                            <a href="../ordens_servico/visualizar.php?id=<?= $os['id_os'] ?>" class="btn btn-sm btn-danger fw-bold">
+                                                Ver O.S.
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php 
+                                    }
+                                } else { 
+                                ?>
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4 text-muted">
+                                            <span class="text-success fw-bold">
+                                                <i class="bi bi-check-circle-fill me-2"></i>Excelente! Nenhuma Ordem de Serviço está retida por falta de peças.
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

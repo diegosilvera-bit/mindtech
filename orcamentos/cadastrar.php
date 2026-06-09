@@ -1,133 +1,118 @@
 <?php 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/../includes/functions.php'; 
 require_once '../includes/auth.php'; 
 
-// Inclui a conexão com o banco de dados
+// TRAVA DE SEGURANÇA
+verificarAcesso(['G', 'A']);
+
 include '../config/conexao.php'; 
+
+// SISTEMA ANTI-DUPLICAÇÃO: Se clicar no botão de gerar orçamento lá dentro da O.S., ele verifica se já existe.
+$id_os_url = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+if ($id_os_url > 0) {
+    $check = mysqli_query($conn, "SELECT id_orcamento FROM orcamentos WHERE id_os = $id_os_url");
+    if (mysqli_num_rows($check) > 0) {
+        $orc = mysqli_fetch_assoc($check);
+        // Se já existe, manda direto para a página de edição desse orçamento
+        header("Location: editar.php?id=" . $orc['id_orcamento']);
+        exit;
+    }
+}
 
 $mensagem = ''; 
 
-// SE O FORMULÁRIO FOR ENVIADO
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     $id_os = (int)$_POST['id_os'];
-    $usuario_responsavel = $_POST['usuario_responsavel'] != '' ? (int)$_POST['usuario_responsavel'] : 'NULL';
-    $valor_mao_obra = (float)$_POST['valor_mao_obra'];
-    $valor_pecas = (float)$_POST['valor_pecas'];
+    // Tratamento seguro para os valores financeiros
+    $valor_mao_obra = empty($_POST['valor_mao_obra']) ? 0 : (float)$_POST['valor_mao_obra'];
+    $valor_pecas = empty($_POST['valor_pecas']) ? 0 : (float)$_POST['valor_pecas'];
     
-    // Calcula o valor total automaticamente
+    // Calcula o total pelo PHP para segurança
     $valor_total = $valor_mao_obra + $valor_pecas;
 
     if ($id_os <= 0) {
-        $mensagem = "Erro: É necessário selecionar uma Ordem de Serviço válida.";
+        $mensagem = "Selecione uma Ordem de Serviço válida.";
     } else {
+        $sql = "INSERT INTO orcamentos (id_os, valor_mao_obra, valor_pecas, valor_total, aprovado) 
+                VALUES ($id_os, $valor_mao_obra, $valor_pecas, $valor_total, 0)";
         
-        // Comando para inserir o orçamento
-        $sql = "INSERT INTO orcamentos (id_os, usuario_responsavel, valor_mao_obra, valor_pecas, valor_total, aprovado) 
-                VALUES ($id_os, $usuario_responsavel, $valor_mao_obra, $valor_pecas, $valor_total, 0)";
-        
-        // Usamos um bloco try/catch para capturar o erro do MySQL de forma elegante
-        try {
-            if (mysqli_query($conn, $sql)) {
-                $mensagem = "Orçamento cadastrado com sucesso! Valor Total: R$ " . number_format($valor_total, 2, ',', '.');
-            }
-        } catch (mysqli_sql_exception $e) {
-            // Se o código do erro for 1062 (Duplicate entry), exibimos uma mensagem amigável
-            if ($e->getCode() == 1062 || mysqli_errno($conn) == 1062) {
-                $mensagem = "Aviso: Esta Ordem de Serviço já possui um orçamento cadastrado.";
-            } else {
-                $mensagem = "Erro ao cadastrar orçamento: " . $e->getMessage();
-            }
+        if (mysqli_query($conn, $sql)) {
+            $mensagem = "Orçamento gerado com sucesso! Aguardando aprovação do cliente.";
+        } else {
+            $mensagem = "Erro ao gerar orçamento: " . mysqli_error($conn);
         }
     }
 }
 
-// BUSCA APENAS AS ORDENS DE SERVIÇO QUE NÃO TÊM ORÇAMENTO AINDA (Usando LEFT JOIN + IS NULL)
-$sql_os = "SELECT os.id_os, c.nome AS nome_cliente, e.modelo 
-           FROM ordens_servico os
-           JOIN clientes c ON os.id_cliente = c.id_cliente
-           JOIN equipamentos e ON os.id_equipamento = e.id_equipamento
-           LEFT JOIN orcamentos o ON os.id_os = o.id_os
-           WHERE o.id_os IS NULL
-           ORDER BY os.id_os DESC";
-$result_os = mysqli_query($conn, $sql_os);
-
-// BUSCA OS USUÁRIOS (TÉCNICOS E GERENTES) PARA VINCULAR
-$sql_usuarios = "SELECT id_usuario, nome FROM usuarios WHERE perfil IN ('T', 'G') ORDER BY nome ASC";
-$result_usuarios = mysqli_query($conn, $sql_usuarios);
+// BUSCA APENAS AS O.S. QUE AINDA NÃO TÊM ORÇAMENTO GERADO E NÃO ESTÃO CANCELADAS
+$sql_pendentes = "SELECT os.id_os, c.nome, e.modelo
+                  FROM ordens_servico os
+                  JOIN clientes c ON os.id_cliente = c.id_cliente
+                  JOIN equipamentos e ON os.id_equipamento = e.id_equipamento
+                  LEFT JOIN orcamentos o ON os.id_os = o.id_os
+                  WHERE o.id_orcamento IS NULL AND os.status != 'CANCELADO'
+                  ORDER BY os.id_os ASC";
+$res_pendentes = mysqli_query($conn, $sql_pendentes);
 
 include '../includes/header.php'; 
 ?>
 
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Cadastrar Novo Orçamento</h1>
-        <a href="listar.php" class="btn btn-secondary me-2">Voltar para a Lista</a>
+        <h1 class="fw-bold">Gerar Novo Orçamento</h1>
+        <a href="listar.php" class="btn btn-secondary">Voltar para Lista</a>
     </div>
 
     <?php if ($mensagem != '') { ?>
-        <div class="alert alert-info shadow-sm">
-            <?php echo $mensagem; ?>
-        </div>
+        <div class="alert alert-info shadow-sm fw-bold"><?php echo $mensagem; ?></div>
     <?php } ?>
 
-    <div class="card shadow-sm border-0 border-start border-4 border-primary">
+    <div class="card shadow-sm border-0 border-start border-4 border-warning">
         <div class="card-body p-4">
-            <form method="post" action="">
+            <form method="post" action="cadastrar.php">
                 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Selecione a Ordem de Serviço *</label>
-                        <select class="form-select" name="id_os" required>
-                            <option value="">-- Escolha a OS do Cliente --</option>
-                            <?php 
-                            if ($result_os && mysqli_num_rows($result_os) > 0) {
-                                while ($os = mysqli_fetch_assoc($result_os)) {
-                                    echo "<option value='{$os['id_os']}'>OS #{$os['id_os']} - {$os['nome_cliente']} ({$os['modelo']})</option>";
-                                }
-                            } else {
-                                echo "<option value=''>Nenhuma OS pendente de orçamento disponível</option>";
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Selecione a Ordem de Serviço *</label>
+                    <select class="form-select form-select-lg" name="id_os" required>
+                        <option value="">-- O.S. pendentes de orçamento --</option>
+                        <?php 
+                        if ($res_pendentes && mysqli_num_rows($res_pendentes) > 0) {
+                            while($p = mysqli_fetch_assoc($res_pendentes)) {
+                                $selected = ($id_os_url == $p['id_os']) ? 'selected' : '';
+                                echo "<option value='{$p['id_os']}' $selected>O.S. #{$p['id_os']} — Cliente: {$p['nome']} ({$p['modelo']})</option>";
                             }
-                            ?>
-                        </select>
+                        } else {
+                            echo "<option value='' disabled>Nenhuma O.S. aguardando orçamento no momento.</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+
+                <div class="row bg-light p-3 rounded border mb-4">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-bold">Mão de Obra (R$)</label>
+                        <input type="number" step="0.01" class="form-control" name="valor_mao_obra" id="valor_mao_obra" value="0.00" oninput="calcularTotal()">
                     </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Usuário Responsável *</label>
-                        <select class="form-select" name="usuario_responsavel" required>
-                            <option value="">-- Selecione o Técnico/Gerente --</option>
-                            <?php 
-                            if ($result_usuarios && mysqli_num_rows($result_usuarios) > 0) {
-                                while ($user = mysqli_fetch_assoc($result_usuarios)) {
-                                    echo "<option value='{$user['id_usuario']}'>{$user['nome']}</option>";
-                                }
-                            }
-                            ?>
-                        </select>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-bold">Valor das Peças (R$)</label>
+                        <input type="number" step="0.01" class="form-control" name="valor_pecas" id="valor_pecas" value="0.00" oninput="calcularTotal()">
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-bold text-success">Valor Total a Cobrar (R$)</label>
+                        <input type="text" class="form-control fw-bold text-success fs-5" id="valor_total_visual" value="R$ 0,00" readonly>
                     </div>
                 </div>
 
-                <div class="row mt-2">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-bold">Valor da Mão de Obra (R$) *</label>
-                        <input type="number" step="0.01" class="form-control" name="valor_mao_obra" id="valor_mao_obra" value="0.00" required oninput="calcularTotal()">
-                    </div>
-
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-bold">Valor das Peças (R$) *</label>
-                        <input type="number" step="0.01" class="form-control" name="valor_pecas" id="valor_pecas" value="0.00" required oninput="calcularTotal()">
-                    </div>
-
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-bold text-primary">Valor Total Estimado (R$)</label>
-                        <input type="text" class="form-control fw-bold bg-light text-primary" id="valor_total_visual" value="0,00" readonly>
-                    </div>
-                </div>
-
-                <hr class="mt-4">
                 <div class="d-flex justify-content-end gap-2">
                     <a href="listar.php" class="btn btn-light border">Cancelar</a>
-                    <button class="btn btn-primary" type="submit">Salvar Orçamento</button>
+                    <button class="btn btn-warning text-dark fw-bold" type="submit">Gravar Orçamento</button>
                 </div>
 
             </form>
@@ -140,8 +125,7 @@ function calcularTotal() {
     var maoObra = parseFloat(document.getElementById('valor_mao_obra').value) || 0;
     var pecas = parseFloat(document.getElementById('valor_pecas').value) || 0;
     var total = maoObra + pecas;
-    
-    document.getElementById('valor_total_visual').value = total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('valor_total_visual').value = total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
 }
 </script>
 
