@@ -1,57 +1,41 @@
 <?php 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/../includes/functions.php'; 
 require_once '../includes/auth.php'; 
+
+// SEGURANÇA MÁXIMA: Bloqueia acesso direto à página caso não seja gerente
+verificarAcesso(['G']);
 
 // Inclui a conexão com o banco de dados
 include '../config/conexao.php'; 
 
-// --- BLOQUEIO DE SEGURANÇA CONTRA INVASÃO DE LINK ---
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-if (!isset($_SESSION['usuario']['perfil']) || $_SESSION['usuario']['perfil'] !== 'G') {
-    echo "<script>
-            alert('Acesso negado! Apenas Gerentes podem cadastrar novos funcionários.'); 
-            window.location.href = 'listar.php';
-          </script>";
-    exit();
-}
-// -----------------------------------------------------
-
 $mensagem = ''; 
-// ... Resto do teu código original do cadastrar.php continua igual daqui para baixo
+$tipo_alerta = '';
 
-// Verifica se o formulário foi enviado
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
-    // Pega os dados do formulário de forma simples
-    $nome = $_POST['nome'];
-    $login = $_POST['login'];
-    $senha = $_POST['senha'];
-    $perfil = $_POST['perfil'];
+    // Captura e higieniza inputs
+    $nome = mysqli_real_escape_string($conn, trim($_POST['nome']));
+    $login = mysqli_real_escape_string($conn, trim($_POST['login']));
+    $senha = mysqli_real_escape_string($conn, trim($_POST['senha']));
+    $perfil = mysqli_real_escape_string($conn, trim($_POST['perfil']));
 
-    // Validação: Todos os campos são obrigatórios para criar um usuário
-    if ($nome == '' || $login == '' || $senha == '' || $perfil == '') {
-        $mensagem = "Por favor, preencha todos os campos.";
+    if (empty($nome) || empty($login) || empty($senha) || empty($perfil)) {
+        $mensagem = "Por favor, preencha todos os campos obrigatórios (*).";
+        $tipo_alerta = "warning";
     } else {
+        // Insere o novo registro
+        $sql = "INSERT INTO usuarios (nome, login, senha, perfil) VALUES ('$nome', '$login', '$senha', '$perfil')";
         
-        // Proteção contra aspas para evitar erros de SQL
-        $nome = mysqli_real_escape_string($conn, $nome);
-        $login = mysqli_real_escape_string($conn, $login);
-        
-        // Mantemos a senha simples conforme o seu usuário "admin" já existente no banco
-        $senha = mysqli_real_escape_string($conn, $senha); 
-
-        // Monta o comando SQL para inserir o usuário
-        $sql = "INSERT INTO usuarios (nome, login, senha, perfil) 
-                VALUES ('$nome', '$login', '$senha', '$perfil')";
-        
-        // Executa o comando e verifica se deu certo
         if (mysqli_query($conn, $sql)) {
             $mensagem = "Usuário cadastrado com sucesso!";
+            $tipo_alerta = "success";
         } else {
-            // Se tentar cadastrar um login que já existe, o banco vai dar erro (UNIQUE)
-            $mensagem = "Erro ao cadastrar: " . mysqli_error($conn);
+            $mensagem = "Erro ao cadastrar usuário: " . mysqli_error($conn);
+            $tipo_alerta = "danger";
         }
     }
 }
@@ -60,36 +44,42 @@ include '../includes/header.php';
 ?>
 
 <div class="container mt-4 mb-5">
+    
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Cadastrar Novo Usuário</h1>
-        <a href="listar.php" class="btn btn-secondary me-2">Voltar para a Lista</a>
+        <div>
+            <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-person-plus-fill text-dark me-2"></i>Novo Usuário</h1>
+            <p class="text-muted small mb-0">Cadastre credenciais e distribua os níveis de controle interno.</p>
+        </div>
+        <a href="listar.php" class="btn btn-sm btn-outline-secondary fw-bold px-3">
+            <i class="bi bi-arrow-left me-1"></i> Voltar à Lista
+        </a>
     </div>
 
-    <?php if ($mensagem != '') { ?>
-        <div class="alert alert-info shadow-sm">
+    <?php if (!empty($mensagem)): ?>
+        <div class="alert alert-<?php echo $tipo_alerta; ?> alert-dismissible fade show shadow-sm border-0" role="alert">
+            <i class="bi <?php echo ($tipo_alerta == 'success') ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'; ?> me-2"></i>
             <?php echo $mensagem; ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    <?php } ?>
+    <?php endif; ?>
 
     <div class="card shadow-sm border-0 border-start border-4 border-dark">
         <div class="card-body p-4">
-            <p class="text-muted mb-4">Crie uma conta de acesso para um funcionário e defina o seu nível de permissão.</p>
-            
-            <form method="post" action="">
+            <form method="POST" action="cadastrar.php">
                 
                 <div class="row">
                     <div class="col-md-8 mb-3">
-                        <label class="form-label fw-bold">Nome Completo do Funcionário *</label>
-                        <input type="text" class="form-control" name="nome" placeholder="Ex: Maria Oliveira" required>
+                        <label class="form-label fw-bold">Nome Completo *</label>
+                        <input type="text" class="form-control" name="nome" placeholder="Ex: Maria das Dores Silva" required style="border-radius: 8px;">
                     </div>
 
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-bold">Perfil de Acesso *</label>
-                        <select class="form-select" name="perfil" required>
-                            <option value="">Selecione...</option>
+                        <select class="form-select" name="perfil" required style="border-radius: 8px;">
+                            <option value="" selected disabled>Escolha o cargo...</option>
                             <option value="A">Atendimento (Recepção)</option>
-                            <option value="T">Técnico</option>
-                            <option value="E">Estoquista</option>
+                            <option value="T">Técnico (Laboratório)</option>
+                            <option value="E">Estoquista (Peças)</option>
                             <option value="G">Gerente (Acesso Total)</option>
                         </select>
                     </div>
@@ -98,20 +88,23 @@ include '../includes/header.php';
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Nome de Login *</label>
-                        <input type="text" class="form-control" name="login" placeholder="Ex: maria.oliveira" required>
-                        <small class="text-muted">Nome usado para entrar no sistema.</small>
+                        <input type="text" class="form-control" name="login" placeholder="Ex: maria.silva" required style="border-radius: 8px;">
+                        <small class="text-muted">Utilizado para efetuar o login no painel.</small>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Senha de Acesso *</label>
-                        <input type="text" class="form-control" name="senha" placeholder="Digite uma senha" required>
+                        <input type="text" class="form-control" name="senha" placeholder="Crie uma senha de acesso estável" required style="border-radius: 8px;">
                     </div>
                 </div>
 
-                <hr class="mt-4">
+                <hr class="my-4 text-muted opacity-20">
+                
                 <div class="d-flex justify-content-end gap-2">
-                    <a href="listar.php" class="btn btn-light border">Cancelar</a>
-                    <button class="btn btn-dark" type="submit">Salvar Usuário</button>
+                    <a href="listar.php" class="btn btn-light border fw-bold px-4" style="border-radius: 8px;">Cancelar</a>
+                    <button class="btn btn-dark fw-bold px-5 shadow-sm" type="submit" style="border-radius: 8px;">
+                        <i class="bi bi-save me-2"></i> Salvar Usuário
+                    </button>
                 </div>
 
             </form>
