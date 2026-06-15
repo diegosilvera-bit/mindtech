@@ -9,8 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $data_fim = $_POST['data_fim'] ?? '';
 
     if (!empty($tipo_relatorio)) {
-        // Redireciona para a página listar.php passando as datas escolhidas pela URL
-        header("Location: listar.php?tipo=$tipo_relatorio&inicio=$data_inicio&fim=$data_fim");
+        // CORREÇÃO: Força o redirecionamento correto passando os parâmetros via GET para o listar.php
+        header("Location: listar.php?tipo=" . urlencode($tipo_relatorio) . "&inicio=" . urlencode($data_inicio) . "&fim=" . urlencode($data_fim));
         exit;
     }
 }
