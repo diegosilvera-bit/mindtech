@@ -128,7 +128,7 @@ include '../includes/header.php';
                         <li class="nav-item"><a class="nav-link" href="/mindtech/orcamentos/listar.php"><i class="bi bi-cash-coin me-2"></i> Orçamentos</a></li>
                     <?php endif; ?>
                     <?php if (in_array($perfil, ['G'])): ?>
-                        <li class="nav-item"><a class="nav-link" href="/mindtech/relatorios/listar.php"><i class="bi bi-bar-chart-fill me-2"></i> Relatórios</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/mindtech/relatorios/cadastrar.php"><i class="bi bi-bar-chart-fill me-2"></i> Relatórios</a></li>
                     <?php endif; ?>
                 </ul>
                 <hr class="text-secondary mx-3 my-4">

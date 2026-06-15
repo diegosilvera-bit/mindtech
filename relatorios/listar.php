@@ -6,27 +6,22 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../includes/functions.php'; 
 require_once '../includes/auth.php'; 
 
-// Inclui a conexão com o banco de dados
 include '../config/conexao.php'; 
 
-// Pega os parâmetros passados pelo formulário via URL (GET)
-$tipo = isset($_GET['tipo']) ? $_GET['tipo'] : '';
-$inicio = isset($_GET['inicio']) ? $_GET['inicio'] : '';
-$fim = isset($_GET['fim']) ? $_GET['fim'] : '';
+$tipo = isset($_GET['tipo']) ? trim($_GET['tipo']) : '';
+$inicio = isset($_GET['inicio']) ? trim($_GET['inicio']) : '';
+$fim = isset($_GET['fim']) ? trim($_GET['fim']) : '';
 
-// Define o título da página baseado na escolha
 $titulo_relatorio = "Relatório Geral";
 $cor_borda = "border-secondary";
 
 if ($tipo == 'faturamento') { 
     $titulo_relatorio = "Faturamento Mensal & Receitas"; 
     $cor_borda = "border-primary";
-}
-if ($tipo == 'ordens_servico') { 
+} elseif ($tipo == 'ordens_servico') { 
     $titulo_relatorio = "Ordens de Serviço por Período"; 
     $cor_borda = "border-warning";
-}
-if ($tipo == 'pecas_baixo_estoque') { 
+} elseif ($tipo == 'pecas_baixo_estoque') { 
     $titulo_relatorio = "Alerta de Peças com Baixo Estoque"; 
     $cor_borda = "border-danger";
 }
@@ -61,9 +56,11 @@ include '../includes/header.php';
             <a href="cadastrar.php" class="btn btn-sm btn-light border fw-bold me-2 px-3">
                 <i class="bi bi-arrow-left me-1"></i> Voltar aos Filtros
             </a>
-            <button onclick="window.print()" class="btn btn-sm btn-primary fw-bold px-4 shadow-sm">
-                <i class="bi bi-printer-fill me-1"></i> Imprimir / Salvar PDF
-            </button>
+            <?php if (!empty($tipo)): ?>
+                <button onclick="window.print()" class="btn btn-sm btn-primary fw-bold px-4 shadow-sm">
+                    <i class="bi bi-printer-fill me-1"></i> Imprimir / Salvar PDF
+                </button>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -96,14 +93,12 @@ include '../includes/header.php';
                         </thead>
                         <tbody>
                             <?php
-                            // Buscamos orçamentos aprovados. Ajustamos o filtro de data usando DATE(os.data_entrada)
                             $sql = "SELECT o.*, os.data_entrada 
                                     FROM orcamentos o 
                                     JOIN ordens_servico os ON o.id_os = os.id_os 
                                     WHERE o.aprovado = 1";
                             
                             if (!empty($inicio) && !empty($fim)) {
-                                // DATE() garante que compare apenas Ano-Mês-Dia, ignorando a hora da criação da O.S.
                                 $sql .= " AND DATE(os.data_entrada) BETWEEN '$inicio' AND '$fim'";
                             }
                             $sql .= " ORDER BY o.id_orcamento DESC";
@@ -151,7 +146,6 @@ include '../includes/header.php';
                                     WHERE 1=1";
                             
                             if (!empty($inicio) && !empty($fim)) {
-                                // Tratamento com DATE() adicionado aqui também!
                                 $sql .= " AND DATE(os.data_entrada) BETWEEN '$inicio' AND '$fim'";
                             }
                             $sql .= " ORDER BY os.id_os DESC";
@@ -161,7 +155,6 @@ include '../includes/header.php';
                             if ($result && mysqli_num_rows($result) > 0) {
                                 while ($row = mysqli_fetch_assoc($result)) {
                                     $data_pt = date('d/m/Y', strtotime($row['data_entrada']));
-                                    
                                     $status_atual = trim($row['status']);
                                     $badge_class = "bg-secondary";
                                     
@@ -199,7 +192,7 @@ include '../includes/header.php';
                             $result = mysqli_query($conn, $sql);
 
                             if ($result && mysqli_num_rows($result) > 0) {
-                                while ($row = mysqli_fetch_assoc($result)) {
+                                while ($row = mysqli_fetch_assoc($row)) {
                                     echo "<tr>";
                                     echo "<td class='ps-4'><span class='badge bg-dark fw-bold'>{$row['codigo']}</span></td>";
                                     echo "<td class='fw-bold text-dark'>{$row['descricao']}</td>";
@@ -211,6 +204,20 @@ include '../includes/header.php';
                                 echo "<tr><td colspan='4' class='text-center py-4 text-success fw-bold'><i class='bi bi-shield-check me-2 fs-5'></i>Excelente! Todas as peças encontram-se acima do nível mínimo.</td></tr>";
                             }
                             ?>
+                        </tbody>
+                    
+                    <?php else: ?>
+                        <tbody>
+                            <tr>
+                                <td class="text-center py-5 text-muted">
+                                    <i class="bi bi-funnel fs-2 d-block mb-3 text-warning"></i>
+                                    <span class="fw-bold d-block text-dark">Nenhum tipo de relatório foi selecionado.</span>
+                                    Por favor, volte para a tela de filtros e escolha uma opção válida.
+                                    <div class="mt-3">
+                                        <a href="cadastrar.php" class="btn btn-sm btn-success fw-bold px-4">Ir para Filtros</a>
+                                    </div>
+                                </td>
+                            </tr>
                         </tbody>
                     <?php endif; ?>
 
