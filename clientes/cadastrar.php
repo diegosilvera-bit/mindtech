@@ -6,9 +6,6 @@ require_once '../includes/auth.php';
 // Inclui a conexão com o banco de dados
 include '../config/conexao.php';
 
-// Inclui a conexão com o banco de dados diego
-include '../config/conexao.php'; 
-
 $mensagem = '';
 
 // Verifica se o formulário foi enviado
