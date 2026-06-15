@@ -33,8 +33,8 @@ include '../includes/header.php';
                 <i class="bi bi-arrow-left me-1"></i> Dashboard
             </a>
             <?php if ($perfil_logado === 'G'): ?>
-                <a href="cadastrar.php" class="btn btn-sm btn-dark fw-bold px-3 shadow-sm">
-                    <i class="bi bi-person-plus-fill me-1"></i> + Novo Usuário
+                <a href="cadastrar.php">
+                    <button class="btn btn-success"> + Novo Usuário</button>
                 </a>
             <?php endif; ?>
         </div>
