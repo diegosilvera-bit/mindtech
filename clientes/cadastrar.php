@@ -2,17 +2,12 @@
 require_once __DIR__ . '/../includes/functions.php';
 require_once '../includes/auth.php';
 
-<<<<<<< HEAD
-// Inclui a conexão com o banco de dados
-=======
-<<<<<<< HEAD
+
 // Inclui a conexão com o banco de dados
 include '../config/conexao.php';
-=======
+
 // Inclui a conexão com o banco de dados diego
->>>>>>> f8cfcf84baaea33203ca347e91b1d39905f49d7f
 include '../config/conexao.php'; 
->>>>>>> 1342cd33e992e5c4462b638ad9982ba9cabe93e9
 
 $mensagem = '';
 
