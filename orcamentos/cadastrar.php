@@ -100,9 +100,27 @@ include '../includes/header.php';
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label class="form-label fw-bold">Valor das Peças (R$)</label>
-                        <input type="number" step="0.01" class="form-control" name="valor_pecas" id="valor_pecas" value="0.00" oninput="calcularTotal()">
-                    </div>
+    <label class="form-label fw-bold" for="valor_pecas">Peça e Valor (R$)</label>
+    <select class="form-control" name="valor_pecas" id="valor_pecas" onchange="calcularTotal()">
+        <option value="0.00">Selecione uma peça...</option>
+        <?php
+        // Cria a consulta no banco (buscando a descrição e o valor)
+        $sql_select_pecas = "SELECT descricao, valor_unitario FROM pecas ORDER BY descricao ASC";
+        $result_select_pecas = mysqli_query($conn, $sql_select_pecas);
+
+        // Verifica se existem peças cadastradas
+        if ($result_select_pecas && mysqli_num_rows($result_select_pecas) > 0) {
+            while ($peca = mysqli_fetch_assoc($result_select_pecas)) {
+                // O 'value' da option recebe o preço, para que o seu JS calcularTotal() continue funcionando
+                $preco_ponto = $peca['valor_unitario'];
+                $preco_virgula = number_format($peca['valor_unitario'], 2, ',', '.');
+                
+                echo "<option value='{$preco_ponto}'>{$peca['descricao']} - R$ {$preco_virgula}</option>";
+            }
+        }
+        ?>
+    </select>
+</div>
 
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-bold text-success">Valor Total a Cobrar (R$)</label>
