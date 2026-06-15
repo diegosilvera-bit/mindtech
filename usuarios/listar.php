@@ -29,8 +29,8 @@ include '../includes/header.php';
             <p class="text-muted small mb-0">Gerencie os funcionários e os níveis de acesso ao painel.</p>
         </div>
         <div>
-            <a href="../dashboard/index.php" class="btn btn-sm btn-outline-secondary fw-bold me-2 px-3">
-                <i class="bi bi-arrow-left me-1"></i> Dashboard
+            <a href="../dashboard/index.php">
+                <button class="btn btn-dark">Dashboard</button> 
             </a>
             <?php if ($perfil_logado === 'G'): ?>
                 <a href="cadastrar.php">
