@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../includes/functions.php'; 
 require_once '../includes/auth.php'; 
 
-// Inclui a conexão com o banco de dados Vitor
+// Inclui a conexão com o banco de dados
 include '../config/conexao.php'; 
 
 $mensagem = ''; 
