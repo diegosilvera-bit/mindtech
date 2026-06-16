@@ -1,4 +1,7 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 <?php 
+
 require_once __DIR__ . '/../includes/functions.php'; 
 require_once '../includes/auth.php'; 
 require_once '../config/conexao.php'; 
@@ -103,7 +106,7 @@ include '../includes/header.php';
                 <ul class="nav flex-column px-2">
                     <li class="nav-item"><a class="nav-link active" href="/mindtech/dashboard/index.php"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
                     <?php if (in_array($perfil, ['G'])): ?>
-                        <li class="nav-item"><a class="nav-link" href="/mindtech/usuarios/listar.php"><i class="bi bi-people-fill me-2"></i> Usuários</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/mindtech/usuarios/listar.php"><i class="bi bi-person"></i> Usuários</a></li>
                     <?php endif; ?>
                     <?php if (in_array($perfil, ['G', 'A'])): ?>
                         <li class="nav-item"><a class="nav-link" href="/mindtech/clientes/listar.php"><i class="bi bi-person-vcard-fill me-2"></i> Clientes</a></li>
