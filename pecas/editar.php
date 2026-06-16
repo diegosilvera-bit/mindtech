@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <?php 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -64,7 +65,7 @@ include '../includes/header.php';
 
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="fw-bold">Editar Peça</h1>
+        <h1 class="fw-bold"><i class="bi bi-pencil-square text-light me-2"></i>Editar Peça</h1>
         <a href="listar.php" class="btn btn-secondary">Voltar para Lista</a>
     </div>
 

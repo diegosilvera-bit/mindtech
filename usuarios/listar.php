@@ -31,11 +31,11 @@ include '../includes/header.php';
         </div>
         <div>
             <a href="../dashboard/index.php">
-                <button class="btn btn-dark">Dashboard</button> 
+                <button class="btn btn-dark"><i class="bi bi-speedometer2 me-2"></i> Dashboard</button> 
             </a>
             <?php if ($perfil_logado === 'G'): ?>
                 <a href="cadastrar.php">
-                    <button class="btn btn-success"> + Novo Usuário</button>
+                    <button class="btn btn-success"> <i class="bi bi-person-plus"></i> Novo Usuário</button>
                 </a>
             <?php endif; ?>
         </div>

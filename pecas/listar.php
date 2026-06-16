@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <?php 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -76,7 +77,7 @@ include '../includes/header.php';
                                     <td class="fw-semibold">R$ <?php echo number_format($peca['valor_unitario'], 2, ',', '.'); ?></td>
                                     
                                     <td class="text-center pe-3">
-                                        <a href="editar.php?id=<?php echo $peca['id_peca']; ?>" class="btn btn-sm btn-outline-danger">Editar</a>
+                                        <a href="editar.php?id=<?php echo $peca['id_peca']; ?>" class="btn btn-sm btn-outline-danger"> <i class="bi bi-pencil-square text-dark me-2"></i>Editar</a>
                                     </td>
                                 </tr>
                         <?php 
