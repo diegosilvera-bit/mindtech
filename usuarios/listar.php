@@ -29,12 +29,13 @@ include '../includes/header.php';
             <p class="text-muted small mb-0">Gerencie os funcionários e os níveis de acesso ao painel.</p>
         </div>
         <div>
-            <a href="../dashboard/index.php">
-                <button class="btn btn-dark">Dashboard</button> 
+            <a href="../dashboard/index.php" class="btn btn-dark me-2">
+                <i class="bi bi-speedometer2 me-1"></i> Dashboard
             </a>
+            
             <?php if ($perfil_logado === 'G'): ?>
-                <a href="cadastrar.php">
-                    <button class="btn btn-success"> + Novo Usuário</button>
+                <a href="cadastrar.php" class="btn btn-success">
+                    <i class="bi bi-person-plus-fill me-1"></i> + Novo Usuário
                 </a>
             <?php endif; ?>
         </div>
