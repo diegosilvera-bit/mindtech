@@ -103,12 +103,12 @@ include '../includes/header.php';
                                             <div class="d-flex justify-content-center gap-2">
 
                                                 <a href="editar.php?id=<?php echo $usuario['id_usuario']; ?>"
-                                                    class="btn btn-sm btn-primary" title="Editar Usuário">
+                                                    class="btn btn-outline-primary" title="Editar Usuário">
                                                     <i class="bi bi-pencil-square"></i> Editar
                                                 </a>
 
                                                 <a href="deletar.php?id=<?php echo $usuario['id_usuario']; ?>"
-                                                    class="btn btn-sm btn-danger" title="Excluir Usuário"
+                                                    class="btn btn-outline-danger" title="Excluir Usuário"
                                                     onclick="return confirm('Aviso: Tem certeza absoluta que deseja excluir o funcionário <?php echo htmlspecialchars($usuario['nome']); ?> do sistema?');">
                                                     <i class="bi bi-trash3-fill"></i> Excluir
                                                 </a>
