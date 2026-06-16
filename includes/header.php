@@ -56,13 +56,7 @@ thead, .table-dark, thead.table-dark th, .table thead th {
 }
 
 /* 4. Botões de Ação Principal (Entrar, Salvar, Novo Usuário) */
-.btn-primary, .btn-warning, button[type="submit"] {
-    color: #121212 !important;
-    font-weight: bold !important;
-}
-.btn-primary:hover, .btn-warning:hover, button[type="submit"]:hover {
-    color: #121212 !important;
-}
+
 
 /* Botão Secundário / Sair / Voltar */
 .btn-secondary, .btn-light, .btn-sair {

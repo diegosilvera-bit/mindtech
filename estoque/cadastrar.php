@@ -74,7 +74,7 @@ include '../includes/header.php';
                 </div>
 
                 <br>
-                <button class="btn btn-primary" type="submit">Salvar Item</button>
+                <button class="btn btn-success" type="submit">Salvar Item</button>
                 <a href="listar.php" class="btn btn-secondary me-2">Voltar para a Lista</a>
                 
             </form>

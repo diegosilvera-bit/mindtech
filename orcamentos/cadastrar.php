@@ -130,7 +130,7 @@ include '../includes/header.php';
 
                 <div class="d-flex justify-content-end gap-2">
                     <a href="listar.php" class="btn btn-light border">Cancelar</a>
-                    <button class="btn btn-warning text-dark fw-bold" type="submit">Gravar Orçamento</button>
+                    <button class="btn btn-success text-dark fw-bold" type="submit">Gravar Orçamento</button>
                 </div>
 
             </form>
