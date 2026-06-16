@@ -27,7 +27,6 @@ include '../includes/header.php';
             <h1 class="h3 mb-1 text-gray-800 fw-bold">
                 <i class="bi bi-people-fill text-dark me-2"></i>Usuários do Sistema
             </h1>
-            <p class="text-muted small mb-0">Gerencie os funcionários e os níveis de acesso ao painel.</p>
         </div>
         <div>
             <a href="../dashboard/index.php" class="btn btn-dark me-2">
