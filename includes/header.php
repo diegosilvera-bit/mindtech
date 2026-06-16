@@ -57,14 +57,10 @@ thead, .table-dark, thead.table-dark th, .table thead th {
 
 /* 4. Botões de Ação Principal (Entrar, Salvar, Novo Usuário) */
 .btn-primary, .btn-warning, button[type="submit"] {
-    background-color: #ecc245 !important;
-    border-color: #ecc245 !important;
     color: #121212 !important;
     font-weight: bold !important;
 }
 .btn-primary:hover, .btn-warning:hover, button[type="submit"]:hover {
-    background-color: #d1aa35 !important;
-    border-color: #d1aa35 !important;
     color: #121212 !important;
 }
 
