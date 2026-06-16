@@ -124,7 +124,7 @@ include '../includes/header.php';
                 <hr class="mt-4">
                 <div class="d-flex justify-content-end gap-2">
                     <a href="listar.php" class="btn btn-light border">Cancelar</a>
-                    <button class="btn btn-info text-white fw-bold" type="submit">Salvar Equipamento</button>
+                    <button class="btn btn-success text-white fw-bold" type="submit">Salvar Equipamento</button>
                 </div>
 
             </form>

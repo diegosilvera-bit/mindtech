@@ -27,15 +27,15 @@ include '../includes/header.php';
             <h1 class="h3 mb-1 text-gray-800 fw-bold">
                 <i class="bi bi-people-fill text-dark me-2"></i>Usuários do Sistema
             </h1>
-            <p class="text-muted small mb-0">Gerencie os funcionários e os níveis de acesso ao painel.</p>
         </div>
         <div>
             <a href="../dashboard/index.php">
-                <button class="btn btn-dark"><i class="bi bi-speedometer2 me-2"></i> Dashboard</button> 
+                <button class="btn btn-dark">Dashboard</button> 
             </a>
+            
             <?php if ($perfil_logado === 'G'): ?>
                 <a href="cadastrar.php">
-                    <button class="btn btn-success"> <i class="bi bi-person-plus"></i> Novo Usuário</button>
+                    <button class="btn btn-success"> + Novo Usuário</button>
                 </a>
             <?php endif; ?>
         </div>

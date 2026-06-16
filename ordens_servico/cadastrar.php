@@ -97,7 +97,7 @@ include '../includes/header.php';
                 <hr class="mt-4">
                 <div class="d-flex justify-content-end gap-2">
                     <a href="listar.php" class="btn btn-light border">Cancelar</a>
-                    <button class="btn btn-primary" type="submit">Salvar Ordem de Serviço</button>
+                    <button class="btn btn-success" type="submit">Salvar Ordem de Serviço</button>
                 </div>
 
             </form>
