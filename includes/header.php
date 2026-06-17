@@ -55,9 +55,6 @@ thead, .table-dark, thead.table-dark th, .table thead th {
     color: #ecc245 !important;
 }
 
-/* 4. Botões de Ação Principal (Entrar, Salvar, Novo Usuário) */
-
-
 /* Botão Secundário / Sair / Voltar */
 .btn-secondary, .btn-light, .btn-sair {
     background-color: #262626 !important;
@@ -73,7 +70,7 @@ thead, .table-dark, thead.table-dark th, .table thead th {
 <body>
 <nav class="navbar navbar-dark">
   <div class="container-fluid">
-    <span class="navbar-brand">MindTech</span>
+    <span class="navbar-brand">MINDTECH</span>
     <a href="/mindtech/logout.php" class="btn btn-light btn-sm">Sair</a>
   </div>
 </nav>
