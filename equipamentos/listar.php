@@ -1,23 +1,23 @@
-<?php 
+<?php
 // LIGA O MODO DE DEPURAÇÃO
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once __DIR__ . '/../includes/functions.php'; 
-require_once '../includes/auth.php'; 
+require_once __DIR__ . '/../includes/functions.php';
+require_once '../includes/auth.php';
 
 // TRAVA DE SEGURANÇA
 verificarAcesso(['G', 'A', 'T']);
 
 // Inclui a conexão com o banco de dados
-include '../config/conexao.php'; 
+include '../config/conexao.php';
 
 // Busca os equipamentos com o nome do dono
 $sql = "SELECT e.*, c.nome AS nome_cliente 
         FROM equipamentos e 
         LEFT JOIN clientes c ON e.id_cliente = c.id_cliente 
-        ORDER BY e.id_equipamento DESC"; 
+        ORDER BY e.id_equipamento DESC";
 
 $result = mysqli_query($conn, $sql);
 
@@ -28,7 +28,7 @@ if (!$result) {
 // Pega o perfil logado para ocultar os botões de Inativar para os Técnicos
 $perfil_logado = $_SESSION['usuario']['perfil'] ?? '';
 
-include '../includes/header.php'; 
+include '../includes/header.php';
 ?>
 
 <div class="container mt-4 mb-5">
@@ -40,7 +40,7 @@ include '../includes/header.php';
         </div>
     </div>
 
-    <?php 
+    <?php
     $msg = $_GET['msg'] ?? '';
     if ($msg == 'equip_inativado') {
         echo '<div class="alert alert-warning fw-bold shadow-sm">Equipamento inativado com sucesso.</div>';
@@ -64,62 +64,76 @@ include '../includes/header.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <?php 
+                        <?php
                         if ($result && mysqli_num_rows($result) > 0) {
-                            while ($equip = mysqli_fetch_assoc($result)) { 
+                            while ($equip = mysqli_fetch_assoc($result)) {
                                 // Verifica se a coluna ativo existe
                                 $ativo = isset($equip['ativo']) ? $equip['ativo'] : 1;
-                        ?>
+                                ?>
                                 <tr class="<?php echo $ativo == 0 ? 'table-light text-muted opacity-75' : ''; ?>">
-                                    <td class="ps-3 fw-bold text-muted">#<?php echo htmlspecialchars($equip['id_equipamento']); ?></td>
-                                    
+                                    <td class="ps-3 fw-bold text-muted">
+                                        #<?php echo htmlspecialchars($equip['id_equipamento']); ?></td>
+
                                     <td class="fw-bold text-dark">
                                         <?php echo !empty($equip['nome_cliente']) ? htmlspecialchars($equip['nome_cliente']) : '<span class="text-danger">Sem dono</span>'; ?>
                                     </td>
-                                    
+
                                     <td>
                                         <span class="badge bg-light text-dark border px-2 py-1 me-1">
                                             <?php echo htmlspecialchars($equip['tipo'] ?? 'N/A'); ?>
                                         </span>
-                                        <?php 
+                                        <?php
                                         $marca = $equip['marca'] ?? '';
                                         $modelo = $equip['modelo'] ?? '';
-                                        echo htmlspecialchars(trim($marca . ' ' . $modelo)); 
+                                        echo htmlspecialchars(trim($marca . ' ' . $modelo));
                                         ?>
                                     </td>
-                                    
+
                                     <td class="text-secondary fw-mono">
                                         <?php echo !empty($equip['numero_serie']) ? htmlspecialchars($equip['numero_serie']) : '-'; ?>
                                     </td>
 
                                     <td class="text-center">
-                                        <?php if($ativo == 1): ?>
+                                        <?php if ($ativo == 1): ?>
                                             <span class="badge bg-info text-dark">Ativo</span>
                                         <?php else: ?>
                                             <span class="badge bg-secondary">Inativo</span>
                                         <?php endif; ?>
                                     </td>
-                                    
+
                                     <td class="text-center pe-3">
-                                        <a href="editar.php?id=<?php echo $equip['id_equipamento']; ?>" class="btn btn-sm btn-outline-info me-1">Editar</a>
-                                        
-                                        <?php if(in_array($perfil_logado, ['G', 'A'])): ?>
-                                            <?php if($ativo == 1): ?>
-                                                <a href="status.php?id=<?php echo $equip['id_equipamento']; ?>" 
-                                                   class="btn btn-sm btn-outline-warning"
-                                                   onclick="return confirm('Deseja inativar este equipamento?');">Inativar</a>
-                                            <?php else: ?>
-                                                <a href="status.php?id=<?php echo $equip['id_equipamento']; ?>" 
-                                                   class="btn btn-sm btn-outline-secondary"
-                                                   onclick="return confirm('Deseja reativar este equipamento?');">Ativar</a>
+                                        <div class="d-flex justify-content-center gap-2">
+
+                                            <a href="editar.php?id=<?php echo $equip['id_equipamento']; ?>"
+                                                class="btn btn-sm btn-primary" title="Editar Equipamento">
+                                                <i class="bi bi-pencil-square"></i> Editar
+                                            </a>
+
+                                            <?php if (in_array($perfil_logado, ['G', 'A'])): ?>
+
+                                                <?php if ($ativo == 1): ?>
+                                                    <a href="status.php?id=<?php echo $equip['id_equipamento']; ?>"
+                                                        class="btn btn-sm btn-danger" title="Inativar Equipamento"
+                                                        onclick="return confirm('Deseja inativar este equipamento?');">
+                                                        <i class="bi bi-dash-circle-fill"></i> Inativar
+                                                    </a>
+                                                <?php else: ?>
+                                                    <a href="status.php?id=<?php echo $equip['id_equipamento']; ?>"
+                                                        class="btn btn-sm btn-success" title="Reativar Equipamento"
+                                                        onclick="return confirm('Deseja reativar este equipamento?');">
+                                                        <i class="bi bi-check-circle-fill"></i> Ativar
+                                                    </a>
+                                                <?php endif; ?>
+
                                             <?php endif; ?>
-                                        <?php endif; ?>
+
+                                        </div>
                                     </td>
                                 </tr>
-                        <?php 
-                            } 
-                        } else { 
-                        ?>
+                            <?php
+                            }
+                        } else {
+                            ?>
                             <tr>
                                 <td colspan="6" class="text-center py-4 text-muted">
                                     Nenhum equipamento cadastrado na assistência ainda.

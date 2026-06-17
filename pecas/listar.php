@@ -1,30 +1,30 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<?php 
+<?php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once __DIR__ . '/../includes/functions.php'; 
-require_once '../includes/auth.php'; 
+require_once __DIR__ . '/../includes/functions.php';
+require_once '../includes/auth.php';
 
 // TRAVA DE SEGURANÇA
 verificarAcesso(['G', 'A', 'E', 'T']);
 
-include '../config/conexao.php'; 
+include '../config/conexao.php';
 
 // BUSCA PEÇAS JÁ COM O NOME DO FORNECEDOR
 $sql = "SELECT p.*, f.nome AS nome_fornecedor 
         FROM pecas p 
         LEFT JOIN fornecedores f ON p.id_fornecedor = f.id_fornecedor 
         ORDER BY p.descricao ASC";
-        
+
 $result = mysqli_query($conn, $sql);
 
 if (!$result) {
     die("Erro fatal na busca de peças: " . mysqli_error($conn));
 }
 
-include '../includes/header.php'; 
+include '../includes/header.php';
 ?>
 
 <div class="container mt-4 mb-5">
@@ -51,21 +51,21 @@ include '../includes/header.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <?php 
+                        <?php
                         if (mysqli_num_rows($result) > 0) {
-                            while ($peca = mysqli_fetch_assoc($result)) { 
-                        ?>
+                            while ($peca = mysqli_fetch_assoc($result)) {
+                                ?>
                                 <tr>
                                     <td class="ps-3 fw-bold text-muted"><?php echo htmlspecialchars($peca['codigo']); ?></td>
-                                    
+
                                     <td class="fw-bold text-dark"><?php echo htmlspecialchars($peca['descricao']); ?></td>
-                                    
+
                                     <td>
                                         <?php echo !empty($peca['nome_fornecedor']) ? htmlspecialchars($peca['nome_fornecedor']) : '<span class="text-muted small">Não informado</span>'; ?>
                                     </td>
-                                    
+
                                     <td>
-                                        <?php 
+                                        <?php
                                         if ($peca['quantidade_disponivel'] <= $peca['nivel_minimo']) {
                                             echo "<span class='badge bg-danger text-white px-2 py-1'><i class='bi bi-exclamation-triangle-fill me-1'></i>" . $peca['quantidade_disponivel'] . " un (Baixo)</span>";
                                         } else {
@@ -73,17 +73,25 @@ include '../includes/header.php';
                                         }
                                         ?>
                                     </td>
-                                    
-                                    <td class="fw-semibold">R$ <?php echo number_format($peca['valor_unitario'], 2, ',', '.'); ?></td>
-                                    
+
+                                    <td class="fw-semibold">R$
+                                        <?php echo number_format($peca['valor_unitario'], 2, ',', '.'); ?></td>
+
                                     <td class="text-center pe-3">
-                                        <a href="editar.php?id=<?php echo $peca['id_peca']; ?>" class="btn btn-sm btn-outline-danger"> <i class="bi bi-pencil-square text-dark me-2"></i>Editar</a>
+                                        <div class="d-flex justify-content-center gap-2">
+
+                                            <a href="editar.php?id=<?php echo $peca['id_peca']; ?>"
+                                                class="btn btn-sm btn-primary" title="Editar Peça">
+                                                <i class="bi bi-pencil-square"></i> Editar
+                                            </a>
+
+                                        </div>
                                     </td>
                                 </tr>
-                        <?php 
-                            } 
-                        } else { 
-                        ?>
+                            <?php
+                            }
+                        } else {
+                            ?>
                             <tr>
                                 <td colspan="6" class="text-center py-4 text-muted">
                                     Nenhuma peça cadastrada no catálogo.
