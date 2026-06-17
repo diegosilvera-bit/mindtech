@@ -73,11 +73,9 @@ include '../includes/header.php';
                         } else { 
                         ?>
                             <tr>
-<<<<<<< HEAD
                                 <td colspan="5" class="text-center py-5 text-muted">
                                     <i class="bi bi-box fs-1 d-block mb-2 text-secondary opacity-50"></i>
                                     Nenhuma peça encontrada no inventário.
-=======
                                 <td class="ps-3"><span class="badge bg-secondary"><?php echo $item['codigo']; ?></span></td>
                                 <td class="fw-bold"><?php echo $item['descricao']; ?></td>
                                 
@@ -96,7 +94,6 @@ include '../includes/header.php';
                                 
                                 <td class="text-center pe-3">
                                     <a href="#" class="btn btn-sm btn-primary">Entrada/Saída</a>
->>>>>>> efea2a470e39bce2d1f37cbb26255ae025705d10
                                 </td>
                             </tr>
                         <?php } ?>
