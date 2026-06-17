@@ -105,30 +105,41 @@ include '../includes/header.php';
             <div class="position-sticky pt-3">
                 <ul class="nav flex-column px-2">
                     <li class="nav-item"><a class="nav-link active" href="/mindtech/dashboard/index.php"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
-                    <?php if (in_array($perfil, ['G'])): ?>
-                        <li class="nav-item"><a class="nav-link" href="/mindtech/usuarios/listar.php"><i class="bi bi-person"></i> Usuários</a></li>
-                    <?php endif; ?>
+                    
                     <?php if (in_array($perfil, ['G', 'A'])): ?>
                         <li class="nav-item"><a class="nav-link" href="/mindtech/clientes/listar.php"><i class="bi bi-person-vcard-fill me-2"></i> Clientes</a></li>
                     <?php endif; ?>
+                    
                     <?php if (in_array($perfil, ['G', 'A', 'T'])): ?>
                         <li class="nav-item"><a class="nav-link" href="/mindtech/equipamentos/listar.php"><i class="bi bi-pc-display me-2"></i> Equipamentos</a></li>
                     <?php endif; ?>
-                    <?php if (in_array($perfil, ['G', 'E', 'T'])): ?>
-                        <li class="nav-item"><a class="nav-link" href="/mindtech/fornecedores/listar.php"><i class="bi bi-truck me-2"></i> Fornecedores</a></li>
-                    <?php endif; ?>
-                    <?php if (in_array($perfil, ['G', 'A', 'E', 'T'])): ?>
-                        <li class="nav-item"><a class="nav-link" href="/mindtech/pecas/listar.php"><i class="bi bi-cpu-fill me-2"></i> Peças</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/mindtech/estoque/listar.php"><i class="bi bi-boxes me-2"></i> Estoque</a></li>
-                    <?php endif; ?>
-                    <?php if (in_array($perfil, ['G', 'A', 'T'])): ?>
-                        <li class="nav-item"><a class="nav-link" href="/mindtech/ordens_servico/listar.php"><i class="bi bi-tools me-2"></i> Ordens de Serviço</a></li>
-                    <?php endif; ?>
+                    
                     <?php if (in_array($perfil, ['G', 'A'])): ?>
                         <li class="nav-item"><a class="nav-link" href="/mindtech/orcamentos/listar.php"><i class="bi bi-cash-coin me-2"></i> Orçamentos</a></li>
                     <?php endif; ?>
+                    
+                    <?php if (in_array($perfil, ['G', 'A', 'T'])): ?>
+                        <li class="nav-item"><a class="nav-link" href="/mindtech/ordens_servico/listar.php"><i class="bi bi-tools me-2"></i> Ordens de Serviço</a></li>
+                    <?php endif; ?>
+                    
+                    <?php if (in_array($perfil, ['G', 'A', 'E', 'T'])): ?>
+                        <li class="nav-item"><a class="nav-link" href="/mindtech/estoque/listar.php"><i class="bi bi-boxes me-2"></i> Estoque</a></li>
+                    <?php endif; ?>
+                    
+                    <?php if (in_array($perfil, ['G', 'A', 'E', 'T'])): ?>
+                        <li class="nav-item"><a class="nav-link" href="/mindtech/pecas/listar.php"><i class="bi bi-cpu-fill me-2"></i> Peças</a></li>
+                    <?php endif; ?>
+                    
+                    <?php if (in_array($perfil, ['G', 'E', 'T'])): ?>
+                        <li class="nav-item"><a class="nav-link" href="/mindtech/fornecedores/listar.php"><i class="bi bi-truck me-2"></i> Fornecedores</a></li>
+                    <?php endif; ?>
+                    
                     <?php if (in_array($perfil, ['G'])): ?>
                         <li class="nav-item"><a class="nav-link" href="/mindtech/relatorios/cadastrar.php"><i class="bi bi-bar-chart-fill me-2"></i> Relatórios</a></li>
+                    <?php endif; ?>
+                    
+                    <?php if (in_array($perfil, ['G'])): ?>
+                        <li class="nav-item"><a class="nav-link" href="/mindtech/usuarios/listar.php"><i class="bi bi-person me-2"></i> Usuários</a></li>
                     <?php endif; ?>
                 </ul>
                 <hr class="text-secondary mx-3 my-4">
