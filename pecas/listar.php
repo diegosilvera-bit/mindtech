@@ -81,7 +81,7 @@ include '../includes/header.php';
                                         <div class="d-flex justify-content-center gap-2">
 
                                             <a href="editar.php?id=<?php echo $peca['id_peca']; ?>"
-                                                class="btn btn-outline-primary" title="Editar Peça">
+                                                class="btn btn-sm btn-primary" title="Editar Peça">
                                                 <i class="bi bi-pencil-square"></i> Editar
                                             </a>
 

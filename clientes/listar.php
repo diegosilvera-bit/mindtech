@@ -79,19 +79,19 @@ include '../includes/header.php';
                                         <div class="d-flex justify-content-center gap-2">
 
                                             <a href="editar.php?id=<?php echo $cliente['id_cliente']; ?>"
-                                                class="btn btn-outline-primary" title="Editar Cliente">
+                                                class="btn btn-sm btn-primary" title="Editar Cliente">
                                                 <i class="bi bi-pencil-square"></i> Editar
                                             </a>
 
                                             <?php if ($ativo == 1): ?>
                                                 <a href="status.php?id=<?php echo $cliente['id_cliente']; ?>"
-                                                    class="btn btn-outline-danger" title="Inativar Cliente"
+                                                    class="btn btn-sm btn-danger" title="Inativar Cliente"
                                                     onclick="return confirm('Deseja inativar este cliente?');">
                                                     <i class="bi bi-dash-circle-fill"></i> Inativar
                                                 </a>
                                             <?php else: ?>
                                                 <a href="status.php?id=<?php echo $cliente['id_cliente']; ?>"
-                                                    class="btn btn-outline-success" title="Reativar Cliente"
+                                                    class="btn btn-sm btn-success" title="Reativar Cliente"
                                                     onclick="return confirm('Deseja reativar este cliente?');">
                                                     <i class="bi bi-check-circle-fill"></i> Ativar
                                                 </a>

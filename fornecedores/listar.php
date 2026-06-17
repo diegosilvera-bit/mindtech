@@ -95,12 +95,12 @@ include '../includes/header.php';
                                     <td class="text-center pe-4">
                                         <div class="d-flex justify-content-center gap-2">
 
-                                            <a href="editar.php?id=<?= $f['id_fornecedor'] ?>" class="btn btn-outline-primary"
+                                            <a href="editar.php?id=<?= $f['id_fornecedor'] ?>" class="btn btn-sm btn-primary"
                                                 title="Editar Fornecedor">
                                                 <i class="bi bi-pencil-square"></i> Editar
                                             </a>
 
-                                            <a href="deletar.php?id=<?= $f['id_fornecedor'] ?>" class="btn btn-outline-danger"
+                                            <a href="deletar.php?id=<?= $f['id_fornecedor'] ?>" class="btn btn-sm btn-danger"
                                                 title="Excluir Fornecedor"
                                                 onclick="return confirm('Tem certeza que deseja excluir este fornecedor?');">
                                                 <i class="bi bi-trash3-fill"></i> Excluir

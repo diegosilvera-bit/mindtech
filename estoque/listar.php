@@ -59,7 +59,7 @@ include '../includes/header.php';
                                 <td>R$ <?php echo number_format($item['valor_unitario'], 2, ',', '.'); ?></td>
                                 
                                 <td class="text-center pe-3">
-                                    <a href="#" class="btn btn-sm btn-outline-primary">Entrada/Saída</a>
+                                    <a href="#" class="btn btn-sm btn-primary">Entrada/Saída</a>
                                 </td>
                             </tr>
                     <?php 
