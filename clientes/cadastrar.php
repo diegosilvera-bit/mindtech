@@ -90,7 +90,7 @@ include '../includes/header.php';
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-bold">CPF *</label>
-                        <input type="text" class="form-control" id="cpf" name="cpf" placeholder="000.000.000-00"
+                        <input type="text" class="form-control" id="cpf" name="cpf" maxlength="14" placeholder="000.000.000-00"
                             required>
                         <script>
                             document.getElementById('cpf').addEventListener('input', function (e) {
@@ -108,7 +108,7 @@ include '../includes/header.php';
 
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-bold">RG</label>
-                        <input type="text" class="form-control" id="rg" name="rg" placeholder="00.000.000-0">
+                        <input type="text" class="form-control" id="rg" name="rg" placeholder="00.000.000-0" maxlength="12">
                         <script>
                             document.getElementById('rg').addEventListener('input', function (e) {
                                 let valor = e.target.value.replace(/\D/g, '');
@@ -125,7 +125,7 @@ include '../includes/header.php';
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-bold">Telefone / WhatsApp</label>
                         <input type="text" class="form-control" id="telefone" name="telefone"
-                            placeholder="(00) 00000-0000">
+                            placeholder="(00) 00000-0000" maxlength="15">
 
                         <script>
                             document.getElementById('telefone').addEventListener('input', function (e) {
