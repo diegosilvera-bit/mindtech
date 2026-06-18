@@ -28,14 +28,14 @@ include '../includes/header.php';
                 <i class="bi bi-people-fill text-dark me-2"></i>Usuários do Sistema
             </h1>
         </div>
-        <div>
-            <a href="../dashboard/index.php">
-                <button class="btn btn-dark">Dashboard</button>
+        <div class="d-flex gap-2">
+            <a href="../dashboard/index.php" class="btn btn-dark shadow-sm">
+                Dashboard
             </a>
 
             <?php if ($perfil_logado === 'G'): ?>
-                <a href="cadastrar.php">
-                    <button class="btn btn-success"> + Novo Usuário</button>
+                <a href="cadastrar.php" class="btn btn-success shadow-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Novo Usuário
                 </a>
             <?php endif; ?>
         </div>
@@ -94,8 +94,8 @@ include '../includes/header.php';
                                     <td class="ps-4 fw-bold text-muted">#<?php echo $usuario['id_usuario']; ?></td>
                                     <td class="fw-bold text-dark"><?php echo htmlspecialchars($usuario['nome']); ?></td>
                                     <td><code><?php echo htmlspecialchars($usuario['login']); ?></code></td>
-                                    <td><span
-                                            class="badge <?php echo $cor_badge; ?> px-2 py-1"><?php echo $nome_perfil; ?></span>
+                                    <td>
+                                        <span class="badge <?php echo $cor_badge; ?> px-2 py-1"><?php echo $nome_perfil; ?></span>
                                     </td>
 
                                     <td class="text-center pe-4">
@@ -103,13 +103,13 @@ include '../includes/header.php';
                                             <div class="d-flex justify-content-center gap-2">
 
                                                 <a href="editar.php?id=<?php echo $usuario['id_usuario']; ?>"
-                                                    class="btn btn-sm btn-primary" title="Editar Usuário">
+                                                   class="btn btn-sm btn-primary" title="Editar Usuário">
                                                     <i class="bi bi-pencil-square"></i> Editar
                                                 </a>
 
                                                 <a href="deletar.php?id=<?php echo $usuario['id_usuario']; ?>"
-                                                    class="btn btn-sm btn-danger" title="Excluir Usuário"
-                                                    onclick="return confirm('Aviso: Tem certeza absoluta que deseja excluir o funcionário <?php echo htmlspecialchars($usuario['nome']); ?> do sistema?');">
+                                                   class="btn btn-sm btn-danger" title="Excluir Usuário"
+                                                   onclick="return confirm('Aviso: Tem certeza absoluta que deseja excluir o funcionário <?php echo htmlspecialchars($usuario['nome']); ?> do sistema?');">
                                                     <i class="bi bi-trash3-fill"></i> Excluir
                                                 </a>
 
@@ -118,13 +118,13 @@ include '../includes/header.php';
                                             <span class="text-muted small"><i class="bi bi-lock-fill me-1"></i>Apenas Leitura</span>
                                         <?php endif; ?>
                                     </td>
+                                </tr>
                                 <?php
                             }
                         } else {
                             ?>
                             <tr>
-                                <td colspan="5" class="text-center py-4 text-muted">Nenhum usuário cadastrado no sistema.
-                                </td>
+                                <td colspan="5" class="text-center py-4 text-muted">Nenhum usuário cadastrado no sistema.</td>
                             </tr>
                         <?php } ?>
                     </tbody>
