@@ -63,7 +63,7 @@ include '../includes/header.php';
                                     <td class="text-muted">R$ <?php echo number_format($item['valor_unitario'], 2, ',', '.'); ?></td>
                                     
                                     <td class="text-center pe-4">
-                                        <a href="movimentar.php?id=<?php echo $item['id_peca']; ?>" class="btn btn-sm btn-outline-primary fw-bold shadow-sm">
+                                        <a href="movimentar.php?id=<?php echo $item['id_peca']; ?>" class="btn btn-sm btn-primary fw-bold shadow-sm">
                                             <i class="bi bi-arrow-left-right me-1"></i> Entrada/Saída
                                         </a>
                                     </td>
