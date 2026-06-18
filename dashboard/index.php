@@ -111,7 +111,7 @@ include '../includes/header.php';
                     <?php endif; ?>
                     
                     <?php if (in_array($perfil, ['G', 'A', 'T'])): ?>
-                        <li class="nav-item"><a class="nav-link" href="/mindtech/equipamentos/listar.php"><i class="bi bi-pc-display me-2"></i> Equipamentos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/mindtech/equipamentos/listar.php"><i class="bi bi-pc-display me-2" a> ></i> <br>Equipamentos </a></li>
                     <?php endif; ?>
                     
                     <?php if (in_array($perfil, ['G', 'A'])): ?>
