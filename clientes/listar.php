@@ -167,11 +167,12 @@ include '../includes/header.php';
                                         <div class="d-flex justify-content-center gap-1 flex-wrap">
 
                                             <!-- BOTÃO: Ver/Gerenciar Equipamentos -->
-                                            <button class="btn btn-sm btn-outline-info"
+                                             
+                                            <a class="btn btn-sm btn-info text-white"
                                                     onclick="abrirEquipamentos(<?php echo $cliente['id_cliente']; ?>, '<?php echo htmlspecialchars(addslashes($cliente['nome'])); ?>')"
                                                     title="Equipamentos do Cliente">
                                                 <i class="bi bi-laptop"></i> Equipamentos
-                                            </button>
+                                        </a>
 
                                             <!-- BOTÃO: Editar Cliente -->
                                             <a href="editar.php?id=<?php echo $cliente['id_cliente']; ?>"
