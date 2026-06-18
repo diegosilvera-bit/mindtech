@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <?php
 // LIGA O MODO DE DEPURAÇÃO
 ini_set('display_errors', 1);
@@ -105,7 +106,7 @@ include '../includes/header.php';
                                         <div class="d-flex justify-content-center gap-2">
 
                                             <a href="editar.php?id=<?php echo $equip['id_equipamento']; ?>"
-                                                class="btn btn-sm btn-primary" title="Editar Equipamento">
+                                                class="btn btn-outline-primary" title="Editar Equipamento">
                                                 <i class="bi bi-pencil-square"></i> Editar
                                             </a>
 
@@ -113,13 +114,13 @@ include '../includes/header.php';
 
                                                 <?php if ($ativo == 1): ?>
                                                     <a href="status.php?id=<?php echo $equip['id_equipamento']; ?>"
-                                                        class="btn btn-sm btn-danger" title="Inativar Equipamento"
+                                                        class="btn btn-outline-danger" title="Inativar Equipamento"
                                                         onclick="return confirm('Deseja inativar este equipamento?');">
                                                         <i class="bi bi-dash-circle-fill"></i> Inativar
                                                     </a>
                                                 <?php else: ?>
                                                     <a href="status.php?id=<?php echo $equip['id_equipamento']; ?>"
-                                                        class="btn btn-sm btn-success" title="Reativar Equipamento"
+                                                        class="btn btn-outline-success" title="Reativar Equipamento"
                                                         onclick="return confirm('Deseja reativar este equipamento?');">
                                                         <i class="bi bi-check-circle-fill"></i> Ativar
                                                     </a>
