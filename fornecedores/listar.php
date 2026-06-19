@@ -36,7 +36,10 @@ include '../includes/header.php';
 
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="fw-bold">Fornecedores Homologados</h1>
+        <h1 class="fw-bold">
+            <i class="bi bi-truck text-success me-2"></i>
+            Fornecedores Homologados
+    </h1>
         <div>
             <a href="../dashboard/index.php" class="btn btn-secondary me-2">Voltar ao Dashboard</a>
             <a href="cadastrar.php" class="btn btn-success">+ Novo Fornecedor</a>
