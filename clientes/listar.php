@@ -18,7 +18,7 @@ $tipo_alerta = '';
 // AÇÃO: INATIVAR / ATIVAR CLIENTE
 // ============================================================
 if (isset($_GET['status_cliente'])) {
-    $id = (int)$_GET['status_cliente'];
+    $id = (int) $_GET['status_cliente'];
     $res = mysqli_query($conn, "SELECT ativo FROM clientes WHERE id_cliente = $id");
     if ($row = mysqli_fetch_assoc($res)) {
         $novo = $row['ativo'] == 1 ? 0 : 1;
@@ -32,12 +32,12 @@ if (isset($_GET['status_cliente'])) {
 // AÇÃO: CADASTRAR EQUIPAMENTO (via modal)
 // ============================================================
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['acao']) && $_POST['acao'] == 'cadastrar_equip') {
-    $id_cliente   = (int)$_POST['id_cliente'];
-    $tipo         = mysqli_real_escape_string($conn, trim($_POST['tipo']));
-    $marca        = mysqli_real_escape_string($conn, trim($_POST['marca']));
-    $modelo       = mysqli_real_escape_string($conn, trim($_POST['modelo']));
+    $id_cliente = (int) $_POST['id_cliente'];
+    $tipo = mysqli_real_escape_string($conn, trim($_POST['tipo']));
+    $marca = mysqli_real_escape_string($conn, trim($_POST['marca']));
+    $modelo = mysqli_real_escape_string($conn, trim($_POST['modelo']));
     $numero_serie = mysqli_real_escape_string($conn, trim($_POST['numero_serie']));
-    $observacoes  = mysqli_real_escape_string($conn, trim($_POST['observacoes']));
+    $observacoes = mysqli_real_escape_string($conn, trim($_POST['observacoes']));
 
     if ($id_cliente <= 0 || empty($tipo)) {
         $mensagem = "Cliente e Tipo do equipamento são obrigatórios.";
@@ -59,13 +59,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['acao']) && $_POST['aca
 // AÇÃO: EDITAR EQUIPAMENTO (via modal)
 // ============================================================
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['acao']) && $_POST['acao'] == 'editar_equip') {
-    $id_equipamento = (int)$_POST['id_equipamento'];
-    $id_cliente     = (int)$_POST['id_cliente'];
-    $tipo           = mysqli_real_escape_string($conn, trim($_POST['tipo']));
-    $marca          = mysqli_real_escape_string($conn, trim($_POST['marca']));
-    $modelo         = mysqli_real_escape_string($conn, trim($_POST['modelo']));
-    $numero_serie   = mysqli_real_escape_string($conn, trim($_POST['numero_serie']));
-    $observacoes    = mysqli_real_escape_string($conn, trim($_POST['observacoes']));
+    $id_equipamento = (int) $_POST['id_equipamento'];
+    $id_cliente = (int) $_POST['id_cliente'];
+    $tipo = mysqli_real_escape_string($conn, trim($_POST['tipo']));
+    $marca = mysqli_real_escape_string($conn, trim($_POST['marca']));
+    $modelo = mysqli_real_escape_string($conn, trim($_POST['modelo']));
+    $numero_serie = mysqli_real_escape_string($conn, trim($_POST['numero_serie']));
+    $observacoes = mysqli_real_escape_string($conn, trim($_POST['observacoes']));
 
     $sql = "UPDATE equipamentos SET
                 id_cliente = $id_cliente,
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['acao']) && $_POST['aca
 // AÇÃO: INATIVAR / ATIVAR EQUIPAMENTO
 // ============================================================
 if (isset($_GET['status_equip'])) {
-    $id = (int)$_GET['status_equip'];
+    $id = (int) $_GET['status_equip'];
     $res = mysqli_query($conn, "SELECT ativo FROM equipamentos WHERE id_equipamento = $id");
     if ($row = mysqli_fetch_assoc($res)) {
         $novo = $row['ativo'] == 1 ? 0 : 1;
@@ -111,9 +111,9 @@ include '../includes/header.php';
 
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1     class="fw-bold"><i class="bi bi-people"></i>Meus Clientes
-        
-        
+        <h1 class="fw-bold"><i class="bi bi-people"></i>Meus Clientes
+
+
         </h1>
         <div>
             <a href="../dashboard/index.php" class="btn btn-secondary me-2">Voltar ao Dashboard</a>
@@ -148,7 +148,7 @@ include '../includes/header.php';
                         if ($result_clientes && mysqli_num_rows($result_clientes) > 0) {
                             while ($cliente = mysqli_fetch_assoc($result_clientes)) {
                                 $ativo = isset($cliente['ativo']) ? $cliente['ativo'] : 1;
-                        ?>
+                                ?>
                                 <tr class="<?php echo $ativo == 0 ? 'table-light text-muted opacity-75' : ''; ?>">
                                     <td class="ps-3 fw-bold">#<?php echo $cliente['id_cliente']; ?></td>
 
@@ -156,7 +156,8 @@ include '../includes/header.php';
 
                                     <td><?php echo htmlspecialchars($cliente['cpf']); ?></td>
 
-                                    <td><?php echo !empty($cliente['telefone']) ? htmlspecialchars($cliente['telefone']) : '-'; ?></td>
+                                    <td><?php echo !empty($cliente['telefone']) ? htmlspecialchars($cliente['telefone']) : '-'; ?>
+                                    </td>
 
                                     <td class="text-center">
                                         <?php if ($ativo == 1): ?>
@@ -166,36 +167,35 @@ include '../includes/header.php';
                                         <?php endif; ?>
                                     </td>
 
-                                    <td class="text-center pe-3">
-                                        <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                    <td class="text-center pe-3" style="white-space: nowrap; min-width: 300px;">
 
-                                            <!-- BOTÃO: Ver/Gerenciar Equipamentos -->
-                                             
-                                            <a class="btn btn-sm btn-info text-white"
-                                                    onclick="abrirEquipamentos(<?php echo $cliente['id_cliente']; ?>, '<?php echo htmlspecialchars(addslashes($cliente['nome'])); ?>')"
-                                                    title="Equipamentos do Cliente">
-                                                <i class="bi bi-laptop"></i> Equipamentos
-                                        </a>
+                                        <div
+                                            class="d-flex flex-row justify-content-center align-items-center gap-2 flex-nowrap">
 
-                                            <!-- BOTÃO: Editar Cliente -->
-                                            <a href="editar.php?id=<?php echo $cliente['id_cliente']; ?>"
-                                               class="btn btn-sm btn-primary" title="Editar Cliente">
-                                                <i class="bi bi-pencil-square"></i> Editar
+                                            <a href="#" class="btn btn-sm btn-info text-white d-inline-flex align-items-center"
+                                                onclick="abrirEquipamentos(<?php echo $cliente['id_cliente']; ?>, '<?php echo htmlspecialchars(addslashes($cliente['nome'])); ?>'); return false;"
+                                                title="Equipamentos do Cliente">
+                                                <i class="bi bi-laptop me-1"></i> Equipamentos
                                             </a>
 
-                                            <!-- BOTÃO: Inativar / Ativar (só G e A) -->
+                                            <a href="editar.php?id=<?php echo $cliente['id_cliente']; ?>"
+                                                class="btn btn-sm btn-primary d-inline-flex align-items-center"
+                                                title="Editar Cliente">
+                                                <i class="bi bi-pencil-square me-1"></i> Editar
+                                            </a>
+
                                             <?php if (in_array($perfil_logado, ['G', 'A'])): ?>
                                                 <?php if ($ativo == 1): ?>
                                                     <a href="?status_cliente=<?php echo $cliente['id_cliente']; ?>"
-                                                       class="btn btn-sm btn-danger"
-                                                       onclick="return confirm('Deseja inativar este cliente?');">
-                                                        <i class="bi bi-dash-circle-fill"></i> Inativar
+                                                        class="btn btn-sm btn-danger d-inline-flex align-items-center"
+                                                        onclick="return confirm('Deseja inativar este cliente?');">
+                                                        <i class="bi bi-dash-circle-fill me-1"></i> Inativar
                                                     </a>
                                                 <?php else: ?>
                                                     <a href="?status_cliente=<?php echo $cliente['id_cliente']; ?>"
-                                                       class="btn btn-sm btn-success"
-                                                       onclick="return confirm('Deseja reativar este cliente?');">
-                                                        <i class="bi bi-check-circle-fill"></i> Ativar
+                                                        class="btn btn-sm btn-success d-inline-flex align-items-center"
+                                                        onclick="return confirm('Deseja reativar este cliente?');">
+                                                        <i class="bi bi-check-circle-fill me-1"></i> Ativar
                                                     </a>
                                                 <?php endif; ?>
                                             <?php endif; ?>
@@ -203,7 +203,7 @@ include '../includes/header.php';
                                         </div>
                                     </td>
                                 </tr>
-                        <?php
+                                <?php
                             }
                         } else { ?>
                             <tr>
@@ -229,7 +229,8 @@ include '../includes/header.php';
 
             <div class="modal-header bg-info text-dark">
                 <h5 class="modal-title">
-                    <i class="bi bi-laptop me-2"></i>Equipamentos de: <span id="nomeClienteModal" class="fw-bold"></span>
+                    <i class="bi bi-laptop me-2"></i>Equipamentos de: <span id="nomeClienteModal"
+                        class="fw-bold"></span>
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -303,11 +304,13 @@ include '../includes/header.php';
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Observações / Estado Físico</label>
-                        <textarea class="form-control" name="observacoes" rows="2" placeholder="Ex: Tela trincada..."></textarea>
+                        <textarea class="form-control" name="observacoes" rows="2"
+                            placeholder="Ex: Tela trincada..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light border" onclick="voltarParaEquipamentos()">Cancelar</button>
+                    <button type="button" class="btn btn-light border"
+                        onclick="voltarParaEquipamentos()">Cancelar</button>
                     <button type="submit" class="btn btn-success fw-bold">Salvar Equipamento</button>
                 </div>
             </form>
@@ -357,16 +360,19 @@ include '../includes/header.php';
                     <div class="row">
                         <div class="col-md-12 mb-3">
                             <label class="form-label fw-bold">Número de Série / IMEI</label>
-                            <input type="text" class="form-control" name="numero_serie" id="edit_equip_serie" placeholder="Ex: BR-123456789">
+                            <input type="text" class="form-control" name="numero_serie" id="edit_equip_serie"
+                                placeholder="Ex: BR-123456789">
                         </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Observações / Estado Físico</label>
-                        <textarea class="form-control" name="observacoes" id="edit_equip_observacoes" rows="2" placeholder="Ex: Tela trincada..."></textarea>
+                        <textarea class="form-control" name="observacoes" id="edit_equip_observacoes" rows="2"
+                            placeholder="Ex: Tela trincada..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light border" onclick="voltarParaEquipamentos()">Cancelar</button>
+                    <button type="button" class="btn btn-light border"
+                        onclick="voltarParaEquipamentos()">Cancelar</button>
                     <button type="submit" class="btn btn-primary fw-bold">Salvar Alterações</button>
                 </div>
             </form>
@@ -392,29 +398,29 @@ while ($eq = mysqli_fetch_assoc($res_equips)) {
 ?>
 
 <script>
-// Dados de todos os equipamentos já carregados do PHP
-const todosEquipamentos = <?php echo json_encode($todos_equipamentos, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+    // Dados de todos os equipamentos já carregados do PHP
+    const todosEquipamentos = <?php echo json_encode($todos_equipamentos, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
 
-let idClienteAtivo = null;
+    let idClienteAtivo = null;
 
-// Abre o modal de equipamentos filtrando pelo cliente
-function abrirEquipamentos(idCliente, nomeCliente) {
-    idClienteAtivo = idCliente;
-    document.getElementById('nomeClienteModal').textContent = nomeCliente;
-    renderizarTabela(idCliente);
-    new bootstrap.Modal(document.getElementById('modalEquipamentos')).show();
-}
+    // Abre o modal de equipamentos filtrando pelo cliente
+    function abrirEquipamentos(idCliente, nomeCliente) {
+        idClienteAtivo = idCliente;
+        document.getElementById('nomeClienteModal').textContent = nomeCliente;
+        renderizarTabela(idCliente);
+        new bootstrap.Modal(document.getElementById('modalEquipamentos')).show();
+    }
 
-// Renderiza a tabela de equipamentos do cliente dentro do modal
-function renderizarTabela(idCliente) {
-    const equips = todosEquipamentos.filter(e => parseInt(e.id_cliente) === parseInt(idCliente));
-    const perfil = '<?php echo $perfil_logado; ?>';
-    let html = '';
+    // Renderiza a tabela de equipamentos do cliente dentro do modal
+    function renderizarTabela(idCliente) {
+        const equips = todosEquipamentos.filter(e => parseInt(e.id_cliente) === parseInt(idCliente));
+        const perfil = '<?php echo $perfil_logado; ?>';
+        let html = '';
 
-    if (equips.length === 0) {
-        html = '<p class="text-center text-muted py-3">Nenhum equipamento cadastrado para este cliente.</p>';
-    } else {
-        html = `
+        if (equips.length === 0) {
+            html = '<p class="text-center text-muted py-3">Nenhum equipamento cadastrado para este cliente.</p>';
+        } else {
+            html = `
         <div class="table-responsive">
         <table class="table table-hover table-striped align-middle mb-0">
             <thead class="table-dark">
@@ -429,25 +435,25 @@ function renderizarTabela(idCliente) {
             </thead>
             <tbody>`;
 
-        equips.forEach(function(eq) {
-            const ativo = parseInt(eq.ativo) === 1 || eq.ativo == null;
-            const badgeStatus = ativo
-                ? `<span class="badge bg-info text-dark">Ativo</span>`
-                : `<span class="badge bg-secondary">Inativo</span>`;
+            equips.forEach(function (eq) {
+                const ativo = parseInt(eq.ativo) === 1 || eq.ativo == null;
+                const badgeStatus = ativo
+                    ? `<span class="badge bg-info text-dark">Ativo</span>`
+                    : `<span class="badge bg-secondary">Inativo</span>`;
 
-            const btnStatus = (perfil === 'G' || perfil === 'A')
-                ? (ativo
-                    ? `<a href="?status_equip=${eq.id_equipamento}" class="btn btn-sm btn-danger"
+                const btnStatus = (perfil === 'G' || perfil === 'A')
+                    ? (ativo
+                        ? `<a href="?status_equip=${eq.id_equipamento}" class="btn btn-sm btn-danger"
                           onclick="return confirm('Inativar este equipamento?')" title="Inativar">
                            <i class="bi bi-dash-circle-fill"></i> Inativar
                        </a>`
-                    : `<a href="?status_equip=${eq.id_equipamento}" class="btn btn-sm btn-success"
+                        : `<a href="?status_equip=${eq.id_equipamento}" class="btn btn-sm btn-success"
                           onclick="return confirm('Reativar este equipamento?')" title="Ativar">
                            <i class="bi bi-check-circle-fill"></i> Ativar
                        </a>`)
-                : '';
+                    : '';
 
-            html += `
+                html += `
             <tr class="${!ativo ? 'table-light text-muted opacity-75' : ''}">
                 <td class="ps-3 fw-bold text-muted">#${eq.id_equipamento}</td>
                 <td><span class="badge bg-light text-dark border">${eq.tipo ?? '-'}</span></td>
@@ -464,49 +470,49 @@ function renderizarTabela(idCliente) {
                     </div>
                 </td>
             </tr>`;
-        });
+            });
 
-        html += '</tbody></table></div>';
-    }
-
-    document.getElementById('tabelaEquipamentosContainer').innerHTML = html;
-}
-
-// Abre o modal de cadastrar equipamento, já com o id_cliente preenchido
-function abrirModalCadastrarEquip() {
-    document.getElementById('cadastrar_id_cliente').value = idClienteAtivo;
-    bootstrap.Modal.getInstance(document.getElementById('modalEquipamentos')).hide();
-    new bootstrap.Modal(document.getElementById('modalCadastrarEquip')).show();
-}
-
-// Abre o modal de editar equipamento preenchido com os dados
-function abrirModalEditarEquip(eq) {
-    document.getElementById('edit_equip_id').value              = eq.id_equipamento;
-    document.getElementById('edit_equip_id_cliente').value      = eq.id_cliente;
-    document.getElementById('edit_equip_marca').value           = eq.marca ?? '';
-    document.getElementById('edit_equip_modelo').value          = eq.modelo ?? '';
-    document.getElementById('edit_equip_serie').value           = eq.numero_serie ?? '';
-    document.getElementById('edit_equip_observacoes').value     = eq.observacoes ?? '';
-
-    // Seleciona o tipo correto no select
-    const sel = document.getElementById('edit_equip_tipo');
-    for (let i = 0; i < sel.options.length; i++) {
-        if (sel.options[i].value === eq.tipo) {
-            sel.selectedIndex = i;
-            break;
+            html += '</tbody></table></div>';
         }
+
+        document.getElementById('tabelaEquipamentosContainer').innerHTML = html;
     }
 
-    bootstrap.Modal.getInstance(document.getElementById('modalEquipamentos')).hide();
-    new bootstrap.Modal(document.getElementById('modalEditarEquip')).show();
-}
+    // Abre o modal de cadastrar equipamento, já com o id_cliente preenchido
+    function abrirModalCadastrarEquip() {
+        document.getElementById('cadastrar_id_cliente').value = idClienteAtivo;
+        bootstrap.Modal.getInstance(document.getElementById('modalEquipamentos')).hide();
+        new bootstrap.Modal(document.getElementById('modalCadastrarEquip')).show();
+    }
 
-// Volta para o modal de equipamentos ao cancelar cadastro/edição
-function voltarParaEquipamentos() {
-    const modalAtivo = document.querySelector('.modal.show');
-    if (modalAtivo) bootstrap.Modal.getInstance(modalAtivo).hide();
-    new bootstrap.Modal(document.getElementById('modalEquipamentos')).show();
-}
+    // Abre o modal de editar equipamento preenchido com os dados
+    function abrirModalEditarEquip(eq) {
+        document.getElementById('edit_equip_id').value = eq.id_equipamento;
+        document.getElementById('edit_equip_id_cliente').value = eq.id_cliente;
+        document.getElementById('edit_equip_marca').value = eq.marca ?? '';
+        document.getElementById('edit_equip_modelo').value = eq.modelo ?? '';
+        document.getElementById('edit_equip_serie').value = eq.numero_serie ?? '';
+        document.getElementById('edit_equip_observacoes').value = eq.observacoes ?? '';
+
+        // Seleciona o tipo correto no select
+        const sel = document.getElementById('edit_equip_tipo');
+        for (let i = 0; i < sel.options.length; i++) {
+            if (sel.options[i].value === eq.tipo) {
+                sel.selectedIndex = i;
+                break;
+            }
+        }
+
+        bootstrap.Modal.getInstance(document.getElementById('modalEquipamentos')).hide();
+        new bootstrap.Modal(document.getElementById('modalEditarEquip')).show();
+    }
+
+    // Volta para o modal de equipamentos ao cancelar cadastro/edição
+    function voltarParaEquipamentos() {
+        const modalAtivo = document.querySelector('.modal.show');
+        if (modalAtivo) bootstrap.Modal.getInstance(modalAtivo).hide();
+        new bootstrap.Modal(document.getElementById('modalEquipamentos')).show();
+    }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
