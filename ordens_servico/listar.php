@@ -107,12 +107,12 @@ include '../includes/header.php';
                                         <a href="visualizar.php?id=<?php echo $row['id_os']; ?>" class="btn btn-sm btn-dark">Ver</a>
                                         
                                         <?php if (!$isCancelada && $row['status'] !== 'FINALIZADO'): ?>
-                                            <a href="editar.php?id=<?php echo $row['id_os']; ?>" class="btn btn-sm btn-outline-primary">Editar</a>
+                                            <a href="editar.php?id=<?php echo $row['id_os']; ?>" class="btn btn-sm btn-primary">Editar</a>
                                         <?php endif; ?>
                                         
                                         <?php if(!$isCancelada && $row['status'] !== 'FINALIZADO' && in_array($perfil_logado, ['G', 'A'])): ?>
                                             <a href="cancelar.php?id=<?php echo $row['id_os']; ?>" 
-                                               class="btn btn-sm btn-outline-danger"
+                                               class="btn btn-sm btn-danger"
                                                onclick="return confirm('Tem a certeza que deseja cancelar a O.S. #<?php echo $row['id_os']; ?>?');">
                                                Cancelar
                                             </a>
