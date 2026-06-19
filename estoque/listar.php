@@ -64,10 +64,10 @@ include '../includes/header.php';
                                     
                                     <td class="text-center pe-4">
                                         <div class="d-flex justify-content-center gap-2">
-                                            <a href="movimentar.php?id=<?php echo $item['id_peca']; ?>" class="btn btn-sm btn-warning fw-bold shadow-sm" title="Entrada/Saída de Estoque">
+                                            <a href="movimentar.php?id=<?php echo $item['id_peca']; ?>" class="btn btn-sm btn-warning fw-bold text-dark" title="Entrada/Saída de Estoque">
                                                 <i class="bi bi-arrow-left-right"></i> Entrada/Saída
                                             </a>
-                                            <a href="editar.php?id=<?php echo $item['id_peca']; ?>" class="btn btn-sm btn-primary fw-bold shadow-sm text-dark" title="Editar Peça">
+                                            <a href="editar.php?id=<?php echo $item['id_peca']; ?>" class="btn btn-sm btn-primary fw-bold shadow-sm text-white" title="Editar Peça">
                                                 <i class="bi bi-pencil-square"></i> Editar
                                             </a>
                                         </div>
