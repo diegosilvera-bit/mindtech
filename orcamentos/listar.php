@@ -72,7 +72,7 @@ include '../includes/header.php';
                                 </td>
                                 
                                 <td class="text-center pe-4">
-                                    <a href="editar.php?id=<?= $o['id_orcamento'] ?>" class="btn btn-sm btn-outline-dark">Ver / Editar</a>
+                                    <a href="editar.php?id=<?= $o['id_orcamento'] ?>" class="btn btn-sm btn-primary">Ver / Editar</a>
                                 </td>
                             </tr>
                         <?php 
