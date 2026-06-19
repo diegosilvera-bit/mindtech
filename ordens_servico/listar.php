@@ -35,10 +35,10 @@ include '../includes/header.php';
 
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="fw-bold">Ordens de Serviço</h1>
+        <h1 class="fw-bold"><i class="bi bi-wrench"></i> Ordens de Serviço</h1>
         <div>
             <a href="/mindtech/dashboard/index.php" class="btn btn-secondary me-2">Voltar ao Dashboard</a>            
-            <a href="cadastrar.php" class="btn btn-success">+ Nova OS</a>
+            <a href="cadastrar.php" class="btn btn-success"> Nova OS</a>
         </div>
     </div>
 
