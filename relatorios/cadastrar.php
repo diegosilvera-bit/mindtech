@@ -27,8 +27,7 @@ include '../includes/header.php';
                 <i class="bi bi-file-earmark-bar-graph-fill text-success me-2"></i>Relatórios Gerenciais
             </h1>
         </div>
-        <a href="../dashboard/index.php" class="btn btn-sm btn-outline-secondary fw-bold px-3">
-            <i class="bi bi-arrow-left me-1"></i> Painel Principal
+        <a href="../dashboard/index.php" class="btn btn-secondary me-2"> Dashboard</a>
         </a>
     </div>
 
