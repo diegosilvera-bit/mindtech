@@ -32,6 +32,26 @@ body {
     height: 100vh;
     display: flex;
     align-items: center;
+    overflow: hidden; /* Impede rolagem indesejada durante a animação */
+}
+
+/* ========================================================= */
+/* ANIMAÇÃO DE ENTRADA (FADE E SCALE baseado no botao.html)  */
+/* ========================================================= */
+@keyframes fadeScaleIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-page {
+    /* Aplica a animação com a mesma duração (0.6s) do seu ficheiro original */
+    animation: fadeScaleIn 0.6s ease forwards;
 }
 
 /* Caixa de Login */
@@ -48,6 +68,7 @@ body {
     border: 1px solid #3d3d3d !important;
     color: #ffffff !important;
     padding: 12px !important;
+    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 
 .form-control::placeholder {
@@ -61,7 +82,7 @@ body {
     box-shadow: 0 0 0 0.25rem rgba(236, 194, 69, 0.2) !important;
 }
 
-/* Botão "Entrar" Dourado */
+/* Botão "Entrar" Dourado com a animação de hover */
 .btn-primary {
     background-color: #ecc245 !important;
     border-color: #ecc245 !important;
@@ -70,13 +91,25 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 12px !important;
-    transition: all 0.2s ease;
+    
+    /* Transição suave no botão (do arquivo botao.html) */
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s !important;
 }
 
 .btn-primary:hover {
     background-color: #d1aa35 !important;
     border-color: #d1aa35 !important;
     color: #121212 !important;
+    
+    /* Move o botão levemente para cima ao passar o rato */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(236, 194, 69, 0.25); /* Leve brilho dourado */
+}
+
+.btn-primary:active {
+    /* Volta à posição normal ao clicar */
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(236, 194, 69, 0.2);
 }
 
 .text-muted {
@@ -86,7 +119,7 @@ body {
 </style>
 </head>
 <body>
-<div class="container">
+<div class="container animate-page">
     <div class="row justify-content-center">
         <div class="col-md-5 col-lg-4">
             

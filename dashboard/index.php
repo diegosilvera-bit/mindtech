@@ -96,6 +96,25 @@ include '../includes/header.php';
         line-height: 1;
         margin: 10px 0;
     }
+
+    /* ========================================================= */
+    /* ANIMAÇÃO DE ENTRADA (FADE E SCALE)                        */
+    /* ========================================================= */
+    @keyframes fadeScaleIn {
+        0% {
+            opacity: 0;
+            transform: scale(0.97); /* Um leve zoom in ideal para painéis */
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .animate-page {
+        animation: fadeScaleIn 0.6s ease forwards;
+        transform-origin: top center; /* Faz a animação expandir a partir do topo */
+    }
 </style>
 
 <div class="container-fluid">
@@ -141,11 +160,12 @@ include '../includes/header.php';
             </div>
         </div>
 
-        <div class="col-md-9 col-lg-10 ms-sm-auto px-md-4 py-4">
+        <div class="col-md-9 col-lg-10 ms-sm-auto px-md-4 py-4 animate-page">
             
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="h3 mb-0 text-gray-800 fw-bold">Painel de Controle</h1>
-                <span class="text-white-50"><i class="bi bi-calendar-event me-1"></i> <?= date('d/m/Y') ?></span>            </div>
+                <span class="text-white-50 text-muted"><i class="bi bi-calendar-event me-1"></i> <?= date('d/m/Y') ?></span>            
+            </div>
 
             <div class="card shadow-sm border-0 border-top border-4 border-warning mb-4">
                 <div class="card-header bg-white fw-bold py-3">

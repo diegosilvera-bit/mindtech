@@ -61,8 +61,8 @@ include '../includes/header.php';
     
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-pencil-square text-dark me-2"></i>Editar Funcionário</h1>
-            <p class="text-muted small mb-0">Atualize os dados cadastrais ou mude as permissões da conta.</p>
+            <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-pencil-square text-white me-2"></i>Editar Funcionário</h1>
+            <p class="text-white small mb-0">Atualize os dados cadastrais ou mude as permissões da conta.</p>
         </div>
         <a href="listar.php" class="btn btn-sm btn-outline-secondary fw-bold px-3">
             <i class="bi bi-arrow-left me-1"></i> Voltar à Lista
