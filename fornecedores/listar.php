@@ -41,7 +41,7 @@ include '../includes/header.php';
             Fornecedores Homologados
     </h1>
         <div>
-            <a href="../dashboard/index.php" class="btn btn-secondary me-2">Voltar ao Dashboard</a>
+            <a href="../dashboard/index.php" class="btn btn-secondary me-2"> Dashboard</a>
             <a href="cadastrar.php" class="btn btn-success">+ Novo Fornecedor</a>
         </div>
     </div>

@@ -19,7 +19,7 @@ include '../includes/header.php';
             <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-boxes text-dark me-2"></i>Controlo de Estoque</h1>
         </div>
         <div class="d-flex gap-2">
-            <a href="../dashboard/index.php" class="btn btn-secondary shadow-sm">Voltar ao Dashboard</a>
+            <a href="../dashboard/index.php" class="btn btn-secondary shadow-sm"> Dashboard</a>
             <a href="cadastrar.php" class="btn btn-success shadow-sm"><i class="bi bi-plus-circle me-1"></i> Nova Peça</a>
         </div>
     </div>
