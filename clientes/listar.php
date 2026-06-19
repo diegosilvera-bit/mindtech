@@ -55,9 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['acao']) && $_POST['aca
     }
 }
 
-// ============================================================
 // AÇÃO: EDITAR EQUIPAMENTO (via modal)
-// ============================================================
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['acao']) && $_POST['acao'] == 'editar_equip') {
     $id_equipamento = (int)$_POST['id_equipamento'];
     $id_cliente     = (int)$_POST['id_cliente'];
@@ -84,9 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['acao']) && $_POST['aca
     }
 }
 
-// ============================================================
 // AÇÃO: INATIVAR / ATIVAR EQUIPAMENTO
-// ============================================================
+
 if (isset($_GET['status_equip'])) {
     $id = (int)$_GET['status_equip'];
     $res = mysqli_query($conn, "SELECT ativo FROM equipamentos WHERE id_equipamento = $id");
@@ -98,9 +96,7 @@ if (isset($_GET['status_equip'])) {
     }
 }
 
-// ============================================================
 // BUSCA: CLIENTES
-// ============================================================
 $sql_clientes = "SELECT * FROM clientes ORDER BY nome ASC";
 $result_clientes = mysqli_query($conn, $sql_clientes);
 
@@ -116,7 +112,7 @@ include '../includes/header.php';
         
         </h1>
         <div>
-            <a href="../dashboard/index.php" class="btn btn-secondary me-2">Voltar ao Dashboard</a>
+            <a href="../dashboard/index.php" class="btn btn-secondary me-2">Dashboard</a>
             <a href="cadastrar.php" class="btn btn-success">+ Novo Cliente</a>
         </div>
     </div>
@@ -220,9 +216,8 @@ include '../includes/header.php';
 </div>
 
 
-<!-- ============================================================ -->
 <!-- MODAL PRINCIPAL: GERENCIAR EQUIPAMENTOS DO CLIENTE           -->
-<!-- ============================================================ -->
+
 <div class="modal fade" id="modalEquipamentos" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -258,9 +253,8 @@ include '../includes/header.php';
 </div>
 
 
-<!-- ============================================================ -->
-<!-- MODAL: CADASTRAR NOVO EQUIPAMENTO                            -->
-<!-- ============================================================ -->
+<!-- MODAL: CADASTRAR NOVO EQUIPAMENTO-->
+
 <div class="modal fade" id="modalCadastrarEquip" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -316,9 +310,8 @@ include '../includes/header.php';
 </div>
 
 
-<!-- ============================================================ -->
 <!-- MODAL: EDITAR EQUIPAMENTO                                    -->
-<!-- ============================================================ -->
+
 <div class="modal fade" id="modalEditarEquip" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -375,9 +368,7 @@ include '../includes/header.php';
 </div>
 
 
-<!-- ============================================================ -->
 <!-- DADOS DOS EQUIPAMENTOS (JSON embutido para o JS)             -->
-<!-- ============================================================ -->
 <?php
 // Busca TODOS os equipamentos de uma vez para evitar queries dentro de loop
 $sql_equips = "SELECT e.*, c.nome AS nome_cliente 
