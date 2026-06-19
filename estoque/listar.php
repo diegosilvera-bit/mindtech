@@ -18,9 +18,9 @@ include '../includes/header.php';
         <div>
             <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-boxes text-dark me-2"></i>Controlo de Estoque</h1>
         </div>
-        <div>
-            <a href="../dashboard/index.php" class="btn btn-secondary me-2">Voltar ao Dashboard</a>
-            <a href="cadastrar.php" class="btn btn-success"><i class="bi bi-plus-circle me-1"></i> Nova Peça</a>
+        <div class="d-flex gap-2">
+            <a href="../dashboard/index.php" class="btn btn-secondary shadow-sm">Voltar ao Dashboard</a>
+            <a href="cadastrar.php" class="btn btn-success shadow-sm"><i class="bi bi-plus-circle me-1"></i> Nova Peça</a>
         </div>
     </div>
 
@@ -63,9 +63,14 @@ include '../includes/header.php';
                                     <td class="text-muted">R$ <?php echo number_format($item['valor_unitario'], 2, ',', '.'); ?></td>
                                     
                                     <td class="text-center pe-4">
-                                        <a href="movimentar.php?id=<?php echo $item['id_peca']; ?>" class="btn btn-sm btn-primary fw-bold shadow-sm">
-                                            <i class="bi bi-arrow-left-right me-1"></i> Entrada/Saída
-                                        </a>
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <a href="movimentar.php?id=<?php echo $item['id_peca']; ?>" class="btn btn-sm btn-primary fw-bold shadow-sm" title="Entrada/Saída de Estoque">
+                                                <i class="bi bi-arrow-left-right"></i> Entrada/Saída
+                                            </a>
+                                            <a href="editar.php?id=<?php echo $item['id_peca']; ?>" class="btn btn-sm btn-warning fw-bold shadow-sm text-dark" title="Editar Peça">
+                                                <i class="bi bi-pencil-square"></i> Editar
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                         <?php 
@@ -76,24 +81,6 @@ include '../includes/header.php';
                                 <td colspan="5" class="text-center py-5 text-muted">
                                     <i class="bi bi-box fs-1 d-block mb-2 text-secondary opacity-50"></i>
                                     Nenhuma peça encontrada no inventário.
-                                <td class="ps-3"><span class="badge bg-secondary"><?php echo $item['codigo']; ?></span></td>
-                                <td class="fw-bold"><?php echo $item['descricao']; ?></td>
-                                
-                                <td>
-                                    <?php 
-                                    // Destaca em vermelho se o estoque for menor ou igual ao nível mínimo
-                                    if ($item['quantidade_disponivel'] <= $item['nivel_minimo']) {
-                                        echo "<span class='text-danger fw-bold'>" . $item['quantidade_disponivel'] . " un (Baixo)</span>";
-                                    } else {
-                                        echo $item['quantidade_disponivel'] . " un";
-                                    }
-                                    ?>
-                                </td>
-                                
-                                <td>R$ <?php echo number_format($item['valor_unitario'], 2, ',', '.'); ?></td>
-                                
-                                <td class="text-center pe-3">
-                                    <a href="#" class="btn btn-sm btn-primary">Entrada/Saída</a>
                                 </td>
                             </tr>
                         <?php } ?>

@@ -122,10 +122,6 @@ include '../includes/header.php';
                         <li class="nav-item"><a class="nav-link" href="/mindtech/estoque/listar.php"><i class="bi bi-boxes me-2"></i> Estoque</a></li>
                     <?php endif; ?>
                     
-                    <?php if (in_array($perfil, ['G', 'A', 'E', 'T'])): ?>
-                        <li class="nav-item"><a class="nav-link" href="/mindtech/pecas/listar.php"><i class="bi bi-cpu-fill me-2"></i> Peças</a></li>
-                    <?php endif; ?>
-                    
                     <?php if (in_array($perfil, ['G', 'E', 'T'])): ?>
                         <li class="nav-item"><a class="nav-link" href="/mindtech/fornecedores/listar.php"><i class="bi bi-truck me-2"></i> Fornecedores</a></li>
                     <?php endif; ?>
