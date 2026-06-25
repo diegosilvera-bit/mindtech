@@ -124,7 +124,7 @@ include '../includes/header.php';
                     <li class="nav-item"><a class="nav-link active" href="/mindtech/dashboard/index.php"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
                     
                     <?php if (in_array($perfil, ['G', 'A'])): ?>
-                        <li class="nav-item"><a class="nav-link" href="/mindtech/clientes/listar.php"><i class="bi bi-person-vcard-fill me-2"></i> Clientes</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/mindtech/clientes/listar.php"><i class="bi bi-person-vcard-fill me-2"></i> Atendimento</a></li>
                     <?php endif; ?>
                     
                     <?php if (in_array($perfil, ['G', 'A', 'T'])): ?>
