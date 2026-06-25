@@ -97,7 +97,7 @@ if (isset($_GET['status_equip'])) {
 }
 
 // BUSCA: CLIENTES
-$sql_clientes = "SELECT * FROM clientes ORDER BY nome ASC";
+$sql_clientes = "SELECT * FROM clientes ORDER BY id_cliente ASC";
 $result_clientes = mysqli_query($conn, $sql_clientes);
 
 include '../includes/header.php';
