@@ -97,9 +97,7 @@ include '../includes/header.php';
         margin: 10px 0;
     }
 
-    /* ========================================================= */
     /* ANIMAÇÃO DE ENTRADA (FADE E SCALE)                        */
-    /* ========================================================= */
     @keyframes fadeScaleIn {
         0% {
             opacity: 0;
@@ -128,15 +126,15 @@ include '../includes/header.php';
                     <?php if (in_array($perfil, ['G', 'A'])): ?>
                         <li class="nav-item"><a class="nav-link" href="/mindtech/clientes/listar.php"><i class="bi bi-person-vcard-fill me-2"></i> Clientes</a></li>
                     <?php endif; ?>
-                            
-                    <?php if (in_array($perfil, ['G', 'A'])): ?>
-                        <li class="nav-item"><a class="nav-link" href="/mindtech/orcamentos/listar.php"><i class="bi bi-cash-coin me-2"></i> Orçamentos</a></li>
-                    <?php endif; ?>
                     
                     <?php if (in_array($perfil, ['G', 'A', 'T'])): ?>
                         <li class="nav-item"><a class="nav-link" href="/mindtech/ordens_servico/listar.php"><i class="bi bi-tools me-2"></i> Ordens de Serviço</a></li>
                     <?php endif; ?>
                     
+                    <?php if (in_array($perfil, ['G', 'A'])): ?>
+                        <li class="nav-item"><a class="nav-link" href="/mindtech/orcamentos/listar.php"><i class="bi bi-cash-coin me-2"></i> Orçamentos</a></li>
+                    <?php endif; ?>
+
                     <?php if (in_array($perfil, ['G', 'A', 'E', 'T'])): ?>
                         <li class="nav-item"><a class="nav-link" href="/mindtech/estoque/listar.php"><i class="bi bi-boxes me-2"></i> Estoque</a></li>
                     <?php endif; ?>
