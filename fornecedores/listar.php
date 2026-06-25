@@ -37,7 +37,7 @@ include '../includes/header.php';
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="fw-bold">
-            <i class="bi bi-truck text-success me-2"></i>
+            <i class="bi bi-truck text-white me-2"></i>
             Fornecedores Homologados
     </h1>
         <div>
