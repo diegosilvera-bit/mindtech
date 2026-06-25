@@ -35,9 +35,8 @@ body {
     overflow: hidden; /* Impede rolagem indesejada durante a animação */
 }
 
-/* ========================================================= */
 /* ANIMAÇÃO DE ENTRADA (FADE E SCALE baseado no botao.html)  */
-/* ========================================================= */
+
 @keyframes fadeScaleIn {
     0% {
         opacity: 0;
@@ -101,7 +100,7 @@ body {
     border-color: #d1aa35 !important;
     color: #121212 !important;
     
-    /* Move o botão levemente para cima ao passar o rato */
+    /* Move o botão levemente para cima ao passar o mouse */
     transform: translateY(-3px);
     box-shadow: 0 6px 15px rgba(236, 194, 69, 0.25); /* Leve brilho dourado */
 }
@@ -151,7 +150,7 @@ body {
                 </form>
                 
                 <div class="mt-4 pt-2 border-top border-secondary border-opacity-20">
-                    <p class="text-muted small mb-0">Mindtech &copy; <?= date('Y') ?> — Todos os direitos reservados.</p>
+                    <p class="text-muted small mb-0">Mindtech &copy; <?= date('Y') ?>  Todos os direitos reservados.</p>
                 </div>
             </div>
 
