@@ -1,15 +1,17 @@
 # MindTech Completo (Estrutura Base)
 
 Sistema em PHP + Bootstrap + MySQL com módulos:
-- Usuários
+
+- Dashboard 
 - Clientes
-- Equipamentos
-- Fornecedores
-- Peças
-- Estoque
-- Ordens de Serviço
 - Orçamentos
+- Ordens de Serviço
+- Estoque
+- Fornecedores
 - Relatórios
+- Estoque
+- Usuários
+
 
 ## Instalação
 1. Extraia em C:\xampp\htdocs\mindtech
