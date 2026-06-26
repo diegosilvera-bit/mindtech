@@ -13,7 +13,7 @@ verificarAcesso(['G', 'A', 'T']);
 
 include '../config/conexao.php'; 
 
-// Consulta SQL ajustada para buscar também o técnico responsável (Tabela usuarios)
+// Consulta SQL para buscar os dados incluindo o técnico responsável
 $sql = "SELECT os.id_os, os.data_entrada, os.status, 
                c.nome AS nome_cliente, 
                CONCAT(e.marca, ' ', e.modelo) AS equipamento,
@@ -60,8 +60,8 @@ include '../includes/header.php';
                             <th class="ps-3" style="width: 5%;">N° OS</th>
                             <th style="width: 20%;">Cliente</th>
                             <th style="width: 20%;">Equipamento</th>
-                            <th style="width: 15%;">Técnico Resp.</th>
                             <th style="width: 10%;">Data</th>
+                            <th style="width: 15%;">Técnico Resp.</th>
                             <th style="width: 15%; text-align: center;">Etapa Atual</th>
                             <th style="width: 15%; text-align: center;" class="pe-3">Ações</th>
                         </tr>
@@ -91,13 +91,14 @@ include '../includes/header.php';
                                 } elseif ($statusTexto === 'CANCELADO') {
                                     $badgeColor = 'bg-danger';
                                     $statusTexto = 'Cancelado';
-                                    $isCancelada = true; // Marca para deixar a linha opaca
+                                    $isCancelada = true;
                                 }
                         ?>
                             <tr class="<?php echo $isCancelada ? 'table-light text-muted opacity-75' : ''; ?>">
                                 <td class="ps-3 fw-bold text-muted">#<?php echo $row['id_os']; ?></td>
                                 <td class="fw-bold text-dark"><?php echo htmlspecialchars($row['nome_cliente']); ?></td>
                                 <td><?php echo htmlspecialchars($row['equipamento']); ?></td>
+                                <td><?php echo date('d/m/Y', strtotime($row['data_entrada'])); ?></td>
                                 <td>
                                     <?php 
                                     if (!empty($row['tecnico_responsavel'])) {
@@ -107,7 +108,6 @@ include '../includes/header.php';
                                     }
                                     ?>
                                 </td>
-                                <td><?php echo date('d/m/Y', strtotime($row['data_entrada'])); ?></td>
                                 <td class="text-center">
                                     <span class="badge <?php echo $badgeColor; ?> px-2 py-1">
                                         <?php echo $statusTexto; ?>
