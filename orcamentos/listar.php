@@ -18,7 +18,7 @@ $sql = "SELECT o.id_orcamento, o.id_os, o.valor_pecas, o.valor_mao_obra, o.valor
         FROM orcamentos o
         INNER JOIN ordens_servico os ON o.id_os = os.id_os
         INNER JOIN clientes c ON os.id_cliente = c.id_cliente
-        ORDER BY o.id_orcamento DESC";
+        ORDER BY o.id_os ASC";
         
 $result = mysqli_query($conn, $sql);
 
