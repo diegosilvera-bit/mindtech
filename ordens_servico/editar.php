@@ -1,4 +1,17 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.1/dist/js/tom-select.complete.min.js"></script>
+
+<style>
+    .ts-dropdown .highlight {
+        background: transparent !important;
+        color: inherit !important;
+        text-decoration: none !important;
+        font-weight: bold !important;
+    }
+</style>
+
 <?php 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -89,8 +102,8 @@ include '../includes/header.php';
                 <div class="row mb-4">
                     <div class="col-md-4">
                         <label class="form-label fw-bold">Técnico Responsável</label>
-                        <select class="form-select" name="id_usuario_responsavel">
-                            <option value="">-- Não alocado --</option>
+                        <select class="form-select" name="id_usuario_responsavel" id="id_usuario_responsavel">
+                            <option value="" disabled <?php echo empty($os['id_usuario_responsavel']) ? 'selected' : ''; ?>>-- Não alocado --</option>
                             <?php 
                             if ($res_tecnicos) {
                                 while ($tec = mysqli_fetch_assoc($res_tecnicos)) {
@@ -130,4 +143,24 @@ include '../includes/header.php';
         </div>
     </div>
 </div>
+
+<script>
+    // Regra de busca estrita: o item deve obrigatoriamente INICIAR com o termo pesquisado
+    function funcaoBuscaEstrita(search) {
+        const query = search.trim().toLowerCase();
+        return function(item) {
+            if (!query) return 1;
+            return item.text.toLowerCase().startsWith(query) ? 1 : 0;
+        };
+    }
+
+    // Inicializa o Buscador de Técnicos
+    const buscadorTecnico = new TomSelect("#id_usuario_responsavel", {
+        create: false,
+        placeholder: "-- Não alocado --",
+        allowEmptyOption: false, // Impede a seleção da opção em branco
+        score: funcaoBuscaEstrita
+    });
+</script>
+
 <?php include '../includes/footer.php'; ?>
