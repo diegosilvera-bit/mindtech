@@ -118,9 +118,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             Deixou o seu aparelho connosco? Consulte agora o andamento do seu reparo de forma rápida, segura e sem complicação.
                         </p>
                         
-                        <a href="cliente/index.php" class="btn btn-light btn-lg fw-bold text-primary w-100 shadow rounded-3 fs-6 py-2">
-                            Acompanhar Meu Reparo <i class="bi bi-arrow-right-short fs-5 align-middle ms-1"></i>
-                        </a>
+                        <a href="ordens_servico/consultar.php" class="btn btn-light btn-lg fw-bold text-primary w-100 shadow rounded-3 fs-6 py-2">
+                             Acompanhar Meu Reparo <i class="bi bi-arrow-right-short fs-5 align-middle ms-1"></i>
+                         </a>
 
                         <div class="mt-4 small text-white-50 opacity-75">
                             <i class="bi bi-shield-check me-1"></i> Consulta 100% segura

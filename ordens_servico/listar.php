@@ -31,9 +31,11 @@ include '../includes/header.php';
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-tools text-dark me-2"></i>Ordens de Serviço</h1>
         <div>
-            <a href="../dashboard/index.php" class="btn btn-secondary me-2">Dashboard</a>
-            <a href="cadastrar.php" class="btn btn-success"><i class=\"bi bi-plus-circle\"></i> Nova O.S.</a>
-        </div>
+             <a href="../dashboard/index.php" class="btn btn-secondary me-2">Dashboard</a>
+            <a href="gerar_codigo.php" class="btn btn-info me-2"><i class="bi bi-qr-code"></i> Código de Acompanhamento</a>
+             <a href="cadastrar.php" class="btn btn-success"><i class=\"bi bi-plus-circle\"></i> Nova O.S.</a>
+         </div>
+
     </div>
 
     <div class="card shadow-sm border-0 border-start border-4 border-dark">
