@@ -1,4 +1,17 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.1/dist/js/tom-select.complete.min.js"></script>
+
+<style>
+    .ts-dropdown .highlight {
+        background: transparent !important;
+        color: inherit !important;
+        text-decoration: none !important;
+        font-weight: bold !important;
+    }
+</style>
+
 <?php 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -81,8 +94,8 @@ include '../includes/header.php';
                 <div class="row">
                     <div class="col-md-12 mb-3">
                         <label class="form-label fw-bold">Fornecedor Principal (Opcional)</label>
-                        <select class="form-select" name="id_fornecedor">
-                            <option value="">-- Selecione o Fornecedor ou deixe em branco --</option>
+                        <select class="form-select" name="id_fornecedor" id="id_fornecedor" style="border-radius: 8px;">
+                            <option value="" disabled selected>-- Selecione o Fornecedor ou deixe em branco --</option>
                             <?php 
                             if ($res_fornecedores && mysqli_num_rows($res_fornecedores) > 0) {
                                 while($f = mysqli_fetch_assoc($res_fornecedores)) {
@@ -128,5 +141,24 @@ include '../includes/header.php';
         </div>
     </div>
 </div>
+
+<script>
+    // Regra de busca estrita: o item deve obrigatoriamente INICIAR com o termo pesquisado
+    function funcaoBuscaEstrita(search) {
+        const query = search.trim().toLowerCase();
+        return function(item) {
+            if (!query) return 1;
+            return item.text.toLowerCase().startsWith(query) ? 1 : 0;
+        };
+    }
+
+    // Inicializa o Buscador de Fornecedores
+    const buscadorFornecedor = new TomSelect("#id_fornecedor", {
+        create: false,
+        placeholder: "-- Selecione o Fornecedor ou deixe em branco --",
+        allowEmptyOption: false, // Impede de selecionar a opção vazia após escolher um fornecedor
+        score: funcaoBuscaEstrita
+    });
+</script>
 
 <?php include '../includes/footer.php'; ?>
