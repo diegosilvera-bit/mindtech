@@ -1,4 +1,17 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.1/dist/js/tom-select.complete.min.js"></script>
+
+<style>
+    .ts-dropdown .highlight {
+        background: transparent !important;
+        color: inherit !important;
+        text-decoration: none !important;
+        font-weight: bold !important;
+    }
+</style>
+
 <?php 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -86,7 +99,7 @@ include '../includes/header.php';
                 <div class="row">
                     <div class="col-md-6 mb-4">
                         <label class="form-label fw-bold">1. Selecione o Cliente *</label>
-                        <select class="form-select" name="id_cliente" id="id_cliente" required onchange="filtrarEquipamentos()" style="border-radius: 8px;">
+                        <select class="form-select" name="id_cliente" id="id_cliente" required style="border-radius: 8px;">
                             <option value="" disabled selected>Pesquise ou selecione na lista...</option>
                             <?php 
                             if ($res_clientes && mysqli_num_rows($res_clientes) > 0) {
@@ -109,8 +122,8 @@ include '../includes/header.php';
                 <div class="row bg-light p-3 rounded mb-4">
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-bold">Técnico Responsável</label>
-                        <select class="form-select" name="id_tecnico" style="border-radius: 8px;">
-                            <option value="">Ainda não alocado</option>
+                        <select class="form-select" name="id_tecnico" id="id_tecnico" style="border-radius: 8px;">
+                            <option value="" disabled selected>Não alocado...</option>
                             <?php 
                             if ($res_tecnicos && mysqli_num_rows($res_tecnicos) > 0) {
                                 while ($tec = mysqli_fetch_assoc($res_tecnicos)) {
@@ -139,7 +152,7 @@ include '../includes/header.php';
 
                 <div class="mb-4">
                     <label class="form-label fw-bold">Problema Relatado / Observações Iniciais *</label>
-                    <textarea class=\"form-control\" name="observacoes" rows="4" required style="border-radius: 8px;"></textarea>
+                    <textarea class="form-control" name="observacoes" rows="4" required style="border-radius: 8px;"></textarea>
                 </div>
 
                 <div class="d-flex justify-content-end gap-2">
@@ -154,23 +167,76 @@ include '../includes/header.php';
 </div>
 
 <script>
+    // Converte o array PHP de equipamentos para um objeto Javascript
     const todosEquipamentos = <?php echo json_encode($array_equipamentos); ?>;
+
+    // Regra de busca estrita: o item deve obrigatoriamente INICIAR com o termo pesquisado
+    function funcaoBuscaEstrita(search) {
+        const query = search.trim().toLowerCase();
+        return function(item) {
+            if (!query) return 1;
+            return item.text.toLowerCase().startsWith(query) ? 1 : 0;
+        };
+    }
+
+    // 1. Inicializa o Buscador de Clientes
+    const buscadorCliente = new TomSelect("#id_cliente", {
+        create: false,
+        placeholder: "Pesquise ou selecione na lista...",
+        allowEmptyOption: false,
+        score: funcaoBuscaEstrita
+    });
+
+    // 2. Inicializa o Buscador de Equipamentos
+    const buscadorEquipamento = new TomSelect("#id_equipamento", {
+        create: false,
+        placeholder: "Primeiro, selecione um cliente...",
+        allowEmptyOption: false,
+        score: funcaoBuscaEstrita
+    });
+
+    // 3. Inicializa o Buscador de Técnicos
+    const buscadorTecnico = new TomSelect("#id_tecnico", {
+        create: false,
+        placeholder: "Não alocado...", // Texto configurado como placeholder
+        allowEmptyOption: false, // Desativa a seleção da opção em branco
+        score: funcaoBuscaEstrita
+    });
+
+    // Escuta a mudança do Cliente para disparar a filtragem de aparelhos
+    buscadorCliente.on('change', function() {
+        filtrarEquipamentos();
+    });
+
     function filtrarEquipamentos() {
+        // Pega o valor atual selecionado no Tom Select do cliente
         const idCliente = document.getElementById('id_cliente').value;
-        const selectEquipamento = document.getElementById('id_equipamento');
-        selectEquipamento.innerHTML = '<option value="" disabled selected>Selecione o aparelho...</option>';
+        
+        // Limpa as seleções e opções anteriores do Tom Select do aparelho
+        buscadorEquipamento.clear();
+        buscadorEquipamento.clearOptions();
+        
+        // Filtra os equipamentos vinculados ao ID do cliente selecionado
         const equipamentosFiltrados = todosEquipamentos.filter(eq => eq.id_cliente == idCliente);
         
         if (equipamentosFiltrados.length > 0) {
             equipamentosFiltrados.forEach(eq => {
-                const option = document.createElement('option');
-                option.value = eq.id_equipamento;
-                option.textContent = `${eq.tipo} ${eq.marca} ${eq.modelo}`;
-                selectEquipamento.appendChild(option);
+                buscadorEquipamento.addOption({
+                    value: eq.id_equipamento,
+                    text: `${eq.tipo} ${eq.marca} ${eq.modelo}`
+                });
             });
         } else {
-            selectEquipamento.innerHTML = '<option value="" disabled selected>Nenhum aparelho registado.</option>';
+            // Se o cliente não possuir aparelhos ativos cadastrados
+            buscadorEquipamento.addOption({
+                value: "",
+                text: "Nenhum aparelho registado."
+            });
         }
+        
+        // Solicita ao componente atualizar a renderização na tela
+        buscadorEquipamento.refreshOptions(false);
     }
 </script>
+
 <?php include '../includes/footer.php'; ?>
