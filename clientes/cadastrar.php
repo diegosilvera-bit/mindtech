@@ -57,9 +57,9 @@ include '../includes/header.php';
 ?>
 
 <div class="container mt-4 mb-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
         <h1>Cadastrar Novo Cliente</h1>
-        
+
         <a href="listar.php" class="btn btn-secondary me-2">Voltar para a Lista</a>
     </div>
 
@@ -140,7 +140,7 @@ include '../includes/header.php';
                 </div>
 
                 <hr class="mt-4">
-                <div class="d-flex justify-content-end gap-2">
+                <div class="d-flex flex-wrap justify-content-end gap-2">
                     <a href="listar.php" class="btn btn-light border">Cancelar</a>
                     <button class="btn btn-success" type="submit">Salvar Cliente</button>
                 </div>

@@ -106,12 +106,12 @@ include '../includes/header.php';
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
 <div class="container mt-4 mb-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
         <h1 class="fw-bold"><i class="bi bi-people"></i>Meus Clientes
 
 
         </h1>
-        <div>
+        <div class="d-flex flex-wrap gap-2">
             <a href="../dashboard/index.php" class="btn btn-secondary me-2">Dashboard</a>
             <a href="cadastrar.php" class="btn btn-success">+ Novo Cliente</a>
         </div>
@@ -163,10 +163,10 @@ include '../includes/header.php';
                                         <?php endif; ?>
                                     </td>
 
-                                    <td class="text-center pe-3" style="white-space: nowrap; min-width: 300px;">
+                                    <td class="text-center pe-3" style="min-width: 180px;">
 
                                         <div
-                                            class="d-flex flex-row justify-content-center align-items-center gap-2 flex-nowrap">
+                                            class="d-flex flex-wrap justify-content-center align-items-center gap-2">
 
                                             <a href="#" class="btn btn-sm btn-info text-white d-inline-flex align-items-center"
                                                 onclick="abrirEquipamentos(<?php echo $cliente['id_cliente']; ?>, '<?php echo htmlspecialchars(addslashes($cliente['nome'])); ?>'); return false;"
