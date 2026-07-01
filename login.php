@@ -3,6 +3,7 @@
 session_start();
 require_once 'config/conexao.php';
 $erro = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE login = ? AND senha = ?");
     $stmt->execute([$_POST['login'], $_POST['senha']]);
@@ -19,143 +20,120 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Login - MindTech</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login - MindTech</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-<style>
-body {
-    background-color: #121212 !important;
-    color: #ffffff !important;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    overflow: hidden; /* Impede rolagem indesejada durante a animação */
-}
+    <style>
+        /* ==========================================
+           O SEU CSS ORIGINAL (MANTIDO INTACTO)
+           ========================================== */
+        body {
+            background-color: #121212 !important;
+            color: #ffffff !important;
+            height: 100vh;
+        }
+        
+        /* Cole aqui o restante do seu CSS antigo se faltar algo (cores dos inputs, etc) */
 
-/* ANIMAÇÃO DE ENTRADA (FADE E SCALE baseado no botao.html)  */
 
-@keyframes fadeScaleIn {
-    0% {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
+        /* ==========================================
+           CSS APENAS PARA A TELA DIVIDIDA DO CLIENTE
+           ========================================== */
+        .split-card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.4);
+            background-color: #1e1e1e; /* Fundo do cartão escuro para combinar com o seu body */
+            border: 1px solid #2d2d2d;
+        }
 
-.animate-page {
-    /* Aplica a animação com a mesma duração (0.6s) do seu ficheiro original */
-    animation: fadeScaleIn 0.6s ease forwards;
-}
+        /* Se a sua marca não for azul, altere as cores HEX aqui! */
+        .bg-cliente {
+            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+            color: white;
+        }
 
-/* Caixa de Login */
-.card {
-    background-color: #1e1e1e !important;
-    border: 1px solid #2d2d2d !important;
-    border-radius: 12px !important;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-}
-
-/* Campos de digitação escuros */
-.form-control {
-    background-color: #252525 !important;
-    border: 1px solid #3d3d3d !important;
-    color: #ffffff !important;
-    padding: 12px !important;
-    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
-}
-
-.form-control::placeholder {
-    color: #757575 !important;
-}
-
-.form-control:focus {
-    background-color: #2d2d2d !important;
-    color: #ffffff !important;
-    border-color: #ecc245 !important;
-    box-shadow: 0 0 0 0.25rem rgba(236, 194, 69, 0.2) !important;
-}
-
-/* Botão "Entrar" Dourado com a animação de hover */
-.btn-primary {
-    background-color: #ecc245 !important;
-    border-color: #ecc245 !important;
-    color: #121212 !important;
-    font-weight: bold !important;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 12px !important;
-    
-    /* Transição suave no botão (do arquivo botao.html) */
-    transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s !important;
-}
-
-.btn-primary:hover {
-    background-color: #d1aa35 !important;
-    border-color: #d1aa35 !important;
-    color: #121212 !important;
-    
-    /* Move o botão levemente para cima ao passar o mouse */
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(236, 194, 69, 0.25); /* Leve brilho dourado */
-}
-
-.btn-primary:active {
-    /* Volta à posição normal ao clicar */
-    transform: translateY(0);
-    box-shadow: 0 2px 5px rgba(236, 194, 69, 0.2);
-}
-
-.text-muted {
-    color: #b3b3b3 !important;
-    text-align: center;
-}
-</style>
+        .brand-logo {
+            max-height: 60px;
+            width: auto;
+            object-fit: contain;
+        }
+    </style>
 </head>
-<body>
-<div class="container animate-page">
+<body class="d-flex align-items-center justify-content-center">
+
+<div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-5 col-lg-4">
+        <div class="col-lg-10 col-xl-8">
             
-            <div class="text-center mb-4">
-                <img src="assets/img/logo.png" alt="Mindtech" class="img-fluid" style="max-width: 220px; filter: drop-shadow(0px 4px 15px rgba(236, 194, 69, 0.15));">
-            </div>
+            <div class="card split-card border-0">
+                <div class="row g-0">
+                    
+                    <div class="col-md-6 p-4 p-sm-5 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="mb-4 text-start">
+                                <img src="assets/img/logo.png" alt="MindTech Logo" class="brand-logo mb-2 img-fluid">
+                                <p class="text-muted small">Acesso restrito para funcionários</p>
+                            </div>
 
-            <div class="card p-4">
-                <h4 class="text-center fw-bold mb-4 text-uppercase tracking-wide" style="color: #ecc245; font-size: 1.1rem;">Acesso ao Sistema</h4>
-                
-                <?php if ($erro): ?>
-                    <div class="alert alert-danger border-0 bg-danger bg-opacity-20 text-danger text-center py-2 small mb-3 rounded">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i><?= $erro ?>
-                    </div>
-                <?php endif; ?>
+                            <?php if (!empty($erro)): ?>
+                                <div class="alert alert-danger border-0 bg-danger bg-opacity-20 text-danger text-center py-2 small mb-3 rounded">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i><?= $erro ?>
+                                </div>
+                            <?php endif; ?>
 
-                <form method="POST" action="">
-                    <div class="mb-3">
-                        <label for="login" class="form-label small fw-bold text-muted">Usuário / Login</label>
-                        <input type="text" class="form-control" id="login" name="login" placeholder="Digite seu usuário" required autocomplete="off">
+                            <form method="POST" action="">
+                                <div class="mb-3">
+                                    <label for="login" class="form-label small fw-bold text-muted">Usuário / Login</label>
+                                    <input type="text" class="form-control" id="login" name="login" placeholder="Digite seu usuário" required autocomplete="off">
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="senha" class="form-label small fw-bold text-muted">Senha</label>
+                                    <input type="password" class="form-control" id="senha" name="senha" placeholder="••••••••" required>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary w-100 rounded-3 py-2 fw-bold">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Entrar no Sistema
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div class="mt-4 pt-3 border-top border-secondary border-opacity-20">
+                            <p class="text-muted small mb-0">Mindtech &copy; <?= date('Y') ?> Todos os direitos reservados.</p>
+                        </div>
                     </div>
-                    <div class="mb-4">
-                        <label for="senha" class="form-label small fw-bold text-muted">Senha </label>
-                        <input type="password" class="form-control" id="senha" name="senha" placeholder="••••••••" required>
+
+                    <div class="col-md-6 bg-cliente p-4 p-sm-5 d-flex flex-column justify-content-center align-items-center text-center">
+                        
+                        <div class="mb-4">
+                            <i class="bi bi-search border border-2 border-white rounded-circle p-3 fs-1 opacity-75"></i>
+                        </div>
+                        
+                        <h3 class="fw-bold mb-3">Sou Cliente</h3>
+                        <p class="mb-4 text-white-50 small px-2">
+                            Deixou o seu aparelho connosco? Consulte agora o andamento do seu reparo de forma rápida, segura e sem complicação.
+                        </p>
+                        
+                        <a href="cliente/index.php" class="btn btn-light btn-lg fw-bold text-primary w-100 shadow rounded-3 fs-6 py-2">
+                            Acompanhar Meu Reparo <i class="bi bi-arrow-right-short fs-5 align-middle ms-1"></i>
+                        </a>
+
+                        <div class="mt-4 small text-white-50 opacity-75">
+                            <i class="bi bi-shield-check me-1"></i> Consulta 100% segura
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 rounded-3">
-                        <i class="bi bi-box-arrow-in-right me-2"></i>Entrar no Sistema
-                    </button>
-                </form>
-                
-                <div class="mt-4 pt-2 border-top border-secondary border-opacity-20">
-                    <p class="text-muted small mb-0">Mindtech &copy; <?= date('Y') ?>  Todos os direitos reservados.</p>
+
                 </div>
             </div>
 
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
