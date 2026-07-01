@@ -7,133 +7,113 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../includes/functions.php'; 
 require_once '../includes/auth.php'; 
 
-// TRAVA DE SEGURANÇA: Gerente (G), Atendimento (A) e Técnico (T) podem editar O.S.
 verificarAcesso(['G', 'A', 'T']);
-
 include '../config/conexao.php'; 
 
 $mensagem = ''; 
 $sucesso = false;
-
-// Pega o ID da OS vindo da URL
 $id_os = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-if ($id_os <= 0) {
-    header("Location: listar.php");
-    exit;
-}
+if ($id_os <= 0) { header("Location: listar.php"); exit; }
 
-// Se o formulário foi enviado, processa a atualização
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $id_cliente = (int)$_POST['id_cliente'];
-    $id_equipamento = (int)$_POST['id_equipamento'];
     $id_tecnico = !empty($_POST['id_usuario_responsavel']) ? (int)$_POST['id_usuario_responsavel'] : 'NULL';
-    $status = $_POST['status'];
-    $observacoes = mysqli_real_escape_string($conn, $_POST['observacoes']);
+    $status = mysqli_real_escape_string($conn, $_POST['status']);
+    $observacoes = mysqli_real_escape_string($conn, trim($_POST['observacoes']));
+    
+    // Captação da Data Atualizada
+    $data_prevista = !empty($_POST['data_prevista_entrega']) ? "'" . mysqli_real_escape_string($conn, $_POST['data_prevista_entrega']) . " 23:59:59'" : "NULL";
 
-    if ($id_cliente <= 0 || $id_equipamento <= 0) {
-        $mensagem = "Os campos Cliente e Equipamento são obrigatórios.";
+    $sql_update = "UPDATE ordens_servico SET 
+                    id_usuario_responsavel = $id_tecnico,
+                    status = '$status',
+                    observacoes = '$observacoes',
+                    data_prevista_entrega = $data_prevista
+                   WHERE id_os = $id_os";
+
+    if (mysqli_query($conn, $sql_update)) {
+        $mensagem = "Ordem de Serviço atualizada com sucesso!";
+        $sucesso = true;
     } else {
-        // Monta o SQL de atualização
-        $sql_update = "UPDATE ordens_servico SET 
-                        id_cliente = $id_cliente, 
-                        id_equipamento = $id_equipamento, 
-                        id_usuario_responsavel = $id_tecnico, 
-                        status = '$status', 
-                        observacoes = '$observacoes' 
-                      WHERE id_os = $id_os";
-
-        if (mysqli_query($conn, $sql_update)) {
-            $mensagem = "Ordem de Serviço atualizada com sucesso!";
-            $sucesso = true;
-        } else {
-            $mensagem = "Erro ao atualizar a O.S.: " . mysqli_error($conn);
-        }
+        $mensagem = "Erro ao atualizar O.S: " . mysqli_error($conn);
     }
 }
 
-// Busca os dados atuais da OS
-$sql_os = "SELECT * FROM ordens_servico WHERE id_os = $id_os";
+$sql_os = "SELECT os.*, c.nome AS nome_cliente, e.marca, e.modelo 
+           FROM ordens_servico os 
+           JOIN clientes c ON os.id_cliente = c.id_cliente
+           JOIN equipamentos e ON os.id_equipamento = e.id_equipamento
+           WHERE os.id_os = $id_os";
 $res_os = mysqli_query($conn, $sql_os);
 $os = mysqli_fetch_assoc($res_os);
 
-if (!$os) {
-    header("Location: listar.php");
-    exit;
+if (!$os) { die("O.S. não encontrada."); }
+
+$data_prevista_input = '';
+if (!empty($os['data_prevista_entrega']) && $os['data_prevista_entrega'] != '0000-00-00 00:00:00') {
+    $data_prevista_input = date('Y-m-d', strtotime($os['data_prevista_entrega']));
 }
 
-// Busca dados auxiliares para preencher os selects do formulário
-$clientes = mysqli_query($conn, "SELECT id_cliente, nome FROM clientes WHERE ativo = 1 OR id_cliente = {$os['id_cliente']} ORDER BY nome ASC");
-$equipamentos = mysqli_query($conn, "SELECT id_equipamento, marca, modelo FROM equipamentos WHERE ativo = 1 OR id_equipamento = {$os['id_equipamento']} ORDER BY marca ASC");
-$tecnicos = mysqli_query($conn, "SELECT id_usuario, nome FROM usuarios WHERE perfil IN ('T', 'G') ORDER BY nome ASC");
+$sql_tecnicos = "SELECT id_usuario, nome FROM usuarios WHERE perfil IN ('T', 'G') ORDER BY nome ASC";
+$res_tecnicos = mysqli_query($conn, $sql_tecnicos);
 
 include '../includes/header.php'; 
 ?>
 
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="fw-bold">Editar Ordem de Serviço #<?php echo $id_os; ?></h1>
-        <a href="listar.php" class="btn btn-secondary">Voltar para Lista</a>
+        <h1 class="h3 mb-1 text-gray-800 fw-bold">Editar O.S. #<?php echo $id_os; ?></h1>
+        <a href="listar.php" class="btn btn-sm btn-outline-secondary fw-bold"><i class="bi bi-arrow-left"></i> Voltar</a>
     </div>
 
-    <?php if ($mensagem != '') { ?>
-        <div class="alert <?php echo $sucesso ? 'alert-success' : 'alert-danger'; ?> shadow-sm fw-bold">
+    <?php if ($mensagem): ?>
+        <div class="alert alert-<?php echo $sucesso ? 'success' : 'danger'; ?> shadow-sm">
             <?php echo $mensagem; ?>
         </div>
-    <?php } ?>
+    <?php endif; ?>
 
     <div class="card shadow-sm border-0 border-start border-4 border-primary">
         <div class="card-body p-4">
-            <form method="post" action="editar.php?id=<?php echo $id_os; ?>">
-                
-                <div class="row">
+            <form method="POST">
+                <div class="row bg-light p-3 rounded mb-4">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Cliente *</label>
-                        <select class="form-select" name="id_cliente" required>
-                            <option value="">-- Selecione o Cliente --</option>
-                            <?php while($c = mysqli_fetch_assoc($clientes)) { ?>
-                                <option value="<?php echo $c['id_cliente']; ?>" <?php echo $c['id_cliente'] == $os['id_cliente'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($c['nome']); ?>
-                                </option>
-                            <?php } ?>
-                        </select>
+                        <label class="form-label fw-bold">Cliente</label>
+                        <input type="text" class="form-control" value="<?php echo htmlspecialchars($os['nome_cliente']); ?>" disabled>
                     </div>
-
                     <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Equipamento *</label>
-                        <select class="form-select" name="id_equipamento" required>
-                            <option value="">-- Selecione o Equipamento --</option>
-                            <?php while($e = mysqli_fetch_assoc($equipamentos)) { ?>
-                                <option value="<?php echo $e['id_equipamento']; ?>" <?php echo $e['id_equipamento'] == $os['id_equipamento'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($e['marca'] . ' ' . $e['modelo']); ?>
-                                </option>
-                            <?php } ?>
-                        </select>
+                        <label class="form-label fw-bold">Equipamento</label>
+                        <input type="text" class="form-control" value="<?php echo htmlspecialchars($os['marca'] . ' ' . $os['modelo']); ?>" disabled>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
+                <div class="row mb-4">
+                    <div class="col-md-4">
                         <label class="form-label fw-bold">Técnico Responsável</label>
                         <select class="form-select" name="id_usuario_responsavel">
-                            <option value="">-- Sem técnico alocado --</option>
-                            <?php while($t = mysqli_fetch_assoc($tecnicos)) { ?>
-                                <option value="<?php echo $t['id_usuario']; ?>" <?php echo $t['id_usuario'] == $os['id_usuario_responsavel'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($t['nome']); ?>
-                                </option>
-                            <?php } ?>
+                            <option value="">-- Não alocado --</option>
+                            <?php 
+                            if ($res_tecnicos) {
+                                while ($tec = mysqli_fetch_assoc($res_tecnicos)) {
+                                    $sel = ($os['id_usuario_responsavel'] == $tec['id_usuario']) ? 'selected' : '';
+                                    echo "<option value='{$tec['id_usuario']}' $sel>{$tec['nome']}</option>";
+                                }
+                            }
+                            ?>
                         </select>
                     </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Etapa / Status Atual</label>
-                        <select class="form-select" name="status">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Status Atual</label>
+                        <select class="form-select fw-bold" name="status">
                             <option value="EM_ANALISE" <?php echo $os['status'] == 'EM_ANALISE' ? 'selected' : ''; ?>>Em Análise</option>
                             <option value="EM_REPARO" <?php echo $os['status'] == 'EM_REPARO' ? 'selected' : ''; ?>>Em Reparo</option>
                             <option value="AGUARDANDO_PECA" <?php echo $os['status'] == 'AGUARDANDO_PECA' ? 'selected' : ''; ?>>Aguardando Peça</option>
                             <option value="FINALIZADO" <?php echo $os['status'] == 'FINALIZADO' ? 'selected' : ''; ?>>Finalizado</option>
                             <option value="CANCELADO" <?php echo $os['status'] == 'CANCELADO' ? 'selected' : ''; ?>>Cancelado</option>
                         </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-primary">Previsão de Entrega</label>
+                        <input type="date" class="form-control border-primary" name="data_prevista_entrega" value="<?php echo $data_prevista_input; ?>">
                     </div>
                 </div>
 
@@ -142,15 +122,12 @@ include '../includes/header.php';
                     <textarea class="form-control" name="observacoes" rows="5"><?php echo htmlspecialchars($os['observacoes']); ?></textarea>
                 </div>
 
-                <hr class="mt-4">
-                <div class="d-flex justify-content-end gap-2">
+                <div class="d-flex justify-content-end gap-2 mt-4">
                     <a href="listar.php" class="btn btn-light border">Cancelar</a>
-                    <button class="btn btn-primary fw-bold" type="submit">Salvar Alterações</button>
+                    <button class="btn btn-primary fw-bold" type="submit">Guardar Alterações</button>
                 </div>
-
             </form>
         </div>
     </div>
 </div>
-
 <?php include '../includes/footer.php'; ?>

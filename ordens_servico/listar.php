@@ -1,6 +1,5 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <?php 
-// LIGA O MODO DE DEPURAÇÃO
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -8,13 +7,11 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../includes/functions.php'; 
 require_once '../includes/auth.php'; 
 
-// TRAVA DE SEGURANÇA
 verificarAcesso(['G', 'A', 'T']);
-
 include '../config/conexao.php'; 
 
-// Consulta SQL para buscar os dados incluindo o técnico responsável
-$sql = "SELECT os.id_os, os.data_entrada, os.status, 
+// Adicionado o os.data_prevista_entrega no SELECT
+$sql = "SELECT os.id_os, os.data_entrada, os.status, os.data_prevista_entrega,
                c.nome AS nome_cliente, 
                CONCAT(e.marca, ' ', e.modelo) AS equipamento,
                u.nome AS tecnico_responsavel
@@ -25,11 +22,6 @@ $sql = "SELECT os.id_os, os.data_entrada, os.status,
         ORDER BY os.id_os DESC";
 
 $result = mysqli_query($conn, $sql);
-
-if (!$result) {
-    die("Erro fatal no banco de dados: " . mysqli_error($conn));
-}
-
 $perfil_logado = $_SESSION['usuario']['perfil'] ?? '';
 
 include '../includes/header.php'; 
@@ -37,99 +29,63 @@ include '../includes/header.php';
 
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="fw-bold"><i class="bi bi-wrench"></i> Ordens de Serviço</h1>
+        <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-tools text-dark me-2"></i>Ordens de Serviço</h1>
         <div>
-            <a href="/mindtech/dashboard/index.php" class="btn btn-secondary me-2"> Dashboard</a>            
-            <a href="cadastrar.php" class="btn btn-success"> Nova OS</a>
+            <a href="../dashboard/index.php" class="btn btn-secondary me-2">Dashboard</a>
+            <a href="cadastrar.php" class="btn btn-success"><i class=\"bi bi-plus-circle\"></i> Nova O.S.</a>
         </div>
     </div>
 
-    <?php 
-    $msg = $_GET['msg'] ?? '';
-    if ($msg == 'os_cancelada') {
-        echo '<div class="alert alert-warning fw-bold shadow-sm">Ordem de Serviço cancelada com sucesso.</div>';
-    }
-    ?>
-
-    <div class="card shadow-sm border-0 border-start border-4 border-primary">
+    <div class="card shadow-sm border-0 border-start border-4 border-dark">
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-dark">
                         <tr>
-                            <th class="ps-3" style="width: 5%;">N° OS</th>
-                            <th style="width: 20%;">Cliente</th>
-                            <th style="width: 20%;">Equipamento</th>
-                            <th style="width: 10%;">Data</th>
-                            <th style="width: 15%;">Técnico Resp.</th>
-                            <th style="width: 15%; text-align: center;">Etapa Atual</th>
-                            <th style="width: 15%; text-align: center;" class="pe-3">Ações</th>
+                            <th class="ps-4">Nº OS</th>
+                            <th>Data Entrada</th>
+                            <th>Cliente / Aparelho</th>
+                            <th>Status</th>
+                            <th class="text-center">Prazo / Alerta</th>
+                            <th class="text-center pe-4">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php 
                         if ($result && mysqli_num_rows($result) > 0) {
                             while ($row = mysqli_fetch_assoc($result)) { 
-                                
-                                // Traduz e colore o status ENUM
-                                $badgeColor = 'bg-secondary';
-                                $statusTexto = $row['status'];
-                                $isCancelada = false;
-                                
-                                if ($statusTexto === 'EM_ANALISE') {
-                                    $badgeColor = 'bg-info text-dark';
-                                    $statusTexto = 'Em Análise';
-                                } elseif ($statusTexto === 'EM_REPARO') {
-                                    $badgeColor = 'bg-warning text-dark';
-                                    $statusTexto = 'Em Reparo';
-                                } elseif ($statusTexto === 'AGUARDANDO_PECA') {
-                                    $badgeColor = 'bg-secondary';
-                                    $statusTexto = 'Aguarda Peça';
-                                } elseif ($statusTexto === 'FINALIZADO') {
-                                    $badgeColor = 'bg-success';
-                                    $statusTexto = 'Finalizado';
-                                } elseif ($statusTexto === 'CANCELADO') {
-                                    $badgeColor = 'bg-danger';
-                                    $statusTexto = 'Cancelado';
-                                    $isCancelada = true;
-                                }
+                                $isCancelada = ($row['status'] === 'CANCELADO');
                         ?>
                             <tr class="<?php echo $isCancelada ? 'table-light text-muted opacity-75' : ''; ?>">
-                                <td class="ps-3 fw-bold text-muted">#<?php echo $row['id_os']; ?></td>
-                                <td class="fw-bold text-dark"><?php echo htmlspecialchars($row['nome_cliente']); ?></td>
-                                <td><?php echo htmlspecialchars($row['equipamento']); ?></td>
+                                <td class="ps-4 fw-bold">#<?php echo $row['id_os']; ?></td>
                                 <td><?php echo date('d/m/Y', strtotime($row['data_entrada'])); ?></td>
                                 <td>
+                                    <strong><?php echo htmlspecialchars($row['nome_cliente']); ?></strong><br>
+                                    <small class="text-secondary"><?php echo htmlspecialchars($row['equipamento']); ?></small>
+                                </td>
+                                <td>
                                     <?php 
-                                    if (!empty($row['tecnico_responsavel'])) {
-                                        echo htmlspecialchars($row['tecnico_responsavel']);
-                                    } else {
-                                        echo '<span class="badge bg-light text-secondary border">Não definido</span>';
-                                    }
+                                        if ($row['status'] == 'EM_ANALISE') echo '<span class="badge bg-secondary">Em Análise</span>';
+                                        elseif ($row['status'] == 'EM_REPARO') echo '<span class="badge bg-primary">Em Reparo</span>';
+                                        elseif ($row['status'] == 'AGUARDANDO_PECA') echo '<span class="badge bg-warning text-dark">Aguarda Peça</span>';
+                                        elseif ($row['status'] == 'FINALIZADO') echo '<span class="badge bg-success">Finalizado</span>';
+                                        elseif ($row['status'] == 'CANCELADO') echo '<span class="badge bg-dark">Cancelado</span>';
                                     ?>
                                 </td>
+                                
                                 <td class="text-center">
-                                    <span class="badge <?php echo $badgeColor; ?> px-2 py-1">
-                                        <?php echo $statusTexto; ?>
-                                    </span>
+                                    <?php echo calcularAlertaPrazo($row['data_prevista_entrega'], $row['status']); ?>
                                 </td>
-                                <td class="pe-3">
-                                    <div class="d-flex justify-content-center align-items-center gap-2">
-                                        
-                                        <a href="visualizar.php?id=<?php echo $row['id_os']; ?>" class="btn btn-sm btn-dark">Ver</a>
-                                        
-                                        <?php if (!$isCancelada && $row['status'] !== 'FINALIZADO'): ?>
-                                            <a href="editar.php?id=<?php echo $row['id_os']; ?>" class="btn btn-sm btn-primary">Editar</a>
+                                
+                                <td class="text-center pe-4">
+                                    <div class="d-flex justify-content-center gap-1">
+                                        <a href="visualizar.php?id=<?php echo $row['id_os']; ?>" class="btn btn-sm btn-info text-white"><i class="bi bi-eye"></i></a>
+                                        <?php if(!$isCancelada): ?>
+                                            <a href="editar.php?id=<?php echo $row['id_os']; ?>" class="btn btn-sm btn-primary"><i class="bi bi-pencil"></i></a>
                                         <?php endif; ?>
-                                        
                                         <?php if(!$isCancelada && $row['status'] !== 'FINALIZADO' && in_array($perfil_logado, ['G', 'A'])): ?>
-                                            <a href="cancelar.php?id=<?php echo $row['id_os']; ?>" 
-                                               class="btn btn-sm btn-danger"
-                                               onclick="return confirm('Tem a certeza que deseja cancelar a O.S. #<?php echo $row['id_os']; ?>?');">
-                                               Cancelar
-                                            </a>
+                                            <a href="cancelar.php?id=<?php echo $row['id_os']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Tem a certeza que deseja cancelar a O.S. #<?php echo $row['id_os']; ?>?');"><i class="bi bi-x-circle"></i></a>
                                         <?php endif; ?>
-                                        
                                     </div>
                                 </td>
                             </tr>
@@ -137,9 +93,7 @@ include '../includes/header.php';
                             } 
                         } else { 
                         ?>
-                            <tr>
-                                <td colspan="7" class="text-center text-muted py-4">Nenhuma Ordem de Serviço encontrada no sistema.</td>
-                            </tr>
+                            <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma Ordem de Serviço registada.</td></tr>
                         <?php } ?>
                     </tbody>
                 </table>
@@ -147,5 +101,4 @@ include '../includes/header.php';
         </div>
     </div>
 </div>
-
 <?php include '../includes/footer.php'; ?>

@@ -151,4 +151,33 @@ function redirecionar($url) {
 function alerta($mensagem, $tipo = 'success') {
     return '<div class="alert alert-' . e($tipo) . '">' . e($mensagem) . '</div>';
 }
+
+// FUNÇÃO PARA CALCULAR O PRAZO DE ENTREGA DA O.S.
+function calcularAlertaPrazo($data_prevista, $status_os) {
+    if (empty($data_prevista) || $data_prevista == '0000-00-00 00:00:00' || $data_prevista == '0000-00-00') {
+        return '<span class="badge bg-secondary"><i class="bi bi-calendar-x me-1"></i> Sem Prazo</span>';
+    }
+    if ($status_os === 'FINALIZADO' || $status_os === 'CANCELADO') {
+        return '<span class="badge bg-light text-muted border"><i class="bi bi-check-all me-1"></i> Concluído</span>';
+    }
+
+    $hoje = new DateTime();
+    $hoje->setTime(0, 0, 0); 
+    $prazo = new DateTime($data_prevista);
+    $prazo->setTime(0, 0, 0);
+
+    $diferenca = $hoje->diff($prazo);
+    $dias = (int)$diferenca->format('%R%a'); 
+
+    if ($dias < 0) {
+        $dias_atraso = abs($dias);
+        return "<span class='badge bg-danger shadow-sm'><i class='bi bi-exclamation-triangle-fill me-1'></i> Atrasado {$dias_atraso} dia(s)</span>";
+    } elseif ($dias == 0) {
+        return "<span class='badge bg-warning text-dark shadow-sm fw-bold'><i class='bi bi-clock-history me-1'></i> Entrega Hoje!</span>";
+    } else {
+        return "<span class='badge bg-info text-dark shadow-sm'><i class='bi bi-calendar-check me-1'></i> Faltam {$dias} dia(s)</span>";
+    }
+}
+
+
 ?>
