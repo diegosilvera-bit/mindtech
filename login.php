@@ -27,21 +27,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
-        /* ==========================================
-           O SEU CSS ORIGINAL (MANTIDO INTACTO)
-           ========================================== */
+    
         body {
             background-color: #121212 !important;
             color: #ffffff !important;
             height: 100vh;
         }
         
-        /* Cole aqui o restante do seu CSS antigo se faltar algo (cores dos inputs, etc) */
-
-
-        /* ==========================================
-           CSS APENAS PARA A TELA DIVIDIDA DO CLIENTE
-           ========================================== */
+       
         .split-card {
             border-radius: 12px;
             overflow: hidden;
@@ -52,15 +45,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         /* Se a sua marca não for azul, altere as cores HEX aqui! */
         .bg-cliente {
-            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+            background: linear-gradient(150deg,rgb(0, 0, 0),rgb(260, 200, 0));
             color: white;
         }
 
         .brand-logo {
-            max-height: 60px;
-            width: auto;
-            object-fit: contain;
-        }
+    max-height: 200px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
     </style>
 </head>
 <body class="d-flex align-items-center justify-content-center">
@@ -76,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div>
                             <div class="mb-4 text-start">
                                 <img src="assets/img/logo.png" alt="MindTech Logo" class="brand-logo mb-2 img-fluid">
-                                <p class="text-muted small">Acesso restrito para funcionários</p>
+                                <p class="text-white">Acesso restrito para funcionários</p>
                             </div>
 
                             <?php if (!empty($erro)): ?>
@@ -87,23 +83,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                             <form method="POST" action="">
                                 <div class="mb-3">
-                                    <label for="login" class="form-label small fw-bold text-muted">Usuário / Login</label>
-                                    <input type="text" class="form-control" id="login" name="login" placeholder="Digite seu usuário" required autocomplete="off">
+                                    <label for="login" class="form-label small fw-bold text-white">Usuário / Login</label>
+                                    <input type="text-white" class="form-control" id="login" name="login" placeholder="Digite seu usuário" required autocomplete="off">
                                 </div>
                                 
                                 <div class="mb-4">
-                                    <label for="senha" class="form-label small fw-bold text-muted">Senha</label>
+                                    <label for="senha" class="form-label small fw-bold text-white">Senha</label>
                                     <input type="password" class="form-control" id="senha" name="senha" placeholder="••••••••" required>
                                 </div>
                                 
-                                <button type="submit" class="btn btn-primary w-100 rounded-3 py-2 fw-bold">
+                                <button type="submit" class="btn btn-warning w-100 rounded-3 py-2 fw-bold">
                                     <i class="bi bi-box-arrow-in-right me-2"></i>Entrar no Sistema
                                 </button>
                             </form>
                         </div>
                         
                         <div class="mt-4 pt-3 border-top border-secondary border-opacity-20">
-                            <p class="text-muted small mb-0">Mindtech &copy; <?= date('Y') ?> Todos os direitos reservados.</p>
+                            <p class="text-white small mb-0">Mindtech &copy; <?= date('Y') ?> Todos os direitos reservados.</p>
                         </div>
                     </div>
 
@@ -118,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             Deixou o seu aparelho connosco? Consulte agora o andamento do seu reparo de forma rápida, segura e sem complicação.
                         </p>
                         
-                        <a href="cliente/index.php" class="btn btn-light btn-lg fw-bold text-primary w-100 shadow rounded-3 fs-6 py-2">
+                        <a href="cliente/index.php" class="btn btn-light btn-lg fw-bold text-black w-100 shadow rounded-3 fs-6 py-2">
                             Acompanhar Meu Reparo <i class="bi bi-arrow-right-short fs-5 align-middle ms-1"></i>
                         </a>
 
