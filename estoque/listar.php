@@ -16,7 +16,7 @@ include '../includes/header.php';
     
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-boxes text-dark me-2"></i>Controlo de Estoque</h1>
+            <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-boxes text-white me-2"></i>Controlo de Estoque</h1>
         </div>
         <div class="d-flex gap-2">
             <a href="../dashboard/index.php" class="btn btn-secondary shadow-sm"> Dashboard</a>
