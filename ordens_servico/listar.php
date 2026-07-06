@@ -29,7 +29,7 @@ include '../includes/header.php';
 
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-tools text-dark me-2"></i>Ordens de Serviço</h1>
+        <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-tools text-white me-2"></i>Ordens de Serviço</h1>
         <div>
              <a href="../dashboard/index.php" class="btn btn-secondary me-2">Dashboard</a>
             <a href="gerar_codigo.php" class="btn btn-info me-2"><i class="bi bi-qr-code"></i> Código de Acompanhamento</a>
