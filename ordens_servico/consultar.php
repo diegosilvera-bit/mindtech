@@ -3,7 +3,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Tela pública: propositalmente NÃO carrega auth.php, pois o cliente não tem login.
 include '../config/conexao.php'; 
 
 $os = null;
@@ -11,10 +10,8 @@ $erro = '';
 $codigo_digitado = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['codigo'])) {
-    // Normaliza o código (maiúsculas, sem espaços) para facilitar a digitação do cliente
     $codigo_digitado = strtoupper(trim($_POST['codigo']));
 
-    // Consulta segura via prepared statement, pois esta tela é pública
     $stmt = mysqli_prepare($conn, "SELECT os.id_os, os.status, os.data_entrada, os.data_previsao_saida, os.observacoes,
                                            e.tipo AS eq_tipo, e.marca AS eq_marca, e.modelo AS eq_modelo
                                     FROM ordens_servico os
@@ -31,10 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['codigo'])) {
     }
 }
 
-// Formatação amigável do status (sem expor termos internos do sistema)
 $statusInfo = [
     'EM_ANALISE'      => ['texto' => 'Em Análise',         'cor' => 'info',     'icone' => 'bi-search',       'passo' => 1],
-    'EM_REPARO'       => ['texto' => 'Em Reparo',           'cor' => 'warning',  'icone' => 'bi-tools',        'passo' => 2],
+    'EM_REPARO'       => ['texto' => 'Em Reparo',           'cor' => 'warning text-dark', 'icone' => 'bi-tools',        'passo' => 2],
     'AGUARDANDO_PECA' => ['texto' => 'Aguardando Peça',     'cor' => 'secondary','icone' => 'bi-box-seam',     'passo' => 2],
     'FINALIZADO'      => ['texto' => 'Pronto para Retirada','cor' => 'success',  'icone' => 'bi-check-circle', 'passo' => 3],
     'CANCELADO'       => ['texto' => 'Cancelado',           'cor' => 'danger',   'icone' => 'bi-x-circle',     'passo' => 0],
@@ -50,9 +46,6 @@ $statusInfo = [
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
-        /* ==========================================
-           MESMA IDENTIDADE VISUAL DO LOGIN.PHP
-           ========================================== */
         body {
             background-color: #121212 !important;
             color: #ffffff !important;
@@ -64,7 +57,7 @@ $statusInfo = [
             overflow: hidden;
             box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.4);
             background-color: #1e1e1e;
-            border: 1px solid #2d2d2d;
+            border: 1px solid #3a3a3a;
         }
 
         .brand-logo {
@@ -75,8 +68,9 @@ $statusInfo = [
 
         .form-control {
             background-color: #2a2a2a;
-            border-color: #3a3a3a;
+            border-color: #4a4a4a;
             color: #ffffff;
+            font-size: 1.1rem;
         }
         .form-control:focus {
             background-color: #2a2a2a;
@@ -84,8 +78,9 @@ $statusInfo = [
             border-color: #0d6efd;
             box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25);
         }
+        /* Clareado o placeholder para melhor visualização */
         .form-control::placeholder {
-            color: #888888;
+            color: #cccccc;
         }
 
         .card-consulta {
@@ -95,16 +90,16 @@ $statusInfo = [
 
         .info-box {
             background-color: #2a2a2a;
-            border: 1px solid #3a3a3a;
+            border: 1px solid #4a4a4a;
             border-radius: 8px;
         }
 
         .progress {
-            background-color: #2a2a2a;
+            background-color: #3a3a3a;
         }
 
         hr {
-            border-color: #3a3a3a;
+            border-color: #555555;
             opacity: 1;
         }
     </style>
@@ -119,9 +114,9 @@ $statusInfo = [
                 <div class="card-body p-4 p-sm-5">
 
                     <div class="mb-4 text-center">
-                        <img src="../assets/img/logo.png" alt="MindTech Logo" class="brand-logo mb-2 img-fluid">
-                        <h4 class="fw-bold mt-3 mb-1"><i class="bi bi-wrench-adjustable-circle text-primary me-1"></i> Acompanhe seu Reparo</h4>
-                        <p class="text-muted small mb-0">Digite o código que você recebeu ao deixar o aparelho na assistência técnica.</p>
+                        <img src="../assets/img/logo.png" alt="MindTech Logo" class="brand-logo mb-3 img-fluid">
+                        <h4 class="fw-bold text-white mt-3 mb-2"><i class="bi bi-wrench-adjustable-circle text-primary me-1"></i> Acompanhe seu Reparo</h4>
+                        <p class="text-light fw-semibold fs-6 mb-0">Digite o código que você recebeu ao deixar o aparelho na assistência técnica.</p>
                     </div>
 
                     <form method="POST" action="consultar.php" class="d-flex gap-2">
@@ -133,13 +128,13 @@ $statusInfo = [
                                maxlength="20"
                                required
                                autofocus>
-                        <button type="submit" class="btn btn-primary fw-bold px-4">
+                        <button type="submit" class="btn btn-primary fw-bold px-4 fs-5 text-white">
                             <i class="bi bi-search"></i> Consultar
                         </button>
                     </form>
 
                     <?php if (!empty($erro)): ?>
-                        <div class="alert alert-danger border-0 bg-danger bg-opacity-20 text-danger text-center py-2 small mt-3 mb-0 rounded">
+                        <div class="alert alert-danger border-0 bg-danger text-white fw-bold text-center py-2 mt-3 mb-0 rounded">
                             <i class="bi bi-exclamation-triangle-fill me-2"></i><?php echo htmlspecialchars($erro); ?>
                         </div>
                     <?php endif; ?>
@@ -154,32 +149,32 @@ $statusInfo = [
                     <div class="card-body p-4 p-sm-5">
 
                         <div class="text-center mb-4">
-                            <span class="badge bg-<?php echo $info['cor']; ?> fs-6 px-3 py-2">
+                            <span class="badge bg-<?php echo $info['cor']; ?> fs-5 px-4 py-2 fw-bold">
                                 <i class="bi <?php echo $info['icone']; ?> me-1"></i> <?php echo htmlspecialchars($info['texto']); ?>
                             </span>
                         </div>
 
                         <?php if ($info['passo'] > 0): ?>
-                        <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress mb-2" style="height: 10px;">
                             <div class="progress-bar bg-<?php echo $info['cor']; ?>" style="width: <?php echo ($info['passo'] / 3) * 100; ?>%"></div>
                         </div>
-                        <div class="d-flex justify-content-between small text-muted mb-4">
+                        <div class="d-flex justify-content-between text-white fw-bold mb-4">
                             <span>Entrada</span>
                             <span>Em Reparo</span>
                             <span>Pronto</span>
                         </div>
                         <?php endif; ?>
 
-                        <div class="info-box p-3 mb-2">
-                            <p class="mb-1"><strong>Aparelho:</strong> <?php echo htmlspecialchars($os['eq_tipo'] . ' ' . $os['eq_marca'] . ' ' . $os['eq_modelo']); ?></p>
-                            <p class="mb-1"><strong>Data de Entrada:</strong> <?php echo date('d/m/Y', strtotime($os['data_entrada'])); ?></p>
+                        <div class="info-box p-3 mb-3 text-white fs-6">
+                            <p class="mb-2"><strong>Aparelho:</strong> <?php echo htmlspecialchars($os['eq_tipo'] . ' ' . $os['eq_marca'] . ' ' . $os['eq_modelo']); ?></p>
+                            <p class="mb-2"><strong>Data de Entrada:</strong> <?php echo date('d/m/Y', strtotime($os['data_entrada'])); ?></p>
                             <?php if (!empty($os['data_previsao_saida'])): ?>
-                                <p class="mb-0"><strong>Previsão de Entrega:</strong> <?php echo date('d/m/Y', strtotime($os['data_previsao_saida'])); ?></p>
+                                <p class="mb-0 text-warning fw-bold"><strong>Previsão de Entrega:</strong> <?php echo date('d/m/Y', strtotime($os['data_previsao_saida'])); ?></p>
                             <?php endif; ?>
                         </div>
 
                         <hr>
-                        <p class="text-muted small mb-0 text-center">
+                        <p class="text-light fw-semibold fs-6 mb-0 text-center">
                             Em caso de dúvidas sobre o seu reparo, entre em contato com a nossa assistência técnica.
                         </p>
                     </div>
@@ -187,7 +182,7 @@ $statusInfo = [
             <?php endif; ?>
 
             <div class="text-center mt-4">
-                <a href="../login.php" class="text-muted small text-decoration-none">
+                <a href="../login.php" class="text-light fs-6 fw-bold text-decoration-none">
                     <i class="bi bi-arrow-left me-1"></i> Voltar ao login de funcionários
                 </a>
             </div>
