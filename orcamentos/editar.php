@@ -59,9 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (mysqli_query($conn, $sql_update)) {
         $id_os_vinculada = (int)$orc['id_os'];
         
-        // =================================================================
         // GATILHO DE AUTOMAÇÃO DE STATUS DA O.S. (O CORAÇÃO DA LOGICA)
-        // =================================================================
         if ($aprovado == 1) {
             // Se aprovou -> O.S. vai direto para a bancada (Em Reparo)
             $sql_sync_os = "UPDATE ordens_servico SET status = 'EM_REPARO' WHERE id_os = $id_os_vinculada";
@@ -77,7 +75,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $sql_sync_os = "UPDATE ordens_servico SET status = 'EM_ANALISE' WHERE id_os = $id_os_vinculada";
             mysqli_query($conn, $sql_sync_os);
         }
-        // =================================================================
 
         // Redireciona com mensagem de sucesso
         header("Location: listar.php?msg=orcamento_atualizado");
