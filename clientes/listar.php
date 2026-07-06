@@ -163,10 +163,8 @@ include '../includes/header.php';
                                         <?php endif; ?>
                                     </td>
 
-                                    <td class="text-center pe-3" style="min-width: 180px;">
-
-                                        <div
-                                            class="d-flex flex-wrap justify-content-center align-items-center gap-2">
+                                    <td class="text-center pe-3" style="white-space: nowrap;">
+                                        <div class="d-flex flex-nowrap justify-content-center align-items-center gap-2">
 
                                             <a href="#" class="btn btn-sm btn-info text-white d-inline-flex align-items-center"
                                                 onclick="abrirEquipamentos(<?php echo $cliente['id_cliente']; ?>, '<?php echo htmlspecialchars(addslashes($cliente['nome'])); ?>'); return false;"
