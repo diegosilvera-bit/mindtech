@@ -59,9 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// =====================================================================
 // BUSCA INTELIGENTE DE O.S. DISPONÍVEIS PARA ORÇAMENTO
-// =====================================================================
 if ($id_os_url > 0) {
     // Caso A: Veio clicado de dentro de uma O.S. -> Traz APENAS ela pré-selecionada
     $sql_os = "SELECT os.id_os, c.nome AS nome_cliente, e.modelo 
