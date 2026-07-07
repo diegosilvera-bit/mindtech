@@ -70,7 +70,7 @@ include '../includes/header.php';
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">CNPJ *</label>
-                        <input type="text" class="form-control" name="cnpj" value="<?= htmlspecialchars($cnpj ?? '') ?>" required>
+                        <input type="text" class="form-control" name="cnpj" value="<?= htmlspecialchars($cnpj ?? '') ?>" required maxlength="18" oninput="mascaraCNPJ(this)">
                     </div>
                 </div>
                 <div class="row">
@@ -80,7 +80,7 @@ include '../includes/header.php';
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Telefone / WhatsApp</label>
-                        <input type="text" class="form-control" name="telefone" value="<?= htmlspecialchars($telefone ?? '') ?>">
+                        <input type="text" class="form-control" name="telefone" value="<?= htmlspecialchars($telefone ?? '') ?>" maxlength="15" oninput="mascaraTelefone(this)">
                     </div>
                 </div>
                 <hr>
@@ -93,3 +93,22 @@ include '../includes/header.php';
     </div>
 </div>
 <?php include '../includes/footer.php'; ?>
+<script>
+    // Máscara para CNPJ: 00.000.000/0000-00
+    function mascaraCNPJ(input) {
+        let v = input.value.replace(/\D/g, ""); // Remove tudo o que não é dígito
+        v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+        v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+        v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
+        v = v.replace(/(\d{4})(\d)/, "$1-$2");
+        input.value = v.substring(0, 18); // Limita o tamanho
+    }
+
+    // Máscara para Telefone: (00) 0000-0000 ou (00) 00000-0000
+    function mascaraTelefone(input) {
+        let v = input.value.replace(/\D/g, ""); // Remove tudo o que não é dígito
+        v = v.replace(/^(\d{2})(\d)/g, "($1) $2"); // Coloca parênteses
+        v = v.replace(/(\d)(\d{4})$/, "$1-$2"); // Coloca o hífen
+        input.value = v.substring(0, 15); // Limita o tamanho
+    }
+</script>
