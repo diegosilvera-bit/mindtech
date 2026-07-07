@@ -50,7 +50,7 @@ include '../includes/header.php';
         <div>
             <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-person-plus-fill text-dark me-2"></i>Novo Usuário</h1>
             </div>
-        <a href="listar.php" class="btn btn-sm btn-secondary fw-bold px-3">
+            <a href="listar.php" class="btn btn-secondary px-3">
              Voltar à Lista
         </a>
     </div>

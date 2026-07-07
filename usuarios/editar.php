@@ -64,7 +64,7 @@ include '../includes/header.php';
             <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-pencil-square text-white me-2"></i>Editar Funcionário</h1>
             <p class="text-white small mb-0">Atualize os dados cadastrais ou mude as permissões da conta.</p>
         </div>
-        <a href="listar.php" class="btn btn-sm btn-secondary fw-bold px-3">
+        <a href="listar.php" class="btn btn-secondary px-3">
              Voltar à Lista
         </a>
     </div>

@@ -85,8 +85,8 @@ include '../includes/header.php';
                 <i class="bi bi-laptop text-warning me-2"></i>Editar Equipamento
             </h1>
         </div>
-        <a href="listar.php" class="btn btn-sm btn-outline-secondary fw-bold px-3">
-            <i class="bi bi-arrow-left me-1"></i> Voltar à Lista
+        <a href="listar.php" class="btn btn-outline-secondary fw-bold px-3">
+             Voltar à Lista
         </a>
     </div>
 
