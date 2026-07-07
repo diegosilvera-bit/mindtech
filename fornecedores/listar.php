@@ -55,6 +55,8 @@ include '../includes/header.php';
     .topo-pagina__acoes {
         display: flex;
         align-items: center;
+        justify-content: flex-end; /* Mantém os itens alinhados à direita */
+        margin-left: auto; /* Empurra todo o bloco para o canto direito */
         gap: 0.5rem;
         flex-wrap: wrap;
     }
@@ -81,6 +83,7 @@ include '../includes/header.php';
             grid-template-columns: 1fr 1fr;
             gap: 0.5rem;
             width: 100%;
+            margin-left: 0; /* Reseta a margem no mobile para ocupar a tela toda */
         }
         .topo-pagina__acoes .btn {
             width: 100%;
@@ -109,7 +112,7 @@ include '../includes/header.php';
     <div class="topo-pagina">
         <h1 class="fw-bold mb-0">
             <i class="bi bi-truck text-white me-2"></i>
-            Fornecedores Homologados
+            Fornecedores
         </h1>
         <div class="topo-pagina__acoes">
             <div class="campo-busca-wrap">
