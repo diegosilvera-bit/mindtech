@@ -36,6 +36,7 @@ $perfil_logado = $_SESSION['usuario']['perfil'] ?? '';
 include '../includes/header.php'; 
 ?>
 
+
 <style>
     /* Cabeçalho: Flexbox no desktop */
     .topo-pagina {

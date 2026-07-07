@@ -76,7 +76,7 @@ include '../includes/header.php';
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-1 text-gray-800 fw-bold">Editar O.S. #<?php echo $id_os; ?></h1>
-        <a href="listar.php" class="btn btn-sm btn-outline-secondary fw-bold"><i class="bi bi-arrow-left"></i> Voltar</a>
+        <a href="listar.php" class="btn btn-sm btn-secondary fw-bold"> Voltar</a>
     </div>
 
     <?php if ($mensagem): ?>

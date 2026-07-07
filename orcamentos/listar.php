@@ -96,6 +96,7 @@ include '../includes/header.php';
 </style>
 
 <div class="container mt-4 mb-5">
+
     <div class="topo-pagina">
         <h1 class="fw-bold mb-0"><i class="bi bi-cash-coin"></i> Gestão de Orçamentos</h1>
         <div class="topo-pagina__acoes">
@@ -109,6 +110,7 @@ include '../includes/header.php';
                     </div>
             </div>
             <a href="../dashboard/index.php" class="btn btn-secondary">Voltar ao Dashboard</a>
+
             <a href="cadastrar.php" class="btn btn-success">+ Gerar Novo Orçamento</a>
         </div>
     </div>

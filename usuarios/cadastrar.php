@@ -49,10 +49,9 @@ include '../includes/header.php';
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-person-plus-fill text-dark me-2"></i>Novo Usuário</h1>
-            <p class="text-muted small mb-0">Cadastre credenciais e distribua os níveis de controle interno.</p>
-        </div>
-        <a href="listar.php" class="btn btn-sm btn-outline-secondary fw-bold px-3">
-            <i class="bi bi-arrow-left me-1"></i> Voltar à Lista
+            </div>
+        <a href="listar.php" class="btn btn-sm btn-secondary fw-bold px-3">
+             Voltar à Lista
         </a>
     </div>
 

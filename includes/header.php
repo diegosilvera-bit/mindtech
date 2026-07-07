@@ -28,6 +28,7 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
 .navbar-brand {
     color: #ecc245 !important; /* Destaca o nome MindTech em Dourado */
     font-weight: bold;
+    text-decoration: none; /* Remove o sublinhado padrão de links */
 }
 
 /* 3. CORREÇÃO CRUCIAL PARA AS TABELAS, CARDS E INPUTS DO SISTEMA */
@@ -70,7 +71,7 @@ thead, .table-dark, thead.table-dark th, .table thead th {
 <body>
 <nav class="navbar navbar-dark">
   <div class="container-fluid">
-    <span class="navbar-brand">MINDTECH</span>
+    <a href="/mindtech/dashboard/index.php" class="navbar-brand">MINDTECH</a>
     <a href="/mindtech/logout.php" class="btn btn-light btn-sm">Sair</a>
   </div>
 </nav>

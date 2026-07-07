@@ -92,10 +92,8 @@ include '../includes/header.php';
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-calculator text-success me-2"></i>Gerar Novo Orçamento</h1>
-            <p class="text-muted small mb-0">Lance os valores de bancada para aprovação do cliente.</p>
         </div>
-        <a href="listar.php" class="btn btn-sm btn-outline-secondary fw-bold px-3">
-            <i class="bi bi-arrow-left me-1"></i> Voltar à Lista
+        <a href="listar.php" class="btn btn-sm btn-secondary  px-3"> Voltar à Lista
         </a>
     </div>
 
@@ -134,7 +132,7 @@ include '../includes/header.php';
                         <label class="form-label fw-bold">Valor da Mão de Obra (R$)*</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light text-muted">R$</span>
-                            <input type="number" step="0.01" min="0" class="form-control" id="valor_mao_obra" name="valor_mao_obra" value="0.00" oninput="calcularTotal()" required>
+                            <input type="text" class="form-control" id="valor_mao_obra" name="valor_mao_obra" value="0,00" oninput="mascaraMoeda(this); calcularTotal()" required>
                         </div>
                     </div>
 
@@ -174,8 +172,22 @@ include '../includes/header.php';
 </div>
 
 <script>
+// Máscara para formato de moeda (R$)
+function mascaraMoeda(input) {
+    let v = input.value.replace(/\D/g, ""); // Remove tudo que não é dígito
+    if (v === "") v = "0";
+    v = (parseInt(v, 10) / 100).toFixed(2) + ""; // Divide por 100 para ter os centavos
+    v = v.replace(".", ","); // Substitui o ponto decimal pela vírgula
+    v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."); // Adiciona o ponto de milhar
+    input.value = v;
+}
+
 function calcularTotal() {
-    var maoObra = parseFloat(document.getElementById('valor_mao_obra').value) || 0;
+    // Pega o valor da mão de obra (ex: "1.500,00"), tira os pontos e troca vírgula por ponto ("1500.00")
+    var maoObraTexto = document.getElementById('valor_mao_obra').value || "0";
+    var maoObraLimpa = maoObraTexto.replace(/\./g, '').replace(',', '.');
+    
+    var maoObra = parseFloat(maoObraLimpa) || 0;
     var pecas = parseFloat(document.getElementById('valor_pecas').value) || 0;
     var total = maoObra + pecas;
     
