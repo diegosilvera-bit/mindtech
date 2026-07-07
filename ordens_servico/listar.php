@@ -50,6 +50,8 @@ include '../includes/header.php';
     .topo-pagina__acoes {
         display: flex;
         align-items: center;
+        justify-content: flex-end; /* Mantém os itens alinhados à direita */
+        margin-left: auto; /* Empurra todo o bloco para o canto direito */
         gap: 0.5rem;
         flex-wrap: wrap;
     }
@@ -77,6 +79,7 @@ include '../includes/header.php';
             grid-template-columns: 1fr 1fr;
             gap: 0.5rem;
             width: 100%;
+            margin-left: 0; /* Reseta a margem no mobile */
         }
         .topo-pagina__acoes .btn {
             width: 100%;
@@ -104,7 +107,7 @@ include '../includes/header.php';
 
 <div class="container mt-4 mb-5">
     <div class="topo-pagina">
-        <h1 class="h3 mb-0 text-gray-800 fw-bold"><i class="bi bi-tools text-white mb-0"></i>Ordens de Serviço</h1>
+        <h1 class="h3 mb-0 text-gray-800 fw-bold"><i class="bi bi-tools text-white mb-0"></i> Ordens de Serviço</h1>
         <div class="topo-pagina__acoes">
             <div class="campo-busca-wrap">
                     <div class="input-group">
@@ -116,7 +119,6 @@ include '../includes/header.php';
                     </div>
             </div>
             <a href="../dashboard/index.php" class="btn btn-secondary">Dashboard</a>
-            <a href="gerar_codigo.php" class="btn btn-info"><i class="bi bi-qr-code"></i> Código de Acompanhamento</a>
             <a href="cadastrar.php" class="btn btn-success"><i class="bi bi-plus-circle"></i> Nova O.S.</a>
         </div>
     </div>
@@ -187,8 +189,12 @@ include '../includes/header.php';
                 </table>
             </div>
         </div>
+    </div> <div class="d-flex justify-content-end mt-3">
+        <a href="gerar_codigo.php" class="btn btn-info shadow-sm"><i class="bi bi-qr-code"></i> Código de Acompanhamento</a>
     </div>
+
 </div>
+
 <script>
     // Pesquisa ao vivo: filtra a tabela a cada letra digitada
     (function () {
