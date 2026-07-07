@@ -75,7 +75,7 @@ include '../includes/header.php';
             <i class="bi bi-pencil-square text-warning me-2"></i>Editar Fornecedor
         </h1>
         <a href="listar.php" class="btn btn-secondary btn-sm align-self-start align-self-sm-center">
-            <i class="bi bi-arrow-left me-1"></i> Voltar para Lista
+             Voltar para Lista
         </a>
     </div>
 

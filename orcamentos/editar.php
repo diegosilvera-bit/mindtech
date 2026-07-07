@@ -98,8 +98,8 @@ include '../includes/header.php';
             <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-file-earmark-text text-warning me-2"></i>Editar Orçamento #<?php echo $orc['id_orcamento']; ?></h1>
             <p class="text-muted small mb-0">Vinculado à <strong>O.S. #<?php echo $orc['id_os']; ?></strong> | Cliente: <strong><?php echo htmlspecialchars($orc['nome_cliente']); ?></strong></p>
         </div>
-        <a href="listar.php" class="btn btn-sm btn-outline-secondary fw-bold px-3">
-            <i class="bi bi-arrow-left me-1"></i> Voltar à Lista
+        <a href="listar.php" class="btn btn-sm btn-secondary  px-3">
+             Voltar à Lista
         </a>
     </div>
 
