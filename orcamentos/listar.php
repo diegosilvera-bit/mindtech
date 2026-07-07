@@ -152,9 +152,11 @@ include '../includes/header.php';
                                     <?php endif; ?>
                                 </td>
                                 
-                                <td class="text-center pe-4" data-label="Ações">
-                                    <a href="editar.php?id=<?= $o['id_orcamento'] ?>" class="btn btn-sm btn-primary">Ver / Editar</a>
-                                </td>
+<td class="text-center pe-4" data-label="Ações">
+    <a href="editar.php?id=<?= $o['id_orcamento'] ?>" class="btn btn-sm btn-primary px-3 text-nowrap">
+        <i class="bi bi-eye me-1"></i> Ver | <i class="bi bi-pencil me-1"> Editar </i> 
+    </a>
+</td>                             </td>
                             </tr>
                         <?php 
                             }
