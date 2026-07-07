@@ -65,7 +65,7 @@ include '../includes/header.php';
 
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="fw-bold">Cadastrar Nova Peça</h1>
+        <h1 class="fw-bold"><i class="bi bi-cloud-plus"></i> Cadastrar Nova Peça</h1>
         <a href="listar.php" class="btn btn-secondary">Voltar para Lista</a>
     </div>
 
