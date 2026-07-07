@@ -66,6 +66,15 @@ thead, .table-dark, thead.table-dark th, .table thead th {
     background-color: #333333 !important;
     color: #ffffff !important;
 }
+
+/* 4. REMOVE O CONTORNO AZUL DE FOCO DOS CAMPOS E BOTÕES (+ DOURADO) */
+.form-control:focus, 
+.form-select:focus, 
+.btn:focus {
+    border-color: #ecc245 !important;
+    box-shadow: 0 0 0 0.25rem rgba(236, 194, 69, 0.25) !important;
+    outline: none !important;
+}
 </style>
 </head>
 <body>
