@@ -46,6 +46,8 @@ include '../includes/header.php';
     .topo-pagina__acoes {
         display: flex;
         align-items: center;
+        justify-content: flex-end; /* Mantém os itens alinhados à direita */
+        margin-left: auto; /* Empurra todo o bloco para o canto direito */
         gap: 0.5rem;
         flex-wrap: wrap;
     }
@@ -72,6 +74,7 @@ include '../includes/header.php';
             grid-template-columns: 1fr 1fr;
             gap: 0.5rem;
             width: 100%;
+            margin-left: 0; /* Reseta a margem no mobile para ocupar a tela toda */
         }
         .topo-pagina__acoes .btn {
             width: 100%;
@@ -98,7 +101,7 @@ include '../includes/header.php';
 <div class="container mt-4 mb-5">
 
     <div class="topo-pagina">
-        <h1 class="fw-bold mb-0"><i class="bi bi-cash-coin"></i> Gestão de Orçamentos</h1>
+        <h1 class="fw-bold mb-0 text-white"><i class="bi bi-cash-coin"></i> Gestão de Orçamentos</h1>
         <div class="topo-pagina__acoes">
             <div class="campo-busca-wrap">
                     <div class="input-group">
@@ -109,7 +112,8 @@ include '../includes/header.php';
                         <?php endif; ?>
                     </div>
             </div>
-            <a href="../dashboard/index.php" class="btn btn-secondary">Voltar ao Dashboard</a>
+            
+            <a href="../dashboard/index.php" class="btn btn-secondary">Dashboard</a>
 
             <a href="cadastrar.php" class="btn btn-success">+ Gerar Novo Orçamento</a>
         </div>

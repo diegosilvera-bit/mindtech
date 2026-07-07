@@ -104,7 +104,7 @@ include '../includes/header.php';
 
 <div class="container mt-4 mb-5">
     <div class="topo-pagina">
-        <h1 class="h3 mb-0 text-gray-800 fw-bold"><i class="bi bi-tools text-dark me-2"></i>Ordens de Serviço</h1>
+        <h1 class="h3 mb-0 text-gray-800 fw-bold"><i class="bi bi-tools text-white mb-0"></i>Ordens de Serviço</h1>
         <div class="topo-pagina__acoes">
             <div class="campo-busca-wrap">
                     <div class="input-group">
