@@ -87,7 +87,7 @@ include '../includes/header.php';
     <div class="topo-pagina">
         <div>
 
-            <h1 class="h3 mb-0 text-gray-800 fw-bold"><i class="bi bi-boxes text-dark me-2"></i>Controlo de Estoque</h1>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold"><i class="bi bi-boxes text-white mb-0"></i>Controle de Estoque</h1>
 
         </div>
 
