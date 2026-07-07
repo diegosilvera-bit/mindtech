@@ -58,16 +58,65 @@ include '../includes/header.php';
 
     /* Estilos Menu Lateral Originais */
     .sidebar { background-color: #1e1e24 !important; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
-    .sidebar .nav-link { color: #b3b3b3; padding: 12px 20px; font-weight: 500; transition: all 0.2s ease; border-radius: 5px; margin-bottom: 5px; }
-    .sidebar .nav-link:hover { color: #ffffff; background-color: #2d2d35; }
-    .sidebar .nav-link.active { background-color: #ecc245; color: #121212 !important; font-weight: bold; }
+    
+    /* NOVO LAYOUT DA NAV-LINK COM PREPARAÇÃO PARA ANIMAÇÃO */
+    .sidebar .nav-link { 
+        position: relative; /* Necessário para ancorar a animação dentro do botão */
+        color: #b3b3b3; 
+        padding: 12px 20px; 
+        font-weight: 500; 
+        border-radius: 8px; /* Cantos arredondados suaves */
+        margin-bottom: 5px;
+        display: flex; 
+        align-items: center; 
+        justify-content: flex-start;
+        text-align: left;
+        overflow: hidden; /* CORTA O QUE PASSAR DO BOTÃO: Impede o amarelo de vazar pra fora */
+        z-index: 1;
+        transition: color 0.3s ease;
+    }
+    
+    /* Garante o alinhamento perfeito do ícone */
+    .sidebar .nav-link i {
+        font-size: 1.25rem;
+        min-width: 28px;
+    }
+
+    /* O BLOCO INVISÍVEL QUE FARÁ A ANIMAÇÃO (O fundo amarelo que esmaece) */
+    .sidebar .nav-link::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 0%; /* Começa com tamanho zero (escondido) */
+        /* Degradê que começa com amarelo vibrante na esquerda e some na direita */
+        background: linear-gradient(90deg, rgba(236,194,69,0.7) 0%, rgba(236,194,69,0) 100%);
+        z-index: -1;
+        transition: width 0.4s ease-out; /* Velocidade da animação ao abrir */
+    }
+
+    /* AÇÃO AO PASSAR O MOUSE (Apenas para os botões que não estão ativos) */
+    .sidebar .nav-link:not(.active):hover::before {
+        width: 100%; /* Estica a barra para a direita, revelando o degradê */
+    }
+    .sidebar .nav-link:not(.active):hover { 
+        color: #ffffff; /* O texto fica branco puro para dar foco */
+    }
+
+    /* O ITEM ATIVO ("DASHBOARD") FICA FIXO E NÃO VAZA */
+    .sidebar .nav-link.active { 
+        background-color: #ecc245; 
+        color: #121212 !important; 
+        font-weight: bold; 
+    }
     
     /* Garantir que o sidebar ocupe a altura correta no desktop */
     @media (min-width: 768px) {
         .sidebar { min-height: calc(100vh - 56px); }
     }
 
-    /* Estilos do Fluxo de Processo (mantidos exatamente como os seus originais) */
+    /* Estilos do Fluxo de Processo (mantidos originais) */
     .fluxo-container {
         display: flex;
         justify-content: space-between;
@@ -124,7 +173,7 @@ include '../includes/header.php';
 
             <div class="offcanvas-body d-md-flex flex-column p-3 bg-original h-100">
                 <ul class="nav flex-column px-2 w-100">
-                    <li class="nav-item"><a class="nav-link active" href="/mindtech/dashboard/index.php"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/mindtech/dashboard/index.php"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
                     
                     <?php if (in_array($perfil, ['G', 'A'])): ?>
 
