@@ -81,8 +81,8 @@ include '../includes/header.php';
         <div>
             <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-tools text-success me-2"></i>Abrir Ordem de Serviço</h1>
         </div>
-        <a href="listar.php" class="btn btn-sm btn-outline-secondary fw-bold px-3">
-            <i class="bi bi-arrow-left me-1"></i> Voltar à Lista
+        <a href="listar.php" class="btn btn-sm btn-secondary px-3">
+             Voltar à Lista
         </a>
     </div>
 
