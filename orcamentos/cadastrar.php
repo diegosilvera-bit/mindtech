@@ -92,7 +92,6 @@ include '../includes/header.php';
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-calculator text-success me-2"></i>Gerar Novo Orçamento</h1>
-            <p class="text-muted small mb-0">Lance os valores de bancada para aprovação do cliente.</p>
         </div>
         <a href="listar.php" class="btn btn-sm btn-outline-secondary fw-bold px-3">
             <i class="bi bi-arrow-left me-1"></i> Voltar à Lista
