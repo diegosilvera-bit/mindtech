@@ -114,17 +114,17 @@ include '../includes/header.php';
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-bold">CPF *</label>
-                        <input type="text" class="form-control" name="cpf" value="<?php echo htmlspecialchars($cliente['cpf']); ?>" required>
+                        <input type="text" class="form-control" name="cpf" value="<?php echo htmlspecialchars($cliente['cpf']); ?>" required maxlength="14" oninput="mascaraCPF(this)">
                     </div>
 
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-bold">RG</label>
-                        <input type="text" class="form-control" name="rg" value="<?php echo htmlspecialchars($cliente['rg']); ?>">
+                        <input type="text" class="form-control" name="rg" value="<?php echo htmlspecialchars($cliente['rg']); ?>" maxlength="12" oninput="mascaraRG(this)">
                     </div>
 
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-bold">Telefone / WhatsApp</label>
-                        <input type="text" class="form-control" name="telefone" value="<?php echo htmlspecialchars($cliente['telefone']); ?>">
+                        <input type="text" class="form-control" name="telefone" value="<?php echo htmlspecialchars($cliente['telefone']); ?>" maxlength="15" oninput="mascaraTelefone(this)">
                     </div>
                 </div>
 
@@ -143,5 +143,33 @@ include '../includes/header.php';
         </div>
     </div>
 </div>
+<script>
+    // Máscara para CPF: 000.000.000-00
+    function mascaraCPF(input) {
+        let v = input.value.replace(/\D/g, "");
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        input.value = v.substring(0, 14);
+    }
+
+    // Máscara para RG: 00.000.000-0 (Aceita números e a letra X)
+    function mascaraRG(input) {
+        let v = input.value.replace(/[^a-zA-Z0-9]/g, ""); 
+        v = v.toUpperCase(); 
+        v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+        v = v.replace(/\.(\d{3})(\d)/, ".$1.$2");
+        v = v.replace(/\.(\d{3})([a-zA-Z0-9])$/, ".$1-$2");
+        input.value = v.substring(0, 12);
+    }
+
+    // Máscara para Telefone: (00) 0000-0000 ou (00) 00000-0000
+    function mascaraTelefone(input) {
+        let v = input.value.replace(/\D/g, "");
+        v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
+        v = v.replace(/(\d)(\d{4})$/, "$1-$2");
+        input.value = v.substring(0, 15);
+    }
+</script>
 
 <?php include '../includes/footer.php'; ?>
