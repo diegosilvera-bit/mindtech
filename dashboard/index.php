@@ -171,7 +171,7 @@ include '../includes/header.php';
 
             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-2">
                 <h1 class="h3 mb-0 text-gray-800 fw-bold">Painel de Controle</h1>
-                <span class="text-muted"><i class="bi bi-calendar-event me-1"></i> <?= date('d/m/Y') ?></span>            
+                <span class="text-white"><i class="bi bi-calendar-event me-1"></i> <?= date('d/m/Y') ?></span>            
             </div>
 
             <div class="card shadow-sm border-0 border-top border-4 border-warning mb-4">
