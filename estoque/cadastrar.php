@@ -116,7 +116,7 @@ include '../includes/header.php';
 
                     <div class="col-md-3 mb-3">
                         <label class="form-label fw-bold">Valor Unitário (R$)</label>
-                        <input type="number" step="0.01" class="form-control" name="valor_unitario" placeholder="0.00">
+                        <input type="text" class="form-control" name="valor_unitario" value="0,00" oninput="mascaraMoeda(this)">
                     </div>
 
                     <div class="col-md-3 mb-3">
@@ -143,6 +143,16 @@ include '../includes/header.php';
 </div>
 
 <script>
+    // Máscara para formato de moeda (R$)
+    function mascaraMoeda(input) {
+        let v = input.value.replace(/\D/g, ""); // Remove tudo que não é dígito
+        if (v === "") v = "0";
+        v = (parseInt(v, 10) / 100).toFixed(2) + ""; // Divide por 100 para ter os cêntimos
+        v = v.replace(".", ","); // Substitui o ponto decimal pela vírgula
+        v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."); // Adiciona o ponto de milhar
+        input.value = v;
+    }
+
     // Regra de busca estrita: o item deve obrigatoriamente INICIAR com o termo pesquisado
     function funcaoBuscaEstrita(search) {
         const query = search.trim().toLowerCase();
@@ -156,7 +166,7 @@ include '../includes/header.php';
     const buscadorFornecedor = new TomSelect("#id_fornecedor", {
         create: false,
         placeholder: "-- Selecione o Fornecedor ou deixe em branco --",
-        allowEmptyOption: false, // Impede de selecionar a opção vazia após escolher um fornecedor
+        allowEmptyOption: false,
         score: funcaoBuscaEstrita
     });
 </script>
