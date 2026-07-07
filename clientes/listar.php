@@ -96,8 +96,16 @@ if (isset($_GET['status_equip'])) {
     }
 }
 
+// Filtro de pesquisa por nome do cliente (fallback para quando o JS estiver desativado)
+$busca = trim($_GET['busca'] ?? '');
+$whereBusca = '';
+if ($busca !== '') {
+    $buscaEsc = mysqli_real_escape_string($conn, $busca);
+    $whereBusca = "WHERE nome LIKE '%$buscaEsc%'";
+}
+
 // BUSCA: CLIENTES
-$sql_clientes = "SELECT * FROM clientes ORDER BY id_cliente ASC";
+$sql_clientes = "SELECT * FROM clientes $whereBusca ORDER BY id_cliente ASC";
 $result_clientes = mysqli_query($conn, $sql_clientes);
 
 include '../includes/header.php';
@@ -105,14 +113,121 @@ include '../includes/header.php';
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
+<style>
+    /* =========================================================
+       CABEÇALHO: título, busca e ações — Flexbox no desktop
+    ========================================================= */
+    .clientes-topo {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .clientes-topo__acoes {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .clientes-busca .input-group {
+        min-width: 220px;
+    }
+
+    /* =========================================================
+       MOBILE (até 768px): Grid para os botões + busca em largura total
+    ========================================================= */
+    @media (max-width: 768px) {
+        .clientes-topo {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .clientes-busca {
+            order: -1;
+            width: 100%;
+        }
+
+        .clientes-busca .input-group {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .clientes-topo__acoes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .clientes-topo__acoes .btn {
+            width: 100%;
+        }
+    }
+
+    /* =========================================================
+       MOBILE (até 768px): Tabela vira "cards" — CSS puro, sem alterar o HTML
+    ========================================================= */
+    @media (max-width: 768px) {
+        #tabelaClientes thead {
+            display: none;
+        }
+
+        #tabelaClientes,
+        #tabelaClientes tbody,
+        #tabelaClientes tr,
+        #tabelaClientes td {
+            display: block;
+            width: 100%;
+        }
+
+        #tabelaClientes tr {
+            margin-bottom: 0.85rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+        }
+
+        #tabelaClientes td {
+            border: none;
+            padding: 0.3rem 0;
+            text-align: left !important;
+        }
+
+        #tabelaClientes td::before {
+            content: attr(data-label);
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #6c757d;
+            margin-bottom: 0.15rem;
+        }
+
+        #tabelaClientes td[data-label="Ações"] .d-flex {
+            flex-wrap: wrap;
+            justify-content: flex-start !important;
+        }
+    }
+</style>
+
 <div class="container mt-4 mb-5">
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
-        <h1 class="fw-bold"><i class="bi bi-people"></i>Meus Clientes
-
-
-        </h1>
-        <div class="d-flex flex-wrap gap-2">
-            <a href="../dashboard/index.php" class="btn btn-secondary me-2">Dashboard</a>
+    <div class="clientes-topo">
+        <h1 class="fw-bold mb-0"><i class="bi bi-people"></i> Meus Clientes</h1>
+        <div class="clientes-topo__acoes">
+            <div class="clientes-busca">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" id="campoBusca" class="form-control" placeholder="Pesquisar por cliente..." value="<?php echo htmlspecialchars($busca); ?>" autocomplete="off">
+                    <?php if ($busca !== ''): ?>
+                        <a href="listar.php" class="btn btn-outline-secondary" title="Limpar"><i class="bi bi-x-lg"></i></a>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <a href="../dashboard/index.php" class="btn btn-secondary">Dashboard</a>
             <a href="cadastrar.php" class="btn btn-success">+ Novo Cliente</a>
         </div>
     </div>
@@ -128,7 +243,7 @@ include '../includes/header.php';
     <div class="card shadow-sm border-0 border-start border-4 border-success">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle mb-0">
+                <table id="tabelaClientes" class="table table-hover table-striped align-middle mb-0">
                     <thead class="table-dark">
                         <tr>
                             <th class="ps-3" style="width: 6%;">ID</th>
@@ -139,23 +254,23 @@ include '../includes/header.php';
                             <th style="width: 28%; text-align: center;" class="pe-3">Ações</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="corpoTabela">
                         <?php
                         if ($result_clientes && mysqli_num_rows($result_clientes) > 0) {
                             while ($cliente = mysqli_fetch_assoc($result_clientes)) {
                                 $ativo = isset($cliente['ativo']) ? $cliente['ativo'] : 1;
                                 ?>
-                                <tr class="<?php echo $ativo == 0 ? 'table-light text-muted opacity-75' : ''; ?>">
-                                    <td class="ps-3 fw-bold">#<?php echo $cliente['id_cliente']; ?></td>
+                                <tr class="<?php echo $ativo == 0 ? 'table-light text-muted opacity-75' : ''; ?>" data-nome="<?php echo htmlspecialchars(mb_strtolower($cliente['nome'])); ?>">
+                                    <td class="ps-3 fw-bold" data-label="ID">#<?php echo $cliente['id_cliente']; ?></td>
 
-                                    <td class="fw-bold"><?php echo htmlspecialchars($cliente['nome']); ?></td>
+                                    <td class="fw-bold" data-label="Nome do Cliente"><?php echo htmlspecialchars($cliente['nome']); ?></td>
 
-                                    <td><?php echo htmlspecialchars($cliente['cpf']); ?></td>
+                                    <td data-label="CPF"><?php echo htmlspecialchars($cliente['cpf']); ?></td>
 
-                                    <td><?php echo !empty($cliente['telefone']) ? htmlspecialchars($cliente['telefone']) : '-'; ?>
+                                    <td data-label="Telefone"><?php echo !empty($cliente['telefone']) ? htmlspecialchars($cliente['telefone']) : '-'; ?>
                                     </td>
 
-                                    <td class="text-center">
+                                    <td class="text-center" data-label="Status">
                                         <?php if ($ativo == 1): ?>
                                             <span class="badge bg-success">Ativo</span>
                                         <?php else: ?>
@@ -163,7 +278,7 @@ include '../includes/header.php';
                                         <?php endif; ?>
                                     </td>
 
-                                    <td class="text-center pe-3" style="white-space: nowrap;">
+                                    <td class="text-center pe-3" data-label="Ações" style="white-space: nowrap;">
                                         <div class="d-flex flex-nowrap justify-content-center align-items-center gap-2">
 
                                             <a href="#" class="btn btn-sm btn-info text-white d-inline-flex align-items-center"
@@ -206,6 +321,11 @@ include '../includes/header.php';
                                 </td>
                             </tr>
                         <?php } ?>
+                        <tr id="semResultadoBusca" style="display:none;">
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                <i class="bi bi-search me-1"></i> Nenhum cliente encontrado.
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -387,6 +507,29 @@ while ($eq = mysqli_fetch_assoc($res_equips)) {
 ?>
 
 <script>
+    // ================================================================
+    // PESQUISA AO VIVO: filtra a tabela de clientes a cada letra digitada
+    // ================================================================
+    (function () {
+        const campoBusca = document.getElementById('campoBusca');
+        const linhas = document.querySelectorAll('#corpoTabela tr[data-nome]');
+        const semResultado = document.getElementById('semResultadoBusca');
+        if (!campoBusca) return;
+
+        campoBusca.addEventListener('input', function () {
+            const termo = this.value.toLowerCase().trim();
+            let encontrados = 0;
+            linhas.forEach(function (linha) {
+                const bate = linha.dataset.nome.includes(termo);
+                linha.style.display = bate ? '' : 'none';
+                if (bate) encontrados++;
+            });
+            if (semResultado) {
+                semResultado.style.display = encontrados === 0 ? '' : 'none';
+            }
+        });
+    })();
+
     // Dados de todos os equipamentos já carregados do PHP
     const todosEquipamentos = <?php echo json_encode($todos_equipamentos, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
 

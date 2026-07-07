@@ -42,7 +42,7 @@ include '../includes/header.php';
             <p class="text-muted small mb-0">Visualização detalhada da ficha técnica.</p>
         </div>
         <div class="d-flex gap-2">
-            <button onclick="window.print()" class="btn btn-outline-dark"><i class="bi bi-printer me-1"></i> Imprimir</button>
+            <button onclick="window.print()" class="btn btn-success"><i class="bi bi-printer me-1"></i> Imprimir</button>
             <a href="editar.php?id=<?php echo $os['id_os']; ?>" class="btn btn-primary"><i class="bi bi-pencil-square me-1"></i> Editar O.S.</a>
             <a href="listar.php" class="btn btn-secondary">Voltar</a>
         </div>
