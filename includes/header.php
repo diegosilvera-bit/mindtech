@@ -13,6 +13,30 @@
 body {
     background-color: #121212 !important;
     color: #ffffff !important;
+    padding-top: 56px !important; /* Empurra o conteúdo para não ficar escondido debaixo da barra fixa do topo */
+}
+
+/* =======================================================
+   BARRA DE ROLAGEM SLIM (GLOBAL)
+   ======================================================= */
+* {
+    scrollbar-width: thin; /* Deixa a barra fininha no Firefox */
+    scrollbar-color: #333333 #121212; /* Cor da barra e cor do fundo */
+}
+
+::-webkit-scrollbar {
+    width: 6px; /* Largura da barra fininha (Chrome, Safari, Edge) */
+    height: 6px; 
+}
+::-webkit-scrollbar-track {
+    background: #121212; 
+}
+::-webkit-scrollbar-thumb {
+    background-color: #333333; 
+    border-radius: 10px; 
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: #ecc245; /* Brilha em dourado ao passar o rato! */
 }
 
 /* 2. Força Títulos Principais a ficarem Brancos */
@@ -20,10 +44,15 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
     color: #ffffff !important;
 }
 
-/* Ajuste da Barra de Navegação Superior */
+/* Ajuste da Barra de Navegação Superior FIXA */
 .navbar {
     background-color: #161616 !important;
     border-bottom: 1px solid #2d2d2d !important;
+    position: fixed !important; /* Trava a barra no topo */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1050; /* Fica por cima de tudo */
 }
 .navbar-brand {
     color: #ecc245 !important; /* Destaca o nome MindTech em Dourado */
