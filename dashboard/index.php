@@ -53,70 +53,117 @@ include '../includes/header.php';
 ?>
 
 <style>
+    /* =======================================================
+       NOVO TRAVAMENTO ABSOLUTO (HEADER E BARRA LATERAL)
+       ======================================================= */
+    
+    /* 1. Trava a Barra Superior (Nav) no topo da tela */
+    .navbar {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1050;
+    }
+
+    /* 2. Empurra o corpo do site para não ficar por baixo da Navbar fixa */
+    body {
+        padding-top: 56px !important; /* Altura padrão da barra do topo */
+    }
+
+    @media (min-width: 768px) {
+        /* 3. Trava a Barra Lateral de forma fixa e permanente */
+        .sidebar {
+            position: fixed !important;
+            top: 56px; /* Cola exatamente embaixo da navbar */
+            left: 0;
+            width: 25%; /* Mesma largura do col-md-3 */
+            height: calc(100vh - 56px) !important; /* Altura da tela menos o topo */
+            z-index: 1040;
+            overflow-y: auto; /* Rola internamente apenas se tiver muitos botões */
+        }
+        
+        /* 4. Empurra o painel principal para a direita, para não sumir atrás da barra */
+        .painel-direito {
+            margin-left: 25% !important;
+        }
+
+        /* Customização da barrinha de rolagem invisível para a barra lateral */
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background-color: #333333; border-radius: 10px; }
+        .sidebar::-webkit-scrollbar-thumb:hover { background-color: #ecc245; }
+    }
+
+    @media (min-width: 992px) {
+        .sidebar {
+            width: 16.666667% !important; /* Mesma largura do col-lg-2 */
+        }
+        .painel-direito {
+            margin-left: 16.666667% !important;
+        }
+    }
+
+    /* ======================================================= */
+
     /* Manter a cor de fundo original do projeto */
     .bg-original { background-color: #1e1e24 !important; }
 
     /* Estilos Menu Lateral Originais */
     .sidebar { background-color: #1e1e24 !important; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
     
-    /* NOVO LAYOUT DA NAV-LINK COM PREPARAÇÃO PARA ANIMAÇÃO */
+    /* ======== ESTÉTICA PREMIUM PARA OS BOTÕES ======== */
     .sidebar .nav-link { 
-        position: relative; /* Necessário para ancorar a animação dentro do botão */
-        color: #b3b3b3; 
-        padding: 12px 20px; 
+        position: relative; 
+        color: #a0a0a0; 
+        font-size: 0.9rem; 
+        padding: 10px 15px 10px 20px; 
         font-weight: 500; 
-        border-radius: 8px; /* Cantos arredondados suaves */
-        margin-bottom: 5px;
+        border-radius: 0 50px 50px 0; 
+        margin-bottom: 4px; 
         display: flex; 
         align-items: center; 
         justify-content: flex-start;
         text-align: left;
-        overflow: hidden; /* CORTA O QUE PASSAR DO BOTÃO: Impede o amarelo de vazar pra fora */
+        overflow: hidden; 
         z-index: 1;
-        transition: color 0.3s ease;
+        transition: color 0.3s ease, transform 0.2s ease;
     }
     
-    /* Garante o alinhamento perfeito do ícone */
     .sidebar .nav-link i {
-        font-size: 1.25rem;
-        min-width: 28px;
+        font-size: 1.1rem;
+        min-width: 26px; 
+        transition: transform 0.3s ease;
     }
 
-    /* O BLOCO INVISÍVEL QUE FARÁ A ANIMAÇÃO (O fundo amarelo que esmaece) */
     .sidebar .nav-link::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         height: 100%;
-        width: 0%; /* Começa com tamanho zero (escondido) */
-        /* Degradê que começa com amarelo vibrante na esquerda e some na direita */
-        background: linear-gradient(90deg, rgba(236,194,69,0.7) 0%, rgba(236,194,69,0) 100%);
+        width: 0%; 
+        background: linear-gradient(90deg, rgba(236,194,69,0.1) 0%, rgba(236,194,69,0) 100%); 
         z-index: -1;
-        transition: width 0.4s ease-out; /* Velocidade da animação ao abrir */
+        transition: width 0.3s ease-out; 
     }
 
-    /* AÇÃO AO PASSAR O MOUSE (Apenas para os botões que não estão ativos) */
     .sidebar .nav-link:not(.active):hover::before {
-        width: 100%; /* Estica a barra para a direita, revelando o degradê */
+        width: 100%; 
     }
     .sidebar .nav-link:not(.active):hover { 
-        color: #ffffff; /* O texto fica branco puro para dar foco */
+        color: #ecc245; 
+        transform: translateX(4px); 
     }
 
-    /* O ITEM ATIVO ("DASHBOARD") FICA FIXO E NÃO VAZA */
     .sidebar .nav-link.active { 
         background-color: #ecc245; 
         color: #121212 !important; 
-        font-weight: bold; 
-    }
-    
-    /* Garantir que o sidebar ocupe a altura correta no desktop */
-    @media (min-width: 768px) {
-        .sidebar { min-height: calc(100vh - 56px); }
+        font-weight: 600; 
+        box-shadow: 0 4px 10px rgba(236, 194, 69, 0.25); 
     }
 
-    /* Estilos do Fluxo de Processo (mantidos originais) */
+    /* Estilos do Fluxo de Processo */
     .fluxo-container {
         display: flex;
         justify-content: space-between;
@@ -161,8 +208,8 @@ include '../includes/header.php';
     }
 </style>
 
-<div class="container-fluid">
-    <div class="row">
+<div class="container-fluid px-0">
+    <div class="row g-0">
         
         <div class="col-md-3 col-lg-2 px-0 sidebar bg-original offcanvas-md offcanvas-start" tabindex="-1" id="sidebarMobile" aria-labelledby="sidebarMobileLabel">
             
@@ -171,14 +218,12 @@ include '../includes/header.php';
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMobile" aria-label="Close"></button>
             </div>
 
-            <div class="offcanvas-body d-md-flex flex-column p-3 bg-original h-100">
-                <ul class="nav flex-column px-2 w-100">
+            <div class="offcanvas-body d-md-flex flex-column py-3 pe-3 ps-0 bg-original h-100">
+                <ul class="nav flex-column pe-2 ps-0 w-100">
                     <li class="nav-item"><a class="nav-link" href="/mindtech/dashboard/index.php"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
                     
                     <?php if (in_array($perfil, ['G', 'A'])): ?>
-
                         <li class="nav-item"><a class="nav-link" href="/mindtech/clientes/listar.php"><i class="bi bi-person-vcard-fill me-2"></i> Atendimento</a></li>
-
                     <?php endif; ?>
                     
                     <?php if (in_array($perfil, ['G', 'A', 'T'])): ?>
@@ -202,14 +247,15 @@ include '../includes/header.php';
                         <li class="nav-item"><a class="nav-link" href="/mindtech/usuarios/listar.php"><i class="bi bi-person me-2"></i> Usuários</a></li>
                     <?php endif; ?>
                 </ul>
-                <hr class="text-secondary mx-3 my-4 d-none d-md-block">
-                <ul class="nav flex-column px-2 w-100 mt-auto">
+                <hr class="text-secondary mx-3 my-3 d-none d-md-block">
+                
+                <ul class="nav flex-column pe-2 ps-0 w-100 mt-auto">
                     <li class="nav-item"><a class="nav-link text-danger" href="/mindtech/logout.php"><i class="bi bi-box-arrow-right me-2"></i> Sair do Sistema</a></li>
                 </ul>
             </div>
         </div>
 
-        <div class="col-md-9 col-lg-10 ms-sm-auto px-md-4 py-4 animate-page">
+        <div class="col-md-9 col-lg-10 ms-sm-auto px-md-4 py-4 animate-page painel-direito">
             
             <div class="d-md-none d-flex justify-content-between align-items-center mb-4 bg-original p-3 rounded shadow-sm text-white">
                 <h5 class="mb-0 fw-bold" style="color: #ecc245;">Painel Mindtech</h5>

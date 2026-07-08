@@ -84,4 +84,3 @@ thead, .table-dark, thead.table-dark th, .table thead th {
     <a href="/mindtech/logout.php" class="btn btn-light btn-sm">Sair</a>
   </div>
 </nav>
-<div class="container mt-4">
