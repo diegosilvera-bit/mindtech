@@ -79,7 +79,7 @@ include '../includes/header.php';
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-tools text-success me-2"></i>Abrir Ordem de Serviço</h1>
+            <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-tools text-success-white me-2"></i>Abrir Ordem de Serviço</h1>
         </div>
         <a href="listar.php" class="btn btn-secondary px-3">
              Voltar para a Lista
