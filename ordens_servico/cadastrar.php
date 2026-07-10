@@ -145,7 +145,7 @@ include '../includes/header.php';
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label class="form-label fw-bold text-primary">Previsão de Entrega</label>
+                        <label class="form-label fw-bold text-primary-black">Previsão de Entrega</label>
                         <input type="date" class="form-control border-primary" name="data_prevista_entrega" style="border-radius: 8px;">
                     </div>
                 </div>
