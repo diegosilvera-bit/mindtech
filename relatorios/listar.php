@@ -162,11 +162,11 @@ include '../includes/header.php';
                     </div>
                 </div>
             <?php endif; ?>
-            <a href="cadastrar.php" class="btn btn-sm btn-light border fw-bold px-3">
+            <a href="cadastrar.php" class="btn btn-secondary me-2">
                 <i class="bi bi-arrow-left me-1"></i> Voltar aos Filtros
             </a>
             <?php if (!empty($tipo)): ?>
-                <button onclick="window.print()" class="btn btn-sm btn-primary fw-bold px-4 shadow-sm">
+                <button onclick="window.print()" class="btn btn-primary me-2">
                     <i class="bi bi-printer-fill me-1"></i> Imprimir / Salvar PDF
                 </button>
             <?php endif; ?>
