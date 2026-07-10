@@ -75,7 +75,7 @@ include '../includes/header.php';
         </div>
     <?php } ?>
 
-    <div class="card shadow-sm border-0 border-start border-4 border-danger">
+    <div class="card shadow-sm border-0 border-start border-4 border-success">
         <div class="card-body p-4">
             <form method="post" action="cadastrar.php">
                 
