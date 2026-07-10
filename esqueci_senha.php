@@ -1,21 +1,87 @@
 <?php
 session_start();
-require_once 'config/conexao.php'; // Ajuste o caminho se necessário
+require_once 'config/conexao.php'; // Usa o seu arquivo que tem o $pdo
+
+// Ajuste os caminhos abaixo de acordo com a pasta onde guardou o PHPMailer
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+// Se usou o Composer, descomente a linha abaixo e apague os requires manuais:
+// require 'vendor/autoload.php';
+
+// Se baixou manualmente, mantenha estes requires:
+require 'libs/PHPMailer/Exception.php';
+require 'libs/PHPMailer/PHPMailer.php';
+require 'libs/PHPMailer/SMTP.php';
 
 $mensagem = '';
 $tipo_alerta = '';
 
-// Aqui entrará a lógica de envio de e-mail na próxima etapa...
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     
-    // Simulação temporária até colocarmos o PHPMailer:
-    if (!empty($email)) {
-        $mensagem = "Se este e-mail estiver registado, receberá um link de recuperação em breve. (Simulação)";
-        $tipo_alerta = "success";
+    // 1. Verifica se o e-mail existe no Banco de Dados
+    $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE email = ? LIMIT 1");
+    $stmt->execute([$email]);
+    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($usuario) {
+        // 2. Gera um Token Único e Seguro e a data de expiração (1 hora a partir de agora)
+        $token = bin2hex(random_bytes(50));
+        $expiracao = date('Y-m-d H:i:s', strtotime('+1 hour'));
+
+        // 3. Salva o token no banco de dados do utilizador
+        $stmt_update = $pdo->prepare("UPDATE usuarios SET token_recuperacao = ?, token_expiracao = ? WHERE id = ?");
+        $stmt_update->execute([$token, $expiracao, $usuario['id']]);
+
+        // 4. Prepara o link de recuperação
+        // Substitua 'seusite.com' pelo seu domínio real ou localhost
+        $link_recuperacao = "http://localhost/mindtech/redefinir.php?token=" . $token;
+
+        // 5. Configura e dispara o E-mail com PHPMailer
+        $mail = new PHPMailer(true);
+        try {
+            // Configurações do Servidor SMTP do Gmail
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'themindtechservices@gmail.com'; // O seu novo e-mail
+            $mail->Password   = 'COLOQUE_AQUI_A_SENHA_DE_16_LETRAS'; // A senha de app do Google
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
+
+            // Remetente e Destinatário
+            $mail->setFrom('themindtechservices@gmail.com', 'Sistema MindTech');
+            $mail->addAddress($email); 
+
+            // Conteúdo do E-mail
+            $mail->isHTML(true);
+            $mail->Subject = 'Recuperacao de Palavra-passe - MindTech';
+            $mail->Body    = "
+                <h3>Olá!</h3>
+                <p>Recebemos um pedido para redefinir a palavra-passe da sua conta no sistema MindTech.</p>
+                <p>Para criar uma nova senha, clique no link abaixo:</p>
+                <p><a href='{$link_recuperacao}' style='padding: 10px 15px; background-color: #ecc245; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold;'>Redefinir Minha Senha</a></p>
+                <br>
+                <p><i>Se o botão não funcionar, copie e cole o link abaixo no seu navegador:</i><br>
+                {$link_recuperacao}</p>
+                <br>
+                <p><small>Este link é válido por 1 hora. Se não foi você que pediu, pode ignorar este e-mail.</small></p>
+            ";
+
+            $mail->send();
+            $mensagem = "Enviámos um e-mail com as instruções para redefinir a sua senha. Verifique também a pasta de SPAM.";
+            $tipo_alerta = "success";
+            
+        } catch (Exception $e) {
+            $mensagem = "Não foi possível enviar o e-mail de recuperação. Erro do Servidor: {$mail->ErrorInfo}";
+            $tipo_alerta = "danger";
+        }
     } else {
-        $mensagem = "Por favor, digite um e-mail válido.";
-        $tipo_alerta = "danger";
+        // Por motivos de segurança, não dizemos se o e-mail existe ou não, para evitar que invasores testem e-mails.
+        $mensagem = "Se este e-mail estiver registado, receberá as instruções em breve.";
+        $tipo_alerta = "success";
     }
 }
 ?>
