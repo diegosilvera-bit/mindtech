@@ -16,13 +16,13 @@ $titulo_relatorio = "Relatório Geral";
 $cor_borda = "border-secondary";
 
 if ($tipo == 'faturamento') {
-    $titulo_relatorio = "Faturamento Mensal & Receitas";
+    $titulo_relatorio = ' <i class="bi bi-cash-stack"></i>Faturamento Mensal & Receitas';
     $cor_borda = "border-primary";
 } elseif ($tipo == 'ordens_servico') {
-    $titulo_relatorio = "Ordens de Serviço por Período";
+    $titulo_relatorio = '<i class="bi bi-file-earmark-word"></i> Ordens de Serviço por Período';
     $cor_borda = "border-warning";
 } elseif ($tipo == 'pecas_baixo_estoque') {
-    $titulo_relatorio = "Alerta de Peças com Baixo Estoque";
+    $titulo_relatorio = '<i class="bi bi-exclamation-circle"></i> Alerta de Peças com Baixo Estoque';
     $cor_borda = "border-danger";
 }
 
