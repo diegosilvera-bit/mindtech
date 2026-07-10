@@ -16,7 +16,7 @@ $titulo_relatorio = "Relatório Geral";
 $cor_borda = "border-secondary";
 
 if ($tipo == 'faturamento') {
-    $titulo_relatorio = ' <i class="bi bi-cash-stack"></i>Faturamento Mensal & Receitas';
+    $titulo_relatorio = ' <i class="bi bi-cash-stack"></i> Faturamento Mensal & Receitas';
     $cor_borda = "border-primary";
 } elseif ($tipo == 'ordens_servico') {
     $titulo_relatorio = '<i class="bi bi-file-earmark-word"></i> Ordens de Serviço por Período';
