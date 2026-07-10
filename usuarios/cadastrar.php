@@ -48,7 +48,7 @@ include '../includes/header.php';
     
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-person-plus-fill text-dark me-2"></i>Novo Usuário</h1>
+            <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-person-plus-fill text-white me-2"></i>Novo Usuário</h1>
             </div>
             <a href="listar.php" class="btn btn-secondary px-3">
              Voltar à Lista
