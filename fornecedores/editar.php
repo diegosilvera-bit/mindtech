@@ -14,8 +14,7 @@ verificarAcesso(['G', 'A']);
 include '../config/conexao.php'; 
 
 $mensagem = ''; 
-$tipo_alerta = 'danger';
-$sucesso = false;
+$tipo_alerta = '';
 
 // Pega o ID do fornecedor vindo da URL
 $id_fornecedor = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -33,10 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = mysqli_real_escape_string($conn, trim($_POST['email']));
     $endereco = mysqli_real_escape_string($conn, trim($_POST['endereco']));
 
-    if (empty($nome)) {
-        $mensagem = "O nome do fornecedor é obrigatório.";
+    if (empty($nome) || empty($cnpj)) {
+        $mensagem = "Os campos Nome e CNPJ são obrigatórios.";
+        $tipo_alerta = "warning";
     } else {
-        // Query de Update mapeada com os campos da sua tabela 'fornecedores'
+        // Query de Update mapeada com os campos da tabela 'fornecedores'
         $sql_update = "UPDATE fornecedores SET 
                         nome = '$nome', 
                         cnpj = '$cnpj', 
@@ -46,11 +46,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                       WHERE id_fornecedor = $id_fornecedor";
 
         if (mysqli_query($conn, $sql_update)) {
-            $mensagem = "Fornecedor atualizado com sucesso!";
+            $mensagem = "Fornecedor <strong>$nome</strong> atualizado com sucesso!";
             $tipo_alerta = "success";
-            $sucesso = true;
         } else {
             $mensagem = "Erro ao atualizar fornecedor: " . mysqli_error($conn);
+            $tipo_alerta = "danger";
         }
     }
 }
@@ -68,76 +68,77 @@ if (!$fornecedor) {
 
 include '../includes/header.php'; 
 ?>
-
-<div class="container-fluid px-0">
-    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-4">
-        <h1 class="h3 mb-0 text-white">
-            <i class="bi bi-pencil-square text-warning me-2"></i>Editar Fornecedor
-        </h1>
-        <a href="listar.php" class="btn btn-secondary align-self-start align-self-sm-center">
-             Voltar para Lista
-        </a>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Editar Fornecedor</h1>
+        <a href="listar.php" class="btn btn-secondary me-2">Voltar para Lista</a>
     </div>
 
     <?php if (!empty($mensagem)): ?>
-        <div class="alert alert-<?= $tipo_alerta ?> alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
-            <i class="bi <?= $sucesso ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill' ?> me-2"></i>
+        <div class="alert alert-<?= $tipo_alerta ?> alert-dismissible fade show shadow-sm" role="alert">
             <?= $mensagem ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
 
-    <div class="card shadow-sm border-0 bg-white text-dark" style="border-radius: 12px;">
+    <div class="card shadow-sm">
         <div class="card-body p-4">
-            <p class="text-muted border-bottom pb-2 mb-4">
-                <i class="bi bi-info-circle me-1"></i> Altere as informações cadastrais do fornecedor <strong>#<?= $fornecedor['id_fornecedor'] ?></strong>.
-            </p>
-
             <form method="POST" action="">
-                <div class="row g-3">
-                    
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold">Nome do Fornecedor / Razão Social <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control bg-light" name="nome" 
-                               value="<?= htmlspecialchars($fornecedor['nome']) ?>" required placeholder="Ex: Importadora de Componentes Ltda">
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label">Nome da Empresa *</label>
+                        <input type="text" class="form-control" name="nome" value="<?= htmlspecialchars($fornecedor['nome']) ?>" required>
                     </div>
-
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold">CNPJ</label>
-                        <input type="text" class="form-control bg-light" name="cnpj" 
-                               value="<?= htmlspecialchars($fornecedor['cnpj'] ?? '') ?>" placeholder="00.000.000/0000-00">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">CNPJ *</label>
+                        <input type="text" class="form-control" name="cnpj" value="<?= htmlspecialchars($fornecedor['cnpj'] ?? '') ?>" required maxlength="18" placeholder="00.000.000/0000-00" oninput="mascaraCNPJ(this)">
                     </div>
-
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold">Telefone de Contato</label>
-                        <input type="text" class="form-control bg-light" name="telefone" 
-                               value="<?= htmlspecialchars($fornecedor['telefone'] ?? '') ?>" placeholder="(00) 00000-0000">
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold">E-mail Corporativo</label>
-                        <input type="email" class="form-control bg-light" name="email" 
-                               value="<?= htmlspecialchars($fornecedor['email'] ?? '') ?>" placeholder="contato@fornecedor.com">
-                    </div>
-
-                    <div class="col-12">
-                        <label class="form-label fw-bold">Endereço Completo</label>
-                        <input type="text" class="form-control bg-light" name="endereco" 
-                               value="<?= htmlspecialchars($fornecedor['endereco'] ?? '') ?>" placeholder="Rua, Número, Bairro, Cidade - UF">
-                    </div>
-
                 </div>
-
-                <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2 flex-wrap">
-                    <a href="listar.php" class="btn btn-light border px-4 flex-grow-1 flex-md-grow-0">Cancelar</a>
-                    <button class="btn btn-primary fw-bold px-4 flex-grow-1 flex-md-grow-0" type="submit" style="border-radius: 8px;">
-                        <i class="bi bi-save me-2"></i>Salvar Alterações
-                    </button>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">E-mail Comercial</label>
+                        <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($fornecedor['email'] ?? '') ?>">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Telefone / WhatsApp</label>
+                        <input type="text" class="form-control" name="telefone" value="<?= htmlspecialchars($fornecedor['telefone'] ?? '') ?>" maxlength="15" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)">
+                    </div>
                 </div>
-
+                <!-- O campo de Endereço foi movido para uma nova linha mantendo o mesmo estilo visual -->
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Endereço Completo</label>
+                        <input type="text" class="form-control" name="endereco" value="<?= htmlspecialchars($fornecedor['endereco'] ?? '') ?>" placeholder="Rua, Número, Bairro, Cidade - UF">
+                    </div>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="listar.php" class="btn btn-light border">Cancelar</a>
+                    <button class="btn btn-success" type="submit">Salvar</button>
+                </div>
             </form>
         </div>
     </div>
 </div>
+<?php include '../includes/footer.php'; ?>
+<script>
+    // Máscara para CNPJ: 00.000.000/0000-00
+    function mascaraCNPJ(input) {
+        let v = input.value.replace(/\D/g, ""); // Remove tudo o que não é dígito
+        v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+        v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+        v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
+        v = v.replace(/(\d{4})(\d)/, "$1-$2");
+        input.value = v.substring(0, 18); // Limita o tamanho
+    }
+
+    // Máscara para Telefone: (00) 0000-0000 ou (00) 00000-0000
+    function mascaraTelefone(input) {
+        let v = input.value.replace(/\D/g, ""); // Remove tudo o que não é dígito
+        v = v.replace(/^(\d{2})(\d)/g, "($1) $2"); // Coloca parênteses
+        v = v.replace(/(\d)(\d{4})$/, "$1-$2"); // Coloca o hífen
+        input.value = v.substring(0, 15); // Limita o tamanho
+    }
+</script>
 
 <?php include '../includes/footer.php'; ?>

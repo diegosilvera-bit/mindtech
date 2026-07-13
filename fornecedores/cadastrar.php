@@ -66,21 +66,21 @@ include '../includes/header.php';
                 <div class="row">
                     <div class="col-md-8 mb-3">
                         <label class="form-label">Nome da Empresa *</label>
-                        <input type="text" class="form-control" name="nome" value="<?= htmlspecialchars($nome ?? '') ?>" required>
+                        <input type="text" class="form-control" name="nome" placeholder="Ex: Sua Empresa S/A" value="<?= htmlspecialchars($nome ?? '') ?>" required>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">CNPJ *</label>
-                        <input type="text" class="form-control" name="cnpj" value="<?= htmlspecialchars($cnpj ?? '') ?>" required maxlength="18" oninput="mascaraCNPJ(this)">
+                        <input type="text" class="form-control" name="cnpj" value="<?= htmlspecialchars($cnpj ?? '') ?>" required maxlength="18" placeholder="00.000.000/0000-00" oninput="mascaraCNPJ(this)">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">E-mail Comercial</label>
-                        <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($email ?? '') ?>">
+                        <input type="email" class="form-control" name="email" placeholder="contato@suaempresa.com.br" value="<?= htmlspecialchars($email ?? '') ?>">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Telefone / WhatsApp</label>
-                        <input type="text" class="form-control" name="telefone" value="<?= htmlspecialchars($telefone ?? '') ?>" maxlength="15" oninput="mascaraTelefone(this)">
+                        <input type="text" class="form-control" name="telefone" value="<?= htmlspecialchars($telefone ?? '') ?>" maxlength="15" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)">
                     </div>
                 </div>
                 <hr>
