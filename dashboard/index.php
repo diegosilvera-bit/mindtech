@@ -1,5 +1,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+<!-- Biblioteca do Chart.js para o Gráfico de Rendas -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <?php 
 require_once __DIR__ . '/../includes/functions.php'; 
@@ -10,7 +12,9 @@ require_once '../config/conexao.php';
 date_default_timezone_set('America/Sao_Paulo');
 $perfil = $_SESSION['usuario']['perfil'] ?? '';
 
+// =========================================================================
 // LÓGICA DO GRÁFICO: Contar O.S. por Status
+// =========================================================================
 $contagem = [
     'analise' => 0,
     'reparo' => 0,
@@ -37,7 +41,9 @@ if ($resultado_status && mysqli_num_rows($resultado_status) > 0) {
     }
 }
 
+// =========================================================================
 // BUSCA DA TABELA DE ALERTA: O.S. com status 'AGUARDANDO_PECA'
+// =========================================================================
 $sql_aguardando_peca = "SELECT os.id_os, os.data_entrada, 
                                c.nome AS nome_cliente, 
                                CONCAT(e.marca, ' ', e.modelo) AS equipamento
@@ -48,6 +54,113 @@ $sql_aguardando_peca = "SELECT os.id_os, os.data_entrada,
                         ORDER BY os.id_os ASC"; 
 
 $res_aguardando = mysqli_query($conn, $sql_aguardando_peca);
+
+// =========================================================================
+// LÓGICA DO GRÁFICO DE RENDAS (SEMANAL, MENSAL, ANUAL) - O.S FINALIZADAS
+// =========================================================================
+$dados_grafico = [
+    'semanal' => ['labels' => [], 'valores' => []],
+    'mensal'  => ['labels' => [], 'valores' => []],
+    'anual'   => ['labels' => [], 'valores' => []]
+];
+
+// 1. Busca Semanal (Últimas 12 Semanas)
+$sql_semanal = "SELECT YEARWEEK(COALESCE(o.data_saida, o.atualizado_em), 1) AS periodo, 
+                       SUM(COALESCE(orcs.valor_total, 0)) AS total 
+                FROM ordens_servico o 
+                LEFT JOIN orcamentos orcs ON orcs.id_os = o.id_os 
+                WHERE o.status = 'FINALIZADO' 
+                GROUP BY periodo ORDER BY periodo ASC LIMIT 12";
+$res_semanal = mysqli_query($conn, $sql_semanal);
+if ($res_semanal) {
+    while ($row = mysqli_fetch_assoc($res_semanal)) {
+        $ano = substr($row['periodo'], 0, 4);
+        $sem = substr($row['periodo'], 4, 2);
+        $dados_grafico['semanal']['labels'][] = "Sem $sem/$ano";
+        $dados_grafico['semanal']['valores'][] = (float) $row['total'];
+    }
+}
+
+// 2. Busca Mensal (Últimos 12 Meses)
+$sql_mensal = "SELECT DATE_FORMAT(COALESCE(o.data_saida, o.atualizado_em), '%Y-%m') AS periodo, 
+                      SUM(COALESCE(orcs.valor_total, 0)) AS total 
+               FROM ordens_servico o 
+               LEFT JOIN orcamentos orcs ON orcs.id_os = o.id_os 
+               WHERE o.status = 'FINALIZADO' 
+               GROUP BY periodo ORDER BY periodo ASC LIMIT 12";
+$res_mensal = mysqli_query($conn, $sql_mensal);
+if ($res_mensal) {
+    while ($row = mysqli_fetch_assoc($res_mensal)) {
+        $data_obj = DateTime::createFromFormat('Y-m', $row['periodo']);
+        $dados_grafico['mensal']['labels'][] = $data_obj ? $data_obj->format('m/Y') : $row['periodo'];
+        $dados_grafico['mensal']['valores'][] = (float) $row['total'];
+    }
+}
+
+// 3. Busca Anual (Últimos 5 Anos)
+$sql_anual = "SELECT YEAR(COALESCE(o.data_saida, o.atualizado_em)) AS periodo, 
+                     SUM(COALESCE(orcs.valor_total, 0)) AS total 
+              FROM ordens_servico o 
+              LEFT JOIN orcamentos orcs ON orcs.id_os = o.id_os 
+              WHERE o.status = 'FINALIZADO' 
+              GROUP BY periodo ORDER BY periodo ASC LIMIT 5";
+$res_anual = mysqli_query($conn, $sql_anual);
+if ($res_anual) {
+    while ($row = mysqli_fetch_assoc($res_anual)) {
+        $dados_grafico['anual']['labels'][] = $row['periodo'];
+        $dados_grafico['anual']['valores'][] = (float) $row['total'];
+    }
+}
+
+$tem_dados_grafico = count($dados_grafico['mensal']['valores']) > 0 || count($dados_grafico['semanal']['valores']) > 0 || count($dados_grafico['anual']['valores']) > 0;
+$json_dados_grafico = json_encode($dados_grafico);
+
+// =========================================================================
+// LÓGICA DO NOVO GRÁFICO (COLUNAS) - VALORES POR STATUS DA O.S
+// =========================================================================
+$sql_status_valor = "SELECT 
+                        o.status, 
+                        SUM(COALESCE(orcs.valor_total, 0)) AS total_valor 
+                     FROM ordens_servico o 
+                     LEFT JOIN orcamentos orcs ON orcs.id_os = o.id_os 
+                     GROUP BY o.status 
+                     ORDER BY total_valor DESC"; // Ordena do maior valor para o menor
+$res_status_valor = mysqli_query($conn, $sql_status_valor);
+
+$labels_status = [];
+$valores_status = [];
+$cores_status = [];
+
+if ($res_status_valor && mysqli_num_rows($res_status_valor) > 0) {
+    while ($row = mysqli_fetch_assoc($res_status_valor)) {
+        $status_raw = strtoupper(trim($row['status']));
+        
+        // Remove os underlines e deixa bonitinho
+        $status_nome = str_replace('_', ' ', $status_raw);
+        $labels_status[] = $status_nome;
+        $valores_status[] = (float) $row['total_valor'];
+        
+        // Define uma cor específica para cada coluna baseado no status
+        if (strpos($status_raw, 'FINALIZADO') !== false || strpos($status_raw, 'CONCLUIDO') !== false) {
+            $cores_status[] = 'rgba(25, 135, 84, 0.7)'; // Verde (Sucesso/Realizado)
+        } elseif (strpos($status_raw, 'CANCELADO') !== false || strpos($status_raw, 'RECUSADO') !== false) {
+            $cores_status[] = 'rgba(220, 53, 69, 0.7)'; // Vermelho (Perdido)
+        } elseif (strpos($status_raw, 'ANALISE') !== false) {
+            $cores_status[] = 'rgba(13, 110, 253, 0.7)'; // Azul (Em orçamento)
+        } elseif (strpos($status_raw, 'REPARO') !== false || strpos($status_raw, 'ANDAMENTO') !== false) {
+            $cores_status[] = 'rgba(255, 193, 7, 0.7)'; // Amarelo (Garantido, em execução)
+        } elseif (strpos($status_raw, 'AGUARDANDO') !== false) {
+            $cores_status[] = 'rgba(253, 126, 20, 0.7)'; // Laranja (Pausado/Aguardando)
+        } else {
+            $cores_status[] = 'rgba(108, 117, 125, 0.7)'; // Cinza (Outros)
+        }
+    }
+}
+
+$json_labels_status = json_encode($labels_status);
+$json_valores_status = json_encode($valores_status);
+$json_cores_status = json_encode($cores_status);
+// =========================================================================
 
 include '../includes/header.php'; 
 ?>
@@ -362,6 +475,165 @@ include '../includes/header.php';
                         </table>
                     </div>
                 </div>
+            </div>
+
+            <div class="row">
+                <!-- ========================================================= -->
+                <!-- CARD DINÂMICO 1: GRÁFICO DE FATURAMENTO                   -->
+                <!-- ========================================================= -->
+                <div class="col-xl-6 mb-4">
+                    <div class="card shadow-sm border-0 border-top border-4 border-success h-100">
+                        <div class="card-header bg-white fw-bold py-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center">
+                            <div class="mb-2 mb-sm-0">
+                                <i class="bi bi-graph-up-arrow text-success me-2"></i> Faturamento (Realizado)
+                            </div>
+                            
+                            <select id="filtroFaturamento" class="form-select form-select-sm w-auto shadow-sm" style="min-width: 110px;">
+                                <option value="semanal">Semanal</option>
+                                <option value="mensal" selected>Mensal</option>
+                                <option value="anual">Anual</option>
+                            </select>
+                        </div>
+                        <div class="card-body px-3 px-md-4">
+                            <?php if ($tem_dados_grafico): ?>
+                                <div style="position: relative; height: 320px; width: 100%;">
+                                    <canvas id="graficoFaturamento"></canvas>
+                                </div>
+                                <script>
+                                    document.addEventListener("DOMContentLoaded", function() {
+                                        const dadosCompletos = <?= $json_dados_grafico ?>;
+                                        const ctx = document.getElementById('graficoFaturamento').getContext('2d');
+                                        
+                                        let graficoInstancia = new Chart(ctx, {
+                                            type: 'line',
+                                            data: {
+                                                labels: dadosCompletos['mensal'].labels,
+                                                datasets: [{
+                                                    label: 'Faturamento (R$)',
+                                                    data: dadosCompletos['mensal'].valores,
+                                                    borderColor: '#198754',
+                                                    backgroundColor: 'rgba(25, 135, 84, 0.2)',
+                                                    borderWidth: 2,
+                                                    fill: true,
+                                                    tension: 0.3
+                                                }]
+                                            },
+                                            options: {
+                                                responsive: true,
+                                                maintainAspectRatio: false,
+                                                plugins: {
+                                                    legend: { display: true, position: 'top' },
+                                                    tooltip: {
+                                                        callbacks: {
+                                                            label: function(context) {
+                                                                let valor = context.parsed.y || 0;
+                                                                return 'R$ ' + valor.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                scales: {
+                                                    y: {
+                                                        beginAtZero: true,
+                                                        ticks: {
+                                                            callback: function(value) {
+                                                                return 'R$ ' + value.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        });
+
+                                        document.getElementById('filtroFaturamento').addEventListener('change', function(e) {
+                                            const periodoEscolhido = e.target.value;
+                                            graficoInstancia.data.labels = dadosCompletos[periodoEscolhido].labels;
+                                            graficoInstancia.data.datasets[0].data = dadosCompletos[periodoEscolhido].valores;
+                                            graficoInstancia.update();
+                                        });
+                                    });
+                                </script>
+                            <?php else: ?>
+                                <div class="text-center py-5 text-muted">
+                                    <span class="text-warning fw-bold fs-5">
+                                        <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>Não há dados suficientes.
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================================= -->
+                <!-- CARD DINÂMICO 2: GRÁFICO DE COLUNAS (VALOR POR STATUS)    -->
+                <!-- ========================================================= -->
+                <div class="col-xl-6 mb-4">
+                    <div class="card shadow-sm border-0 border-top border-4 border-info h-100">
+                        <div class="card-header bg-white fw-bold py-3">
+                            <i class="bi bi-bar-chart-fill text-info me-2"></i> Valores por Status (Em R$)
+                        </div>
+                        <div class="card-body px-3 px-md-4">
+                            <?php if (count($labels_status) > 0): ?>
+                                <div style="position: relative; height: 320px; width: 100%;">
+                                    <canvas id="graficoStatusValor"></canvas>
+                                </div>
+                                <script>
+                                    document.addEventListener("DOMContentLoaded", function() {
+                                        const ctxStatus = document.getElementById('graficoStatusValor').getContext('2d');
+                                        
+                                        new Chart(ctxStatus, {
+                                            type: 'bar',
+                                            data: {
+                                                labels: <?= $json_labels_status ?>,
+                                                datasets: [{
+                                                    label: 'Valor Total (R$)',
+                                                    data: <?= $json_valores_status ?>,
+                                                    backgroundColor: <?= $json_cores_status ?>,
+                                                    borderColor: <?= $json_cores_status ?>.map(color => color.replace('0.7', '1')), // Borda com cor sólida
+                                                    borderWidth: 1,
+                                                    borderRadius: 4
+                                                }]
+                                            },
+                                            options: {
+                                                responsive: true,
+                                                maintainAspectRatio: false,
+                                                plugins: {
+                                                    legend: { display: false }, // Oculta a legenda, pois as cores já representam o status
+                                                    tooltip: {
+                                                        callbacks: {
+                                                            label: function(context) {
+                                                                let valor = context.parsed.y || 0;
+                                                                return 'R$ ' + valor.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                scales: {
+                                                    y: {
+                                                        beginAtZero: true,
+                                                        ticks: {
+                                                            callback: function(value) {
+                                                                // Retira casas decimais no eixo Y para ficar mais limpo
+                                                                return 'R$ ' + value.toLocaleString('pt-BR'); 
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    });
+                                </script>
+                            <?php else: ?>
+                                <div class="text-center py-5 text-muted">
+                                    <span class="text-warning fw-bold fs-5">
+                                        <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>Nenhuma O.S vinculada a orçamentos foi encontrada.
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <!-- ========================================================= -->
             </div>
 
         </div> 
