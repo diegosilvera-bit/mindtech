@@ -38,8 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt_update->execute([$token, $expiracao, $email]);
 
         // 4. Prepara o link de recuperação
-        $link_recuperacao = "http://localhost/mindtech/redefinir.php?token=" . $token;
-
+        $link_recuperacao = "http://localhost:8080/mindtech/redefinir.php?token=" . $token;
+        
         // 5. Configura e dispara o E-mail com PHPMailer
         $mail = new PHPMailer(true);
         try {
