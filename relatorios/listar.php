@@ -40,100 +40,28 @@ include '../includes/header.php';
     }
 
     /* =========================================================
-       CABEÇALHO: título, busca e ações — Flexbox no desktop
-    ========================================================= */
-    .relatorio-topo {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .relatorio-topo__acoes {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-    }
-
-    .relatorio-busca .input-group {
-        min-width: 220px;
-    }
-
-    /* =========================================================
-       MOBILE (até 768px): Grid para os botões + busca em largura total
+       MOBILE (até 768px): Ajuste dos botões e tabela vira "cards"
     ========================================================= */
     @media (max-width: 768px) {
-        .relatorio-topo {
+        .botoes-mobile {
             flex-direction: column;
-            align-items: stretch;
-        }
-
-        .relatorio-busca {
-            order: -1;
+            align-items: stretch !important;
             width: 100%;
         }
-
-        .relatorio-busca .input-group {
+        .botoes-mobile .btn, .botoes-mobile .input-group {
             width: 100%;
-            min-width: 0;
+            max-width: 100% !important;
         }
 
-        .relatorio-topo__acoes {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-            width: 100%;
-        }
-
-        .relatorio-topo__acoes .btn {
-            width: 100%;
-        }
-    }
-
-    /* =========================================================
-       MOBILE (até 768px): Tabela vira "cards" — CSS puro, sem alterar o HTML
-    ========================================================= */
-    @media (max-width: 768px) {
-        #tabelaRelatorio thead {
-            display: none;
-        }
-
-        #tabelaRelatorio,
-        #tabelaRelatorio tbody,
-        #tabelaRelatorio tr,
-        #tabelaRelatorio td {
-            display: block;
-            width: 100%;
-        }
-
-        #tabelaRelatorio tr {
-            margin-bottom: 0.85rem;
-            border: 1px solid #dee2e6;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-        }
-
-        #tabelaRelatorio td {
-            border: none;
-            padding: 0.3rem 0;
-            text-align: left !important;
-        }
-
+        #tabelaRelatorio thead { display: none; }
+        #tabelaRelatorio, #tabelaRelatorio tbody, #tabelaRelatorio tr, #tabelaRelatorio td { display: block; width: 100%; }
+        #tabelaRelatorio tr { margin-bottom: 0.85rem; border: 1px solid #dee2e6; border-radius: 0.5rem; padding: 0.75rem 1rem; }
+        #tabelaRelatorio td { border: none; padding: 0.3rem 0; text-align: left !important; }
         #tabelaRelatorio td::before {
-            content: attr(data-label);
-            display: block;
-            font-size: 0.72rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: #6c757d;
-            margin-bottom: 0.15rem;
+            content: attr(data-label); display: block; font-size: 0.72rem; font-weight: 700;
+            text-transform: uppercase; color: #6c757d; margin-bottom: 0.15rem;
         }
-
-        #tabelaRelatorio tr.table-success td::before,
-        #tabelaRelatorio tr.table-success {
+        #tabelaRelatorio tr.table-success td::before, #tabelaRelatorio tr.table-success {
             text-align: right !important;
         }
     }
@@ -141,8 +69,9 @@ include '../includes/header.php';
 
 <div class="container mt-4 mb-5">
 
-    <div class="relatorio-topo d-print-none">
-        <div>
+    <div class="row align-items-center mb-4 d-print-none">
+        
+        <div class="col-12 col-xl-5 mb-3 mb-xl-0">
             <h1 class="h3 mb-1 text-gray-800 fw-bold"><?php echo $titulo_relatorio; ?></h1>
             <?php if (!empty($inicio) && !empty($fim)): ?>
                 <span class="badge bg-light text-dark border">
@@ -153,24 +82,26 @@ include '../includes/header.php';
                 <span class="badge bg-light text-dark border">Histórico Completo</span>
             <?php endif; ?>
         </div>
-        <div class="relatorio-topo__acoes">
-            <?php if (!empty($tipo)): ?>
-                <div class="relatorio-busca">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        
+        <div class="col-12 col-xl-7">
+            <div class="d-flex flex-wrap flex-md-nowrap gap-3 justify-content-xl-end align-items-center">
+                
+                <?php if (!empty($tipo)): ?>
+                    <div class="input-group" style="max-width: 300px; min-width: 200px;">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
                         <input type="text" id="campoBusca" class="form-control" placeholder="Pesquisar no relatório..." autocomplete="off">
                     </div>
+                <?php endif; ?>
+                
+                <div class="d-flex gap-2 text-nowrap botoes-mobile">
+                    <a href="cadastrar.php" class="btn btn-secondary shadow-sm">
+                        <i class="bi bi-arrow-left me-1"></i> Voltar
+                    </a>
                 </div>
-            <?php endif; ?>
-            <a href="cadastrar.php" class="btn btn-secondary me-2">
-                <i class="bi bi-arrow-left me-1"></i> Voltar aos Filtros
-            </a>
-            <?php if (!empty($tipo)): ?>
-                <button onclick="window.print()" class="btn btn-primary me-2">
-                    <i class="bi bi-printer-fill me-1"></i> Imprimir / Salvar PDF
-                </button>
-            <?php endif; ?>
+
+            </div>
         </div>
+
     </div>
 
     <div class="d-none d-print-block mb-4 border-bottom pb-3">
@@ -193,18 +124,29 @@ include '../includes/header.php';
                     <?php if ($tipo == 'faturamento'): ?>
                         <thead class="table-light">
                             <tr>
-                                <th class="ps-4">Cód. Orçamento</th>
-                                <th>Nº O.S.</th>
+                                <th class="ps-4">Nº O.S.</th>
+                                <th>Cliente</th>
+                                <th>Equipamento</th>
+                                <th>Funcionário</th>
                                 <th>Valor Peças</th>
                                 <th>Mão de Obra</th>
-                                <th class="pe-4">Valor Total Recebido</th>
+                                <th class="pe-4">Total Faturado</th>
                             </tr>
                         </thead>
                         <tbody id="corpoTabela">
                             <?php
-                            $sql = "SELECT o.*, os.data_entrada
+                            // CONSULTA CORRIGIDA COM OS DADOS EXATOS DA SUA BASE DE DADOS MINTDECH (id_usuario_responsavel)
+                            $sql = "SELECT o.id_orcamento, o.valor_pecas, o.valor_mao_obra, o.valor_total,
+                                           os.id_os, os.data_entrada, 
+                                           c.nome AS nome_cliente, 
+                                           CONCAT(e.marca, ' ', e.modelo) AS equipamento,
+                                           COALESCE(u_os.nome, u_orc.nome) AS nome_funcionario
                                     FROM orcamentos o
                                     JOIN ordens_servico os ON o.id_os = os.id_os
+                                    LEFT JOIN clientes c ON os.id_cliente = c.id_cliente
+                                    LEFT JOIN equipamentos e ON os.id_equipamento = e.id_equipamento
+                                    LEFT JOIN usuarios u_os ON os.id_usuario_responsavel = u_os.id_usuario 
+                                    LEFT JOIN usuarios u_orc ON o.usuario_responsavel = u_orc.id_usuario 
                                     WHERE o.aprovado = 1";
 
                             if (!empty($inicio) && !empty($fim)) {
@@ -214,33 +156,32 @@ include '../includes/header.php';
 
                             $result = mysqli_query($conn, $sql);
                             $total_geral = 0;
-                            $tem_linhas = false;
 
                             if ($result && mysqli_num_rows($result) > 0) {
-                                $tem_linhas = true;
                                 while ($row = mysqli_fetch_assoc($result)) {
                                     $total_geral += $row['valor_total'];
-                                    $busca_row = mb_strtolower($row['id_orcamento'] . ' ' . $row['id_os']);
+                                    $busca_row = mb_strtolower($row['id_os'] . ' ' . $row['nome_cliente'] . ' ' . $row['equipamento'] . ' ' . $row['nome_funcionario']);
+                                    
                                     echo "<tr data-busca='" . htmlspecialchars($busca_row) . "'>";
-                                    echo "<td class='ps-4 fw-bold text-muted' data-label='Cód. Orçamento'>#{$row['id_orcamento']}</td>";
-                                    echo "<td data-label='Nº O.S.'><span class='badge bg-secondary-subtle text-secondary border fw-bold'>OS #{$row['id_os']}</span></td>";
+                                    echo "<td class='ps-4 fw-bold text-dark' data-label='Nº O.S.'>OS #{$row['id_os']}</td>";
+                                    echo "<td data-label='Cliente'>" . htmlspecialchars($row['nome_cliente'] ?? 'N/A') . "</td>";
+                                    echo "<td data-label='Equipamento'>" . htmlspecialchars($row['equipamento'] ?? 'N/A') . "</td>";
+                                    echo "<td data-label='Funcionário'>" . htmlspecialchars($row['nome_funcionario'] ?? 'Não Atribuído') . "</td>";
                                     echo "<td data-label='Valor Peças'>R$ " . number_format($row['valor_pecas'], 2, ',', '.') . "</td>";
                                     echo "<td data-label='Mão de Obra'>R$ " . number_format($row['valor_mao_obra'], 2, ',', '.') . "</td>";
-                                    echo "<td class='pe-4 fw-bold text-success' data-label='Valor Total Recebido'>R$ " . number_format($row['valor_total'], 2, ',', '.') . "</td>";
+                                    echo "<td class='pe-4 fw-bold text-success' data-label='Total Faturado'>R$ " . number_format($row['valor_total'], 2, ',', '.') . "</td>";
                                     echo "</tr>";
                                 }
                                 echo "<tr class='table-success fw-bold' data-busca=''>";
-                                echo "<td colspan='4' class='text-end ps-4 py-3 fs-5 text-dark' data-label='Faturamento Total Bruto'>Faturamento Total Bruto:</td>";
+                                echo "<td colspan='6' class='text-end ps-4 py-3 fs-5 text-dark' data-label='Faturamento Total Bruto'>Faturamento Total Bruto:</td>";
                                 echo "<td class='pe-4 py-3 fs-5 text-success' data-label=''>R$ " . number_format($total_geral, 2, ',', '.') . "</td>";
                                 echo "</tr>";
                             } else {
-                                echo "<tr><td colspan='5' class='text-center py-4 text-muted'>Nenhum faturamento de orçamento aprovado registrado para este filtro.<br><small class='text-danger'>Nota: Certifique-se de que a O.S. possui um orçamento salvo e marcado como 'Aprovado'.</small></td></tr>";
+                                echo "<tr><td colspan='7' class='text-center py-4 text-muted'>Nenhum faturamento de orçamento aprovado registado para este filtro.</td></tr>";
                             }
                             ?>
                             <tr id="semResultadoBusca" style="display:none;">
-                                <td colspan="5" class="text-center py-4 text-muted">
-                                    <i class="bi bi-search me-1"></i> Nenhum registro encontrado para a pesquisa.
-                                </td>
+                                <td colspan="7" class="text-center py-4 text-muted"><i class="bi bi-search me-1"></i> Nenhum registo encontrado para a pesquisa.</td>
                             </tr>
                         </tbody>
 
@@ -291,13 +232,11 @@ include '../includes/header.php';
                                     echo "</tr>";
                                 }
                             } else {
-                                echo "<tr><td colspan='5' class='text-center py-4 text-muted'>Nenhuma Ordem de Serviço encontrada para o período solicitado.</td></tr>";
+                                echo "<tr><td colspan='5' class='text-center py-4 text-muted'>Nenhuma Ordem de Serviço encontrada.</td></tr>";
                             }
                             ?>
                             <tr id="semResultadoBusca" style="display:none;">
-                                <td colspan="5" class="text-center py-4 text-muted">
-                                    <i class="bi bi-search me-1"></i> Nenhuma O.S. encontrada para a pesquisa.
-                                </td>
+                                <td colspan="5" class="text-center py-4 text-muted"><i class="bi bi-search me-1"></i> Nenhuma O.S. encontrada para a pesquisa.</td>
                             </tr>
                         </tbody>
 
@@ -326,13 +265,11 @@ include '../includes/header.php';
                                     echo "</tr>";
                                 }
                             } else {
-                                echo "<tr><td colspan='4' class='text-center py-4 text-success fw-bold'><i class='bi bi-shield-check me-2 fs-5'></i>Excelente! Todas as peças encontram-se acima do nível mínimo.</td></tr>";
+                                echo "<tr><td colspan='4' class='text-center py-4 text-success fw-bold'><i class='bi bi-shield-check me-2 fs-5'></i>Excelente! Todas as peças estão com stock acima do mínimo.</td></tr>";
                             }
                             ?>
                             <tr id="semResultadoBusca" style="display:none;">
-                                <td colspan="4" class="text-center py-4 text-muted">
-                                    <i class="bi bi-search me-1"></i> Nenhuma peça encontrada para a pesquisa.
-                                </td>
+                                <td colspan="4" class="text-center py-4 text-muted"><i class="bi bi-search me-1"></i> Nenhuma peça encontrada.</td>
                             </tr>
                         </tbody>
 
@@ -342,10 +279,6 @@ include '../includes/header.php';
                                 <td class="text-center py-5 text-muted">
                                     <i class="bi bi-funnel fs-2 d-block mb-3 text-warning"></i>
                                     <span class="fw-bold d-block text-dark">Nenhum tipo de relatório foi selecionado.</span>
-                                    Por favor, volte para a tela de filtros e escolha uma opção válida.
-                                    <div class="mt-3">
-                                        <a href="cadastrar.php" class="btn btn-sm btn-success fw-bold px-4">Ir para Filtros</a>
-                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -354,7 +287,18 @@ include '../includes/header.php';
                 </table>
             </div>
         </div>
-    </div>
+    </div> 
+
+    <?php if (!empty($tipo)): ?>
+        <div class="d-flex flex-wrap justify-content-end gap-2 mt-3 d-print-none botoes-mobile">
+            <button onclick="exportarTabelaParaExcel('tabelaRelatorio', 'Relatorio_<?php echo ucfirst($tipo); ?>')" class="btn btn-success shadow-sm fw-bold">
+                <i class="bi bi-file-earmark-excel me-1"></i> Exportar para Excel
+            </button>
+            <button onclick="window.print()" class="btn btn-primary shadow-sm fw-bold">
+                <i class="bi bi-printer-fill me-1"></i> Imprimir / PDF
+            </button>
+        </div>
+    <?php endif; ?>
 
     <div class="d-none d-print-block mt-4 text-center border-top pt-2">
         <p class="text-muted" style="font-size: 0.75rem;">Mindtech Gestão de Assistência &copy; <?php echo date('Y'); ?> — Relatório Gerencial de Uso Exclusivo</p>
@@ -364,7 +308,7 @@ include '../includes/header.php';
 
 <script>
     // ================================================================
-    // PESQUISA AO VIVO: filtra a tabela do relatório a cada letra digitada
+    // PESQUISA AO VIVO (Filtra a tabela a cada letra digitada)
     // ================================================================
     (function () {
         const campoBusca = document.getElementById('campoBusca');
@@ -385,6 +329,52 @@ include '../includes/header.php';
             }
         });
     })();
+
+    // ================================================================
+    // EXPORTADOR PARA EXCEL (.XLS) com conversão de Base64 (Suporta acentos e R$)
+    // ================================================================
+    function exportarTabelaParaExcel(tableID, filename = '') {
+        // Pega a tabela
+        let table = document.getElementById(tableID);
+        // Cria um clone para podermos limpar o que não deve ir para o Excel
+        let clone = table.cloneNode(true);
+        
+        // 1. Remove a linha de "Nenhum registo encontrado"
+        let semResultado = clone.querySelector('#semResultadoBusca');
+        if(semResultado) semResultado.remove();
+        
+        // 2. Remove os ícones do Bootstrap para limpar os dados no Excel
+        let icons = clone.querySelectorAll('i');
+        icons.forEach(icon => icon.remove());
+
+        // Gera o HTML da tabela
+        let tableHTML = clone.outerHTML;
+        
+        // Monta a estrutura de um ficheiro Excel em XML (Garante compatibilidade de formatação e UTF-8)
+        let template = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+        <meta charset="UTF-8">
+        </head>
+        <body>${tableHTML}</body>
+        </html>`;
+        
+        // Codifica em Base64 para evitar quebra de caracteres especiais (como R$, ç, ã)
+        let dataType = 'data:application/vnd.ms-excel;base64,';
+        let base64data = btoa(unescape(encodeURIComponent(template)));
+        
+        // Cria o nome do ficheiro com a data atual
+        let dataAtual = new Date().toISOString().split('T')[0];
+        filename = filename ? filename + '_' + dataAtual + '.xls' : 'Relatorio_' + dataAtual + '.xls';
+        
+        // Dispara o download automático
+        let downloadLink = document.createElement("a");
+        document.body.appendChild(downloadLink);
+        downloadLink.href = dataType + base64data;
+        downloadLink.download = filename;
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    }
 </script>
 
 <?php include '../includes/footer.php'; ?>
