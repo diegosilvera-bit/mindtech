@@ -23,16 +23,19 @@ if ($id_usuario <= 0) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
+    // Captura o E-mail também
     $nome = mysqli_real_escape_string($conn, trim($_POST['nome']));
+    $email = mysqli_real_escape_string($conn, trim($_POST['email']));
     $login = mysqli_real_escape_string($conn, trim($_POST['login']));
     $senha = mysqli_real_escape_string($conn, trim($_POST['senha']));
     $perfil = mysqli_real_escape_string($conn, trim($_POST['perfil']));
 
-    if (empty($nome) || empty($login) || empty($senha) || empty($perfil)) {
+    if (empty($nome) || empty($email) || empty($login) || empty($senha) || empty($perfil)) {
         $mensagem = "Por favor, preencha todos os campos obrigatórios.";
         $tipo_alerta = "warning";
     } else {
-        $sql_update = "UPDATE usuarios SET nome='$nome', login='$login', senha='$senha', perfil='$perfil' WHERE id_usuario=$id_usuario";
+        // Atualiza a query para salvar o e-mail alterado
+        $sql_update = "UPDATE usuarios SET nome='$nome', email='$email', login='$login', senha='$senha', perfil='$perfil' WHERE id_usuario=$id_usuario";
         
         if (mysqli_query($conn, $sql_update)) {
             $mensagem = "Informações do usuário atualizadas com sucesso!";
@@ -84,7 +87,7 @@ include '../includes/header.php';
                 <div class="row">
                     <div class="col-md-8 mb-3">
                         <label class="form-label fw-bold">Nome Completo *</label>
-                        <input type="text" class="form-control" name="nome" value="<?php echo htmlspecialchars($usuario['nome']); ?>" required style="border-radius: 8px;">
+                        <input type="text" class="form-control" name="nome" value="<?php echo htmlspecialchars($usuario['nome'] ?? ''); ?>" required style="border-radius: 8px;">
                     </div>
 
                     <div class="col-md-4 mb-3">
@@ -99,14 +102,22 @@ include '../includes/header.php';
                 </div>
 
                 <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label fw-bold">E-mail *</label>
+                        <input type="email" class="form-control" name="email" value="<?php echo htmlspecialchars($usuario['email'] ?? ''); ?>" required style="border-radius: 8px;">
+                        <small class="text-muted">Utilizado para recuperação de senha.</small>
+                    </div>
+                </div>
+
+                <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Nome de Login *</label>
-                        <input type="text" class="form-control" name="login" value="<?php echo htmlspecialchars($usuario['login']); ?>" required style="border-radius: 8px;">
+                        <input type="text" class="form-control" name="login" value="<?php echo htmlspecialchars($usuario['login'] ?? ''); ?>" required style="border-radius: 8px;">
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Senha de Acesso *</label>
-                        <input type="text" class="form-control" name="senha" value="<?php echo htmlspecialchars($usuario['senha']); ?>" required style="border-radius: 8px;">
+                        <input type="text" class="form-control" name="senha" value="<?php echo htmlspecialchars($usuario['senha'] ?? ''); ?>" required style="border-radius: 8px;">
                     </div>
                 </div>
 

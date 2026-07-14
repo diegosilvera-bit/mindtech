@@ -2,15 +2,17 @@
 session_start();
 require_once 'config/conexao.php'; // Usa o seu arquivo que tem o $pdo
 
-// Ajuste os caminhos abaixo de acordo com a pasta onde guardou o PHPMailer
+// Mostrar erros na tela para facilitar testes (quando o sistema for ao ar, pode apagar estas 3 linhas)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Usa as classes do PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-// Se usou o Composer, descomente a linha abaixo e apague os requires manuais:
-// require 'vendor/autoload.php';
-
-// Se baixou manualmente, mantenha estes requires:
+// Inclui os ficheiros do PHPMailer
 require 'libs/PHPMailer/Exception.php';
 require 'libs/PHPMailer/PHPMailer.php';
 require 'libs/PHPMailer/SMTP.php';
@@ -21,8 +23,8 @@ $tipo_alerta = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     
-    // 1. Verifica se o e-mail existe no Banco de Dados
-    $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE email = ? LIMIT 1");
+    // 1. Verifica se o e-mail existe no Banco de Dados (Usando SELECT *)
+    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ? LIMIT 1");
     $stmt->execute([$email]);
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -32,11 +34,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $expiracao = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
         // 3. Salva o token no banco de dados do utilizador
-        $stmt_update = $pdo->prepare("UPDATE usuarios SET token_recuperacao = ?, token_expiracao = ? WHERE id = ?");
-        $stmt_update->execute([$token, $expiracao, $usuario['id']]);
+        $stmt_update = $pdo->prepare("UPDATE usuarios SET token_recuperacao = ?, token_expiracao = ? WHERE email = ?");
+        $stmt_update->execute([$token, $expiracao, $email]);
 
         // 4. Prepara o link de recuperação
-        // Substitua 'seusite.com' pelo seu domínio real ou localhost
         $link_recuperacao = "http://localhost/mindtech/redefinir.php?token=" . $token;
 
         // 5. Configura e dispara o E-mail com PHPMailer
@@ -46,8 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->isSMTP();
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'themindtechservices@gmail.com'; // O seu novo e-mail
-            $mail->Password   = 'pbltfrlpgbrwsudf'; // A senha de app do Google
+            $mail->Username   = 'themindtechservices@gmail.com';
+            $mail->Password   = 'pbltfrlpgbrwsudf'; // Senha de App do Google
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = 587;
 
@@ -79,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tipo_alerta = "danger";
         }
     } else {
-        // Por motivos de segurança, não dizemos se o e-mail existe ou não, para evitar que invasores testem e-mails.
+        // Por motivos de segurança, se o e-mail não existir, mostramos a mesma mensagem de sucesso
         $mensagem = "Se este e-mail estiver registado, receberá as instruções em breve.";
         $tipo_alerta = "success";
     }
@@ -111,12 +112,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 1px solid #3d3d3d;
             color: #fff;
         }
-        .form-control:focus {
-            background-color: #333;
-            border-color: #ecc245;
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(236, 194, 69, 0.25);
+        
+        /* Correção global para focar com dourado em vez de azul */
+        .form-control:focus, 
+        .form-select:focus, 
+        .btn:focus {
+            border-color: #ecc245 !important;
+            box-shadow: 0 0 0 0.25rem rgba(236, 194, 69, 0.25) !important;
+            outline: none !important;
         }
+
+        /* Correção específica para campos com ícone (Input Groups) */
+        .input-group:focus-within .form-control {
+            border-color: #ecc245 !important;
+            box-shadow: none !important;
+        }
+        .input-group:focus-within {
+            box-shadow: 0 0 0 0.25rem rgba(236, 194, 69, 0.25) !important;
+            border-radius: 0.375rem;
+        }
+        .input-group:focus-within .input-group-text {
+            border-color: #ecc245 !important;
+        }
+
         .text-brand { color: #ecc245; }
         .btn-brand {
             background-color: #ecc245;
@@ -127,6 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-color: #d4ad3c;
             color: #000;
         }
+        .hover-white:hover { color: #fff !important; }
     </style>
 </head>
 <body class="d-flex align-items-center justify-content-center">

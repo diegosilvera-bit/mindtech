@@ -18,8 +18,9 @@ $tipo_alerta = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
-    // Captura e higieniza inputs
+    // Captura e higieniza inputs (AGORA COM EMAIL)
     $nome = mysqli_real_escape_string($conn, trim($_POST['nome']));
+    $email = mysqli_real_escape_string($conn, trim($_POST['email']));
     $login = mysqli_real_escape_string($conn, trim($_POST['login']));
     $senha = mysqli_real_escape_string($conn, trim($_POST['senha']));
     $perfil = mysqli_real_escape_string($conn, trim($_POST['perfil']));
@@ -27,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Criptografia da senha (boa prática de segurança)
     $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
 
-    if (empty($nome) || empty($login) || empty($senha) || empty($perfil)) {
+    if (empty($nome) || empty($email) || empty($login) || empty($senha) || empty($perfil)) {
         $mensagem = "Por favor, preencha todos os campos obrigatórios (*).";
         $tipo_alerta = "warning";
     } else {
@@ -38,22 +39,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
             $diretorio_destino = '../uploads/'; 
             
-            // CRIA A PASTA AUTOMATICAMENTE: Se a pasta 'uploads' não existir, o PHP cria ela agora
             if (!file_exists($diretorio_destino)) {
                 mkdir($diretorio_destino, 0777, true);
             }
             
-            // Obtém a extensão do arquivo
             $extensao = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
             $extensoes_permitidas = array("jpg", "jpeg", "png");
 
-            // Valida se a extensão é permitida
             if (in_array($extensao, $extensoes_permitidas)) {
-                // Gera um nome único para o arquivo (evita que arquivos com o mesmo nome se sobrescrevam)
                 $nome_foto = uniqid() . "_" . time() . "." . $extensao;
                 $caminho_completo = $diretorio_destino . $nome_foto;
 
-                // Move o arquivo temporário para a pasta de destino
                 if (!move_uploaded_file($_FILES['foto']['tmp_name'], $caminho_completo)) {
                     $nome_foto = null;
                     $mensagem = "Falha ao salvar o arquivo de imagem no servidor.";
@@ -65,11 +61,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        // Se não houve erros no upload do arquivo, prossegue para salvar no banco
         if ($tipo_alerta != "danger") {
-            // Query adaptada para inserir o nome da foto no banco de dados
-            $sql = "INSERT INTO usuarios (nome, login, senha, perfil, foto) 
-                    VALUES ('$nome', '$login', '$senha_hash', '$perfil', " . ($nome_foto ? "'$nome_foto'" : "NULL") . ")";
+            // SQL atualizado para inserir o e-mail
+            $sql = "INSERT INTO usuarios (nome, email, login, senha, perfil, foto) 
+                    VALUES ('$nome', '$email', '$login', '$senha_hash', '$perfil', " . ($nome_foto ? "'$nome_foto'" : "NULL") . ")";
             
             if (mysqli_query($conn, $sql)) {
                 $mensagem = "Usuário cadastrado com sucesso!";
@@ -123,6 +118,14 @@ include '../includes/header.php';
                             <option value="E">Estoquista (Peças)</option>
                             <option value="G">Gerente (Acesso Total)</option>
                         </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label fw-bold">E-mail *</label>
+                        <input type="email" class="form-control" name="email" placeholder="Ex: exemplo@email.com" required style="border-radius: 8px;">
+                        <small class="text-muted">Utilizado para recuperação de senha.</small>
                     </div>
                 </div>
 
