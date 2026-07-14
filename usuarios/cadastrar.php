@@ -23,20 +23,61 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $login = mysqli_real_escape_string($conn, trim($_POST['login']));
     $senha = mysqli_real_escape_string($conn, trim($_POST['senha']));
     $perfil = mysqli_real_escape_string($conn, trim($_POST['perfil']));
+    
+    // Criptografia da senha (boa prática de segurança)
+    $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
 
     if (empty($nome) || empty($login) || empty($senha) || empty($perfil)) {
         $mensagem = "Por favor, preencha todos os campos obrigatórios (*).";
         $tipo_alerta = "warning";
     } else {
-        // Insere o novo registro
-        $sql = "INSERT INTO usuarios (nome, login, senha, perfil) VALUES ('$nome', '$login', '$senha', '$perfil')";
         
-        if (mysqli_query($conn, $sql)) {
-            $mensagem = "Usuário cadastrado com sucesso!";
-            $tipo_alerta = "success";
-        } else {
-            $mensagem = "Erro ao cadastrar usuário: " . mysqli_error($conn);
-            $tipo_alerta = "danger";
+        $nome_foto = null; // Valor padrão caso nenhuma foto seja enviada
+
+        // Processamento do Upload da Imagem
+        if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
+            $diretorio_destino = '../uploads/'; 
+            
+            // CRIA A PASTA AUTOMATICAMENTE: Se a pasta 'uploads' não existir, o PHP cria ela agora
+            if (!file_exists($diretorio_destino)) {
+                mkdir($diretorio_destino, 0777, true);
+            }
+            
+            // Obtém a extensão do arquivo
+            $extensao = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
+            $extensoes_permitidas = array("jpg", "jpeg", "png");
+
+            // Valida se a extensão é permitida
+            if (in_array($extensao, $extensoes_permitidas)) {
+                // Gera um nome único para o arquivo (evita que arquivos com o mesmo nome se sobrescrevam)
+                $nome_foto = uniqid() . "_" . time() . "." . $extensao;
+                $caminho_completo = $diretorio_destino . $nome_foto;
+
+                // Move o arquivo temporário para a pasta de destino
+                if (!move_uploaded_file($_FILES['foto']['tmp_name'], $caminho_completo)) {
+                    $nome_foto = null;
+                    $mensagem = "Falha ao salvar o arquivo de imagem no servidor.";
+                    $tipo_alerta = "danger";
+                }
+            } else {
+                $mensagem = "Formato de imagem inválido. Use apenas JPG, JPEG ou PNG.";
+                $tipo_alerta = "danger";
+            }
+        }
+
+        // Se não houve erros no upload do arquivo, prossegue para salvar no banco
+        if ($tipo_alerta != "danger") {
+            // Query adaptada para inserir o nome da foto no banco de dados
+            $sql = "INSERT INTO usuarios (nome, login, senha, perfil, foto) 
+                    VALUES ('$nome', '$login', '$senha_hash', '$perfil', " . ($nome_foto ? "'$nome_foto'" : "NULL") . ")";
+            
+            if (mysqli_query($conn, $sql)) {
+                $mensagem = "Usuário cadastrado com sucesso!";
+                $tipo_alerta = "success";
+            } else {
+                $mensagem = "Erro ao cadastrar usuário: " . mysqli_error($conn);
+                $tipo_alerta = "danger";
+            }
         }
     }
 }
@@ -49,8 +90,8 @@ include '../includes/header.php';
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-person-plus-fill text-white me-2"></i>Novo Usuário</h1>
-            </div>
-            <a href="listar.php" class="btn btn-secondary px-3">
+        </div>
+        <a href="listar.php" class="btn btn-secondary px-3">
              Voltar à Lista
         </a>
     </div>
@@ -65,7 +106,7 @@ include '../includes/header.php';
 
     <div class="card shadow-sm border-0 border-start border-4 border-dark">
         <div class="card-body p-4">
-            <form method="POST" action="cadastrar.php">
+            <form method="POST" action="cadastrar.php" enctype="multipart/form-data">
                 
                 <div class="row">
                     <div class="col-md-8 mb-3">
@@ -94,7 +135,15 @@ include '../includes/header.php';
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Senha de Acesso *</label>
-                        <input type="text" class="form-control" name="senha" placeholder="Crie uma senha de acesso estável" required style="border-radius: 8px;">
+                        <input type="password" class="form-control" name="senha" placeholder="Crie uma senha de acesso estável" required style="border-radius: 8px;">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label fw-bold">Foto de Perfil</label>
+                        <input type="file" class="form-control" name="foto" accept="image/*" style="border-radius: 8px;">
+                        <small class="text-muted">Formatos aceitos: JPG, JPEG ou PNG.</small>
                     </div>
                 </div>
 
