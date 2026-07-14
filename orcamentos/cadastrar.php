@@ -136,21 +136,36 @@ include '../includes/header.php';
                         </div>
                     </div>
 
-                    <div class="col-md-4 mb-4">
-                        <label class="form-label fw-bold">Peça Utilizada (Opcional)</label>
-                        <select class="form-select" id="valor_pecas" name="valor_pecas" onchange="calcularTotal()" style="border-radius: 8px;">
-                            <option value="0.00">Nenhuma peça (R$ 0,00)</option>
-                            <?php 
-                            if ($res_pecas && mysqli_num_rows($res_pecas) > 0) {
-                                while ($peca = mysqli_fetch_assoc($res_pecas)) {
-                                    $preco_ponto = $peca['valor_unitario'];
-                                    $preco_virgula = number_format($peca['valor_unitario'], 2, ',', '.');
-                                    echo "<option value='{$preco_ponto}'>" . htmlspecialchars($peca['descricao']) . " - R$ {$preco_virgula}</option>";
-                                }
-                            }
-                            ?>
-                        </select>
-                    </div>
+                    <label class="form-label fw-bold">Peça Utilizada / Alocada</label>
+
+<input
+    type="text"
+    class="form-control mb-2"
+    id="peca_utilizada"
+    name="peca_utilizada"
+    placeholder="Digite a peça utilizada"
+    value="<?php echo htmlspecialchars($orc['peca_utilizada'] ?? ''); ?>"
+    style="border-radius:8px;"
+>
+
+<label class="form-label fw-bold">Valor da Peça (R$)</label>
+
+<div class="input-group">
+    <span class="input-group-text">R$</span>
+    <input
+        type="number"
+        class="form-control"
+        id="valor_pecas"
+        name="valor_pecas"
+        step="0.01"
+        min="0"
+        value="<?php echo number_format($orc['valor_pecas'],2,'.',''); ?>"
+        oninput="calcularTotal()"
+        style="border-radius:0 8px 8px 0;"
+    >
+</div>
+
+</div>
 
                     <div class="col-md-4 mb-4">
                         <label class="form-label fw-bold text-success">Valor Total Calculado</label>
