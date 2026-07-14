@@ -47,7 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
             $mail->Username   = 'themindtechservices@gmail.com'; // O seu novo e-mail
-            $mail->Password   = 'COLOQUE_AQUI_A_SENHA_DE_16_LETRAS'; // A senha de app do Google
+            $mail->Password   = 'pblt frlp gbrw sudf
+'; // A senha de app do Google
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = 587;
 
