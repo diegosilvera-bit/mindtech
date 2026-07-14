@@ -96,7 +96,7 @@ include '../includes/header.php';
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-file-earmark-text text-warning me-2"></i>Editar Orçamento #<?php echo $orc['id_orcamento']; ?></h1>
-            <p class="text-muted small mb-0">Vinculado à <strong>O.S. #<?php echo $orc['id_os']; ?></strong> | Cliente: <strong><?php echo htmlspecialchars($orc['nome_cliente']); ?></strong></p>
+            <p class="text-white small mb-0 -">Vinculado à <strong>O.S. #<?php echo $orc['id_os']; ?></strong> | Cliente: <strong><?php echo htmlspecialchars($orc['nome_cliente']); ?></strong></p>
         </div>
         <a href="listar.php" class="btn btn-secondary px-3">
              Voltar à Lista
@@ -126,24 +126,37 @@ include '../includes/header.php';
                     </div>
 
                     <div class="col-md-4 mb-4">
-                        <label class="form-label fw-bold">Peça Utilizada / Alocada</label>
-                        <select class="form-select" id="valor_pecas" name="valor_pecas" onchange="calcularTotal()" style="border-radius: 8px;">
-                            <option value="0.00">Nenhuma peça (R$ 0,00)</option>
-                            <?php 
-                            if ($res_pecas && mysqli_num_rows($res_pecas) > 0) {
-                                while ($peca = mysqli_fetch_assoc($res_pecas)) {
-                                    $preco_ponto = $peca['valor_unitario'];
-                                    $preco_virgula = number_format($peca['valor_unitario'], 2, ',', '.');
-                                    
-                                    // Compara se o valor salvo condiz com o dessa peça para deixar pré-selecionado
-                                    $selected = (abs($preco_ponto - $orc['valor_pecas']) < 0.01) ? 'selected' : '';
-                                    
-                                    echo "<option value='{$preco_ponto}' {$selected}>" . htmlspecialchars($peca['descricao']) . " - R$ {$preco_virgula}</option>";
-                                }
-                            }
-                            ?>
-                        </select>
-                    </div>
+
+    <label class="form-label fw-bold">Peça Utilizada / Alocada</label>
+
+    <input
+        type="text"
+        class="form-control mb-2"
+        id="peca_utilizada"
+        name="peca_utilizada"
+        placeholder="Digite a peça utilizada"
+        value="<?php echo htmlspecialchars($orc['peca_utilizada'] ?? ''); ?>"
+        style="border-radius:8px;"
+    >
+
+    <label class="form-label fw-bold">Valor da Peça (R$)</label>
+
+    <div class="input-group">
+        <span class="input-group-text">R$</span>
+        <input
+            type="number"
+            class="form-control"
+            id="valor_pecas"
+            name="valor_pecas"
+            step="0.01"
+            min="0"
+            value="<?php echo number_format($orc['valor_pecas'],2,'.',''); ?>"
+            oninput="calcularTotal()"
+            style="border-radius:0 8px 8px 0;"
+        >
+    </div>
+
+</div>
 
                     <div class="col-md-4 mb-4">
                         <label class="form-label fw-bold text-dark">Situação do Orçamento</label>
