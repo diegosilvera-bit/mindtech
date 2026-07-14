@@ -39,7 +39,7 @@ include '../includes/header.php';
     <div class="d-flex justify-content-between align-items-center mb-4 d-print-none">
         <div>
             <h1 class="h3 mb-1 text-gray-800 fw-bold">Ordem de Serviço #<?php echo $os['id_os']; ?></h1>
-            <p class="text-muted small mb-0">Visualização detalhada da ficha técnica.</p>
+            <p class="text-white small mb-0">Visualização detalhada da ficha técnica.</p>
         </div>
         <div class="d-flex gap-2">
             <button onclick="window.print()" class="btn btn-success"><i class="bi bi-printer me-1"></i> Imprimir</button>
