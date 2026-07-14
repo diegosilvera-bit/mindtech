@@ -331,39 +331,75 @@ include '../includes/header.php';
     })();
 
     // ================================================================
-    // EXPORTADOR PARA EXCEL (.XLS) com conversão de Base64 (Suporta acentos e R$)
+    // EXPORTADOR PARA EXCEL (.XLS) - COM ESTILOS INLINE (MÁXIMA COMPATIBILIDADE)
     // ================================================================
     function exportarTabelaParaExcel(tableID, filename = '') {
         // Pega a tabela
         let table = document.getElementById(tableID);
-        // Cria um clone para podermos limpar o que não deve ir para o Excel
+        // Cria um clone para podermos limpar e alterar sem afetar o ecrã
         let clone = table.cloneNode(true);
         
         // 1. Remove a linha de "Nenhum registo encontrado"
         let semResultado = clone.querySelector('#semResultadoBusca');
         if(semResultado) semResultado.remove();
         
-        // 2. Remove os ícones do Bootstrap para limpar os dados no Excel
+        // 2. Remove os ícones do Bootstrap
         let icons = clone.querySelectorAll('i');
         icons.forEach(icon => icon.remove());
 
-        // Gera o HTML da tabela
+        // 3. Pinta a linha de "Totais" (fazemos isso antes de apagar as classes)
+        let celulasSucesso = clone.querySelectorAll('tr.table-success td');
+        celulasSucesso.forEach(td => {
+            td.style.backgroundColor = '#D9E1F2'; // Fundo azul claro
+            td.style.fontWeight = 'bold';
+        });
+
+        // 4. Limpa todas as classes do Bootstrap e força o Estilo Inline
+        let todasCelulas = clone.querySelectorAll('td, th');
+        todasCelulas.forEach(celula => {
+            // Remove a classe para o Excel não se confundir
+            celula.removeAttribute('class'); 
+            // Força a borda preta
+            celula.style.border = '1px solid #000000';
+            
+            // Força o texto a ser preto em todas as células de dados
+            if(celula.tagName.toLowerCase() === 'td') {
+                celula.style.color = '#000000';
+            }
+        });
+
+        // 5. Pinta o Cabeçalho
+        let cabecalhos = clone.querySelectorAll('th');
+        cabecalhos.forEach(th => {
+            th.style.backgroundColor = '#4F81BD'; // Fundo Azul Escuro
+            th.style.color = '#FFFFFF';           // Letra Branca
+            th.style.fontWeight = 'bold';
+            th.style.textAlign = 'center';
+        });
+
+        // Gera o HTML da tabela já tratada
         let tableHTML = clone.outerHTML;
         
-        // Monta a estrutura de um ficheiro Excel em XML (Garante compatibilidade de formatação e UTF-8)
+        // Monta o ficheiro XML do Excel
         let template = `
         <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
         <head>
         <meta charset="UTF-8">
+        <style>
+            table { border-collapse: collapse; font-family: Arial, sans-serif; font-size: 12px; }
+            /* O mso-number-format:"\\@" FORÇA O EXCEL A LER COMO TEXTO, IMPEDINDO QUE OS NÚMEROS SUMAM */
+            td { mso-number-format:"\\@"; white-space: nowrap; padding: 6px; vertical-align: middle; }
+            th { padding: 6px; vertical-align: middle; }
+        </style>
         </head>
         <body>${tableHTML}</body>
         </html>`;
         
-        // Codifica em Base64 para evitar quebra de caracteres especiais (como R$, ç, ã)
+        // Codifica em Base64
         let dataType = 'data:application/vnd.ms-excel;base64,';
         let base64data = btoa(unescape(encodeURIComponent(template)));
         
-        // Cria o nome do ficheiro com a data atual
+        // Cria o nome do ficheiro
         let dataAtual = new Date().toISOString().split('T')[0];
         filename = filename ? filename + '_' + dataAtual + '.xls' : 'Relatorio_' + dataAtual + '.xls';
         
