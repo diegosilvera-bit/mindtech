@@ -94,9 +94,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </div>
 
                                     <div class="mb-4">
-                                        <label for="senha" class="form-label small fw-bold text-white">Senha</label>
-                                        <input type="password" class="form-control" id="senha" name="senha"
-                                            placeholder="••••••••" required>
+                                      <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label for="senha" class="form-label small fw-bold text-white mb-0">Senha</label>
+                                        <a href="esqueci_senha.php" class="small text-warning text-decoration-none hover-white">Esqueceu a senha?</a>
+                                    </div>
+                                <input type="password" class="form-control" id="senha" name="senha" 
+                                  placeholder="••••••••" required>
                                     </div>
 
                                     <button type="submit" class="btn btn-warning w-100 rounded-3 py-2 fw-bold">
