@@ -111,8 +111,7 @@ include '../includes/header.php';
 <div class="container mt-4 mb-5">
     <div class="topo-pagina">
         <h1 class="fw-bold mb-0">
-            <i class="bi bi-truck text-white me-2"></i>
-            Fornecedores
+            <i class="bi bi-truck text-white me-2"></i>Fornecedores
         </h1>
         <div class="topo-pagina__acoes">
             <div class="campo-busca-wrap">
