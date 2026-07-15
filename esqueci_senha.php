@@ -157,8 +157,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="card login-card p-4 p-sm-5 text-center">
                 <div class="mb-4">
                     <h2 class="text-brand fw-bold mb-3"><i class="bi bi-cpu-fill me-2"></i>MINDTECH</h2>
-                    <h4 class="mb-2">Recuperar Palavra-passe</h4>
-                    <p class="text-muted small">Digite o e-mail associado à sua conta e enviar-lhe-emos instruções para redefinir a sua senha.</p>
+                    <h4 class="mb-2 text-white">Recuperar Palavra-passe</h4>
+                    <p class="text-white small">Digite o e-mail associado à sua conta e enviar-lhe-emos instruções para redefinir a sua senha.</p>
                 </div>
 
                 <?php if (!empty($mensagem)): ?>
@@ -169,10 +169,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <form method="POST" action="">
                     <div class="mb-4 text-start">
-                        <label for="email" class="form-label text-muted small fw-bold">E-mail de Registo</label>
+                        <label for="email" class="form-label text-white small fw-bold">E-mail de Registo</label>
                         <div class="input-group">
-                            <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-envelope"></i></span>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="exemplo@email.com" required>
+                            <span class="input-group-text bg-dark border-secondary text-white"><i class="bi bi-envelope"></i></span>
+                            <input type="email" class="form-control" id="email" name="email " placeholder= "exemplo@email.com" required>
                         </div>
                     </div>
                     
@@ -180,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <i class="bi bi-send me-2"></i>Enviar Link de Recuperação
                     </button>
                     
-                    <a href="login.php" class="text-muted small text-decoration-none hover-white">
+                    <a href="login.php" class="text-white small text-decoration-none hover-white">
                         <i class="bi bi-arrow-left me-1"></i>Voltar ao Login
                     </a>
                 </form>
