@@ -70,7 +70,10 @@ include '../includes/header.php';
 ?>
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Editar Fornecedor</h1>
+    <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-pencil-square fs-1"></i>
+            <h1 class="mb-0 text-start">Editar Fornecedor</h1>
+        </div>
         <a href="listar.php" class="btn btn-secondary me-2">Voltar para Lista</a>
     </div>
 
