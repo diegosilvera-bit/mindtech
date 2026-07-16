@@ -11,14 +11,28 @@ verificarAcesso(['G', 'A', 'T']);
 include '../config/conexao.php'; 
 
 // Filtro de pesquisa por nome do cliente
+// 1. Pega os dados do utilizador logado logo no início
+$perfil_logado = $_SESSION['usuario']['perfil'] ?? '';
+$id_logado = (int)$_SESSION['usuario']['id_usuario'];
+
+// 2. Filtros Dinâmicos (Pesquisa + Trava de Técnico)
 $busca = trim($_GET['busca'] ?? '');
-$whereBusca = '';
+$filtros = [];
+
+// Filtro de pesquisa por nome do cliente
 if ($busca !== '') {
     $buscaEsc = mysqli_real_escape_string($conn, $busca);
-    $whereBusca = "WHERE c.nome LIKE '%$buscaEsc%'";
+    $filtros[] = "c.nome LIKE '%$buscaEsc%'";
 }
 
-// Adicionado o os.data_prevista_entrega no SELECT
+// A TRAVA: Se for Técnico ('T'), obriga a mostrar apenas as suas O.S.
+if ($perfil_logado === 'T') {
+    $filtros[] = "os.id_usuario_responsavel = $id_logado";
+}
+
+// Junta os filtros na query final (se existir algum)
+$whereBusca = count($filtros) > 0 ? "WHERE " . implode(' AND ', $filtros) : "";
+
 $sql = "SELECT os.id_os, os.data_entrada, os.status, os.data_prevista_entrega,
                c.nome AS nome_cliente, 
                CONCAT(e.marca, ' ', e.modelo) AS equipamento,
@@ -31,7 +45,6 @@ $sql = "SELECT os.id_os, os.data_entrada, os.status, os.data_prevista_entrega,
         ORDER BY os.id_os DESC";
 
 $result = mysqli_query($conn, $sql);
-$perfil_logado = $_SESSION['usuario']['perfil'] ?? '';
 
 include '../includes/header.php'; 
 ?>
