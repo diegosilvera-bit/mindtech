@@ -70,7 +70,7 @@ if ($res_equipamentos && mysqli_num_rows($res_equipamentos) > 0) {
     }
 }
 
-$sql_tecnicos = "SELECT id_usuario, nome FROM usuarios WHERE perfil IN ('T', 'G') ORDER BY nome ASC";
+$sql_tecnicos = "SELECT id_usuario, nome FROM usuarios WHERE perfil = 'T' ORDER BY nome ASC";
 $res_tecnicos = mysqli_query($conn, $sql_tecnicos);
 
 include '../includes/header.php'; 
