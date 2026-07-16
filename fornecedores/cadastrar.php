@@ -48,7 +48,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 include '../includes/header.php'; 
 ?>
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 "><i class="bi bi-truck text-white fs-2 me-1"></i> <h1>Cadastrar Fornecedor</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4 ">
+    <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-truck text-white fs-1"></i>
+            <h1 class="mb-0 text-start">Cadastrar Fornecedor</h1>
+        </div>
         <a href="listar.php" class="btn btn-secondary me-2">Voltar para Lista</a>
     </div>
 
