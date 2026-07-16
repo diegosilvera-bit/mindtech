@@ -95,7 +95,7 @@ include '../includes/header.php';
     
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-file-earmark-text text-warning me-2"></i>Editar Orçamento #<?php echo $orc['id_orcamento']; ?></h1>
+            <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-file-earmark-text text-white me-2"></i>Editar Orçamento #<?php echo $orc['id_orcamento']; ?></h1>
             <p class="text-white small mb-0 -">Vinculado à <strong>O.S. #<?php echo $orc['id_os']; ?></strong> | Cliente: <strong><?php echo htmlspecialchars($orc['nome_cliente']); ?></strong></p>
         </div>
         <a href="listar.php" class="btn btn-secondary px-3">
