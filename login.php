@@ -34,24 +34,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             height: 100vh;
         }
 
-
-        .split-card {
+        .login-card {
             border-radius: 12px;
-            overflow: hidden;
             box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.4);
             background-color: #1e1e1e;
-            /* Fundo do cartão escuro para combinar com o seu body */
             border: 1px solid #2d2d2d;
-        }
-
-        /* Se a sua marca não for azul, altere as cores HEX aqui! */
-        .bg-cliente {
-            background: linear-gradient(150deg, rgb(0, 0, 0), rgb(260, 200, 0));
-            color: white;
+            max-width: 450px;
+            width: 100%;
         }
 
         .brand-logo {
-            max-height: 200px;
+            max-height: 180px;
             width: auto;
             object-fit: contain;
             display: block;
@@ -61,91 +54,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 
-<body class="d-flex align-items-center justify-content-center">
+<body class="d-flex align-items-center justify-content-center p-3">
 
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-10 col-xl-8">
+    <div class="card login-card p-4 p-sm-5">
+        <div class="mb-4 text-center">
+            <!-- Atualizado para buscar na pasta assets/img/ -->
+            <img src="assets/img/logo.png" alt="MindTech Logo" class="brand-logo mb-3 img-fluid">
+            <h4 class="fw-bold text-white mb-1">Acesso Restrito</h4>
+            <p class="text-white-50 small mb-0">Área exclusiva para funcionários</p>
+        </div>
 
-                <div class="card split-card border-0">
-                    <div class="row g-0">
-
-                        <div class="col-md-6 p-4 p-sm-5 d-flex flex-column justify-content-between">
-                            <div>
-                                <div class="mb-4 text-start">
-                                    <img src="assets/img/logo.png" alt="MindTech Logo"
-                                        class="brand-logo mb-2 img-fluid">
-                                    <p class="text-white">Acesso restrito para funcionários</p>
-                                </div>
-
-                                <?php if (!empty($erro)): ?>
-                                    <div
-                                        class="alert alert-danger border-0 bg-danger bg-opacity-20 text-danger text-center py-2 small mb-3 rounded">
-                                        <i class="bi bi-exclamation-triangle-fill me-2"></i><?= $erro ?>
-                                    </div>
-                                <?php endif; ?>
-
-                                <form method="POST" action="">
-                                    <div class="mb-3">
-                                        <label for="login" class="form-label small fw-bold text-white">Usuário /
-                                            Login</label>
-                                        <input type="text-white" class="form-control" id="login" name="login"
-                                            placeholder="Digite seu usuário" required autocomplete="off">
-                                    </div>
-
-                                    <div class="mb-4">
-                                      <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <label for="senha" class="form-label small fw-bold text-white mb-0">Senha</label>
-                                        <a href="esqueci_senha.php" class="small text-warning text-decoration-none hover-white">Esqueceu a senha?</a>
-                                    </div>
-                                <input type="password" class="form-control" id="senha" name="senha" 
-                                  placeholder="••••••••" required>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-warning w-100 rounded-3 py-2 fw-bold">
-                                        <i class="bi bi-box-arrow-in-right me-2"></i>Entrar no Sistema
-                                    </button>
-                                </form>
-                            </div>
-
-                            <div class="mt-4 pt-3 border-top border-secondary border-opacity-20">
-                                <p class="text-white small mb-0">Mindtech &copy; <?= date('Y') ?> Todos os direitos
-                                    reservados.</p>
-                            </div>
-                        </div>
-
-                        <div
-                            class="col-md-6 bg-cliente p-4 p-sm-5 d-flex flex-column justify-content-center align-items-center text-center">
-
-                            <div class="mb-4">
-                                <i
-                                    class="bi bi-search border border-2 border-white rounded-circle p-3 fs-1 opacity-75"></i>
-                            </div>
-
-                            <h3 class="fw-bold mb-3">Sou Cliente</h3>
-                            <p class="mb-4 text-white-50 small px-2">
-                                Deixou o seu aparelho connosco? Consulte agora o andamento do seu reparo de forma
-                                rápida, segura e sem complicação.
-                            </p>
-
-                            <a href="ordens_servico/consultar.php"
-                                class="btn btn-light btn-lg fw-bold text-primary w-100 shadow rounded-3 fs-6 py-2">
-                                Acompanhar Meu Reparo <i class="bi bi-arrow-right-short fs-5 align-middle ms-1"></i>
-                            </a>
-
-                            <div class="mt-4 small text-white-50 opacity-75">
-                                <i class="bi bi-shield-check me-1"></i> Consulta 100% segura
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
+        <?php if (!empty($erro)): ?>
+            <div class="alert alert-danger border-0 bg-danger bg-opacity-20 text-danger text-center py-2 small mb-3 rounded">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i><?= $erro ?>
             </div>
+        <?php endif; ?>
+
+        <form method="POST" action="">
+            <div class="mb-3">
+                <label for="login" class="form-label small fw-bold text-white">Usuário / Login</label>
+                <input type="text" class="form-control" id="login" name="login" placeholder="Digite seu usuário" required autocomplete="off">
+            </div>
+
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label for="senha" class="form-label small fw-bold text-white mb-0">Senha</label>
+                    <a href="esqueci_senha.php" class="small text-warning text-decoration-none">Esqueceu a senha?</a>
+                </div>
+                <input type="password" class="form-control" id="senha" name="senha" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn btn-warning w-100 rounded-3 py-2 fw-bold text-dark">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Entrar no Sistema
+            </button>
+        </form>
+
+        <div class="mt-4 pt-3 border-top border-secondary border-opacity-20 text-center">
+            <p class="text-white-50 small mb-0">MindTech &copy; <?= date('Y') ?> Todos os direitos reservados.</p>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
