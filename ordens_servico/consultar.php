@@ -183,7 +183,7 @@ $statusInfo = [
 
             <div class="text-center mt-4">
                 <a href="../portal_cliente.php" class="text-light fs-6 fw-bold text-decoration-none">
-                    <i class="bi bi-arrow-left me-1"></i> Voltar ao login de funcionários
+                    <i class="bi bi-arrow-left me-1"></i> Voltar
                 </a>
             </div>
 
