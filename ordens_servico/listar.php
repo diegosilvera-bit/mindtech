@@ -49,7 +49,6 @@ $result = mysqli_query($conn, $sql);
 include '../includes/header.php'; 
 ?>
 
-
 <style>
     /* Cabeçalho: Flexbox no desktop */
     .topo-pagina {
@@ -155,6 +154,7 @@ include '../includes/header.php';
                         if ($result && mysqli_num_rows($result) > 0) {
                             while ($row = mysqli_fetch_assoc($result)) { 
                                 $isCancelada = ($row['status'] === 'CANCELADO');
+                                $isFinalizada = ($row['status'] === 'FINALIZADO'); // <-- Nova validação
                         ?>
                             <tr class="<?php echo $isCancelada ? 'table-light text-muted opacity-75' : ''; ?>" data-nome="<?php echo htmlspecialchars(mb_strtolower($row['nome_cliente'])); ?>">
                                 <td class="ps-4 fw-bold" data-label="Nº OS">#<?php echo $row['id_os']; ?></td>
@@ -180,10 +180,14 @@ include '../includes/header.php';
                                 <td class="text-center pe-4" data-label="Ações">
                                     <div class="d-flex justify-content-center gap-1">
                                         <a href="visualizar.php?id=<?php echo $row['id_os']; ?>" class="btn btn-sm btn-info text-white"><i class="bi bi-eye"></i></a>
-                                        <?php if(!$isCancelada): ?>
+                                        
+                                        <!-- O botão editar agora só aparece se não estiver cancelada nem finalizada -->
+                                        <?php if(!$isCancelada && !$isFinalizada): ?>
                                             <a href="editar.php?id=<?php echo $row['id_os']; ?>" class="btn btn-sm btn-primary"><i class="bi bi-pencil"></i></a>
                                         <?php endif; ?>
-                                        <?php if(!$isCancelada && $row['status'] !== 'FINALIZADO' && in_array($perfil_logado, ['G', 'A'])): ?>
+                                        
+                                        <!-- O botão cancelar também só aparece se não estiver cancelada nem finalizada -->
+                                        <?php if(!$isCancelada && !$isFinalizada && in_array($perfil_logado, ['G', 'A'])): ?>
                                             <a href="cancelar.php?id=<?php echo $row['id_os']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Tem a certeza que deseja cancelar a O.S. #<?php echo $row['id_os']; ?>?');"><i class="bi bi-x-circle"></i></a>
                                         <?php endif; ?>
                                     </div>

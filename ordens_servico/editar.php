@@ -62,6 +62,13 @@ $os = mysqli_fetch_assoc($res_os);
 
 if (!$os) { die("O.S. não encontrada."); }
 
+// --- TRAVA DE SEGURANÇA ---
+if ($os['status'] === 'CANCELADO' || $os['status'] === 'FINALIZADO') {
+    header("Location: listar.php"); 
+    exit;
+}
+// --------------------------
+
 $data_prevista_input = '';
 if (!empty($os['data_prevista_entrega']) && $os['data_prevista_entrega'] != '0000-00-00 00:00:00') {
     $data_prevista_input = date('Y-m-d', strtotime($os['data_prevista_entrega']));

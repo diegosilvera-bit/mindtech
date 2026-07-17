@@ -21,8 +21,8 @@ if ($busca !== '') {
     $whereBusca = "WHERE nome LIKE '%$buscaEsc%'";
 }
 
-// Busca todos os usuários cadastrados em ordem alfabética
-$sql = "SELECT * FROM usuarios $whereBusca ORDER BY nome ASC";
+// Busca todos os usuários cadastrados
+$sql = "SELECT * FROM usuarios $whereBusca ORDER BY ativo DESC, nome ASC";
 $result = mysqli_query($conn, $sql);
 
 include '../includes/header.php';
@@ -47,165 +47,61 @@ include '../includes/header.php';
         min-width: 220px;
     }
 
-    /* Estilização para o Avatar e Foto de Perfil na Listagem */
-    .avatar-circle {
+    .avatar-circle, .avatar-placeholder {
         width: 42px;
         height: 42px;
         border-radius: 50%;
         object-fit: cover;
-        border: 2px solid #fff;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         cursor: pointer;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .avatar-circle:hover {
-        transform: scale(1.1);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
-    .avatar-placeholder {
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        background: #34495e;
-        color: #fff;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: bold;
         font-size: 14px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .avatar-placeholder:hover {
-        transform: scale(1.1);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
+    .avatar-circle { border: 2px solid #fff; }
+    .avatar-placeholder { background: #34495e; color: #fff; }
+    .avatar-circle:hover, .avatar-placeholder:hover { transform: scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
 
-    /* --- ESTILOS DO MODAL FLUTUANTE (ANIMAÇÃO DA JANELA DE FRENTE) --- */
     .foto-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.65);
-        backdrop-filter: blur(4px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.25s ease-out;
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(0, 0, 0, 0.65); backdrop-filter: blur(4px);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.25s ease-out;
     }
-    
-    .foto-modal.show {
-        opacity: 1;
-        pointer-events: auto;
-    }
-
+    .foto-modal.show { opacity: 1; pointer-events: auto; }
     .foto-modal-content {
-        background-color: #fff;
-        padding: 10px;
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        position: relative;
-        transform: scale(0.7);
-        transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-        max-width: 90%;
+        background-color: #fff; padding: 10px; border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); position: relative;
+        transform: scale(0.7); transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); max-width: 90%;
     }
-
-    .foto-modal.show .foto-modal-content {
-        transform: scale(1);
+    .foto-modal.show .foto-modal-content { transform: scale(1); }
+    .foto-modal-img, .foto-modal-placeholder {
+        width: 250px; height: 250px; border-radius: 12px; object-fit: cover; display: flex;
+        align-items: center; justify-content: center; font-weight: bold; font-size: 70px;
     }
-
-    /* Força o tamanho exato de 250px pedido */
-    .foto-modal-img {
-        width: 250px;
-        height: 250px;
-        object-fit: cover;
-        border-radius: 12px;
-        display: block;
-    }
-
-    .foto-modal-placeholder {
-        width: 250px;
-        height: 250px;
-        border-radius: 12px;
-        background: #34495e;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 70px;
-        user-select: none;
-    }
-
+    .foto-modal-placeholder { background: #34495e; color: #fff; user-select: none; }
     .foto-modal-close {
-        position: absolute;
-        top: -15px;
-        right: -15px;
-        background: #212529;
-        color: #fff;
-        border: none;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        transition: background-color 0.2s, transform 0.2s;
+        position: absolute; top: -15px; right: -15px; background: #212529; color: #fff;
+        border: none; width: 32px; height: 32px; border-radius: 50%; display: flex;
+        align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
-
-    .foto-modal-close:hover {
-        background: #dc3545;
-        transform: scale(1.1);
-    }
+    .foto-modal-close:hover { background: #dc3545; transform: scale(1.1); }
 
     @media (max-width: 768px) {
-        .topo-pagina {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        .campo-busca-wrap {
-            order: -1;
-            width: 100%;
-        }
-        .campo-busca-wrap .input-group,
-        .campo-busca-wrap form {
-            width: 100%;
-            min-width: 0;
-        }
-        .topo-pagina__acoes {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-            width: 100%;
-        }
-        .topo-pagina__acoes .btn {
-            width: 100%;
-        }
-    }
-
-    @media (max-width: 768px) {
+        .topo-pagina { flex-direction: column; align-items: stretch; }
+        .campo-busca-wrap, .campo-busca-wrap .input-group, .campo-busca-wrap form { width: 100%; min-width: 0; order: -1;}
+        .topo-pagina__acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; width: 100%; }
+        .topo-pagina__acoes .btn { width: 100%; }
         #tabelaUsuarios thead { display: none; }
         #tabelaUsuarios, #tabelaUsuarios tbody, #tabelaUsuarios tr, #tabelaUsuarios td { display: block; width: 100%; }
         #tabelaUsuarios tr { margin-bottom: 0.85rem; border: 1px solid #dee2e6; border-radius: 0.5rem; padding: 0.75rem 1rem; }
         #tabelaUsuarios td { border: none; padding: 0.3rem 0; text-align: left !important; }
         #tabelaUsuarios td::before {
-            content: attr(data-label);
-            display: block;
-            font-size: 0.72rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: #6c757d;
-            margin-bottom: 0.15rem;
+            content: attr(data-label); display: block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: #6c757d; margin-bottom: 0.15rem;
         }
-        #tabelaUsuarios td[data-label="Ações"] .d-flex { flex-wrap: wrap; justify-content: flex-start !important; }
     }
 </style>
 
@@ -227,9 +123,7 @@ include '../includes/header.php';
                     <?php endif; ?>
                 </div>
             </div>
-            <a href="../dashboard/index.php" class="btn btn-dark shadow-sm">
-                Dashboard
-            </a>
+            <a href="../dashboard/index.php" class="btn btn-dark shadow-sm">Dashboard</a>
 
             <?php if ($perfil_logado === 'G'): ?>
                 <a href="cadastrar.php" class="btn btn-success shadow-sm">
@@ -242,7 +136,7 @@ include '../includes/header.php';
     <?php if (isset($_GET['erro']) && $_GET['erro'] == 'auto_exclusao'): ?>
         <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
             <i class="bi bi-exclamation-octagon-fill me-2"></i>
-            <strong>Operação Negada!</strong> Você não pode excluir a sua própria conta de usuário logada.
+            <strong>Operação Negada!</strong> Você não pode inativar a sua própria conta logada.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
@@ -255,7 +149,7 @@ include '../includes/header.php';
                         <tr>
                             <th class="ps-4">Código</th>
                             <th>Nome Completo</th>
-                            <th>Nome de Login</th>
+                            <th>Login / Status</th>
                             <th>Perfil / Nível</th>
                             <th class="text-center pe-4">Ações</th>
                         </tr>
@@ -265,70 +159,56 @@ include '../includes/header.php';
                         if ($result && mysqli_num_rows($result) > 0) {
                             while ($usuario = mysqli_fetch_assoc($result)) {
 
-                                // Mapeamento legível de perfis com Badges personalizados
+                                // Fallback caso a coluna ativo ainda não exista na linha
+                                $isAtivo = !isset($usuario['ativo']) || $usuario['ativo'] == 1;
+
                                 $nome_perfil = 'Desconhecido';
                                 $cor_badge = 'bg-secondary';
-
                                 switch ($usuario['perfil']) {
-                                    case 'G':
-                                        $nome_perfil = 'Gerente';
-                                        $cor_badge = 'bg-dark';
-                                        break;
-                                    case 'T':
-                                        $nome_perfil = 'Técnico';
-                                        $cor_badge = 'bg-warning text-dark';
-                                        break;
-                                    case 'E':
-                                        $nome_perfil = 'Estoquista';
-                                        $cor_badge = 'bg-info text-dark';
-                                        break;
-                                    case 'A':
-                                        $nome_perfil = 'Atendimento';
-                                        $cor_badge = 'bg-primary';
-                                        break;
+                                    case 'G': $nome_perfil = 'Gerente'; $cor_badge = 'bg-dark'; break;
+                                    case 'T': $nome_perfil = 'Técnico'; $cor_badge = 'bg-warning text-dark'; break;
+                                    case 'E': $nome_perfil = 'Estoquista'; $cor_badge = 'bg-info text-dark'; break;
+                                    case 'A': $nome_perfil = 'Atendimento'; $cor_badge = 'bg-primary'; break;
                                 }
 
-                                // Calcula as iniciais do nome do usuário para o placeholder
                                 $nomes = explode(' ', trim($usuario['nome']));
                                 $iniciais = mb_strtoupper(mb_substr($nomes[0], 0, 1));
                                 if (count($nomes) > 1) {
                                     $iniciais .= mb_strtoupper(mb_substr(end($nomes), 0, 1));
                                 }
                                 ?>
-                                <tr data-nome="<?php echo htmlspecialchars(mb_strtolower($usuario['nome'])); ?>">
+                                <tr data-nome="<?php echo htmlspecialchars(mb_strtolower($usuario['nome'])); ?>" class="<?php echo !$isAtivo ? 'opacity-50 bg-light' : ''; ?>">
                                     <td data-label="Código" class="ps-4 fw-bold text-muted">#<?php echo $usuario['id_usuario']; ?></td>
                                     
-                                    <!-- COLUNA NOME COMPLETO COM AVATAR INTEGRADO -->
                                     <td data-label="Nome Completo">
                                         <div class="d-flex align-items-center">
                                             <div class="me-3">
                                                 <?php 
-                                                // Verifica se o usuário tem foto e se o arquivo físico existe no servidor
                                                 $caminho_foto = '../uploads/' . $usuario['foto'];
                                                 if (!empty($usuario['foto']) && file_exists($caminho_foto)): 
                                                 ?>
-                                                    <!-- Foto clicável com evento de zoom -->
-                                                    <img src="<?php echo $caminho_foto; ?>" 
-                                                         alt="Foto de <?php echo htmlspecialchars($usuario['nome']); ?>" 
-                                                         class="avatar-circle img-preview-trigger"
-                                                         data-type="image" 
-                                                         data-src="<?php echo $caminho_foto; ?>">
+                                                    <img src="<?php echo $caminho_foto; ?>" alt="Foto" class="avatar-circle img-preview-trigger" data-type="image" data-src="<?php echo $caminho_foto; ?>">
                                                 <?php else: ?>
-                                                    <!-- Placeholder clicável com iniciais -->
-                                                    <div class="avatar-placeholder img-preview-trigger"
-                                                         data-type="initials"
-                                                         data-initials="<?php echo htmlspecialchars($iniciais); ?>">
+                                                    <div class="avatar-placeholder img-preview-trigger" data-type="initials" data-initials="<?php echo htmlspecialchars($iniciais); ?>">
                                                         <?php echo htmlspecialchars($iniciais); ?>
                                                     </div>
                                                 <?php endif; ?>
                                             </div>
                                             <div>
-                                                <span class="fw-bold text-dark d-block"><?php echo htmlspecialchars($usuario['nome']); ?></span>
+                                                <span class="fw-bold text-dark d-block <?php echo !$isAtivo ? 'text-decoration-line-through' : ''; ?>"><?php echo htmlspecialchars($usuario['nome']); ?></span>
                                             </div>
                                         </div>
                                     </td>
 
-                                    <td data-label="Nome de Login"><code><?php echo htmlspecialchars($usuario['login']); ?></code></td>
+                                    <td data-label="Login / Status">
+                                        <code><?php echo htmlspecialchars($usuario['login']); ?></code><br>
+                                        <?php if ($isAtivo): ?>
+                                            <span class="badge bg-success mt-1" style="font-size: 0.7em;">Ativo</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-danger mt-1" style="font-size: 0.7em;">Inativo</span>
+                                        <?php endif; ?>
+                                    </td>
+
                                     <td data-label="Perfil / Nível">
                                         <span class="badge <?php echo $cor_badge; ?> px-2 py-1"><?php echo $nome_perfil; ?></span>
                                     </td>
@@ -342,11 +222,19 @@ include '../includes/header.php';
                                                     <i class="bi bi-pencil-square"></i> Editar
                                                 </a>
 
-                                                <a href="deletar.php?id=<?php echo $usuario['id_usuario']; ?>"
-                                                   class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1" title="Excluir Usuário"
-                                                   onclick="return confirm('Aviso: Tem certeza absoluta que deseja excluir o funcionário <?php echo htmlspecialchars($usuario['nome']); ?> do sistema?');">
-                                                    <i class="bi bi-trash3-fill"></i> Excluir
-                                                </a>
+                                                <?php if ($isAtivo): ?>
+                                                    <a href="status.php?id=<?php echo $usuario['id_usuario']; ?>&acao=inativar"
+                                                       class="btn btn-sm btn-warning d-inline-flex align-items-center gap-1" title="Inativar Usuário"
+                                                       onclick="return confirm('Deseja inativar o funcionário <?php echo htmlspecialchars($usuario['nome']); ?>? Ele perderá acesso ao sistema.');">
+                                                        <i class="bi bi-person-slash"></i> Inativar
+                                                    </a>
+                                                <?php else: ?>
+                                                    <a href="status.php?id=<?php echo $usuario['id_usuario']; ?>&acao=ativar"
+                                                       class="btn btn-sm btn-success d-inline-flex align-items-center gap-1" title="Ativar Usuário"
+                                                       onclick="return confirm('Deseja reativar o acesso de <?php echo htmlspecialchars($usuario['nome']); ?> ao sistema?');">
+                                                        <i class="bi bi-person-check"></i> Ativar
+                                                    </a>
+                                                <?php endif; ?>
 
                                             </div>
                                         <?php else: ?>
@@ -358,13 +246,9 @@ include '../includes/header.php';
                             }
                         } else {
                             ?>
-                            <tr>
-                                <td colspan="5" class="text-center py-4 text-muted"><?php echo $busca !== '' ? 'Nenhum usuário encontrado para "' . htmlspecialchars($busca) . '".' : 'Nenhum usuário cadastrado no sistema.'; ?></td>
-                            </tr>
+                            <tr><td colspan="5" class="text-center py-4 text-muted">Nenhum usuário encontrado.</td></tr>
                         <?php } ?>
-                        <tr id="semResultadoBusca" style="display:none;">
-                            <td colspan="5" class="text-center py-4 text-muted"><i class="bi bi-search me-1"></i> Nenhum usuário encontrado.</td>
-                        </tr>
+                        <tr id="semResultadoBusca" style="display:none;"><td colspan="5" class="text-center py-4 text-muted"><i class="bi bi-search me-1"></i> Nenhum usuário encontrado.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -372,18 +256,15 @@ include '../includes/header.php';
     </div>
 </div>
 
-<!-- --- ESTRUTURA DA JANELA FLUTUANTE (MODAL INTERATIVO) --- -->
+<!-- Modal -->
 <div class="foto-modal" id="previewFotoModal">
     <div class="foto-modal-content">
         <button class="foto-modal-close" id="fecharPreviewBtn"><i class="bi bi-x-lg"></i></button>
-        <div id="modalContentArea">
-            <!-- Conteúdo injetado pelo JavaScript dinamicamente -->
-        </div>
+        <div id="modalContentArea"></div>
     </div>
 </div>
 
 <script>
-    // Pesquisa ao vivo: filtra a tabela a cada letra digitada
     (function () {
         const campoBusca = document.getElementById('campoBusca');
         const linhas = document.querySelectorAll('#corpoTabela tr[data-nome]');
@@ -394,17 +275,14 @@ include '../includes/header.php';
             const termo = this.value.toLowerCase().trim();
             let encontrados = 0;
             linhas.forEach(function (linha) {
-                const bate = inlineBate = linha.dataset.nome.includes(termo);
+                const bate = linha.dataset.nome.includes(termo);
                 linha.style.display = bate ? '' : 'none';
                 if (bate) encontrados++;
             });
-            if (semResultado) {
-                semResultado.style.display = encontrados === 0 ? '' : 'none';
-            }
+            if (semResultado) semResultado.style.display = encontrados === 0 ? '' : 'none';
         });
     })();
 
-    // Lógica para controle da Janela Flutuante (Modal de Visualização)
     (function () {
         const modal = document.getElementById('previewFotoModal');
         const contentArea = document.getElementById('modalContentArea');
@@ -414,38 +292,18 @@ include '../includes/header.php';
         triggers.forEach(function (trigger) {
             trigger.addEventListener('click', function () {
                 const type = this.getAttribute('data-type');
-                
                 if (type === 'image') {
-                    const src = this.getAttribute('data-src');
-                    contentArea.innerHTML = `<img src="${src}" class="foto-modal-img" alt="Foto de Perfil Ampliada">`;
+                    contentArea.innerHTML = `<img src="${this.getAttribute('data-src')}" class="foto-modal-img" alt="Foto">`;
                 } else if (type === 'initials') {
-                    const initials = this.getAttribute('data-initials');
-                    contentArea.innerHTML = `<div class="foto-modal-placeholder">${initials}</div>`;
+                    contentArea.innerHTML = `<div class="foto-modal-placeholder">${this.getAttribute('data-initials')}</div>`;
                 }
-
-                // Ativa a exibição do Modal com animação CSS (de fora para dentro)
                 modal.classList.add('show');
             });
         });
 
-        // Fechar ao clicar no botão de fechar (X)
-        fecharBtn.addEventListener('click', function () {
-            modal.classList.remove('show');
-        });
-
-        // Fechar ao clicar fora da caixa da foto (no fundo escuro)
-        modal.addEventListener('click', function (e) {
-            if (e.target === modal) {
-                modal.classList.remove('show');
-            }
-        });
-
-        // Fechar se pressionar a tecla ESC do teclado
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && modal.classList.contains('show')) {
-                modal.classList.remove('show');
-            }
-        });
+        fecharBtn.addEventListener('click', () => modal.classList.remove('show'));
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.classList.remove('show'); });
     })();
 </script>
 
