@@ -40,27 +40,52 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (mysqli_num_rows($valida_duplicado) > 0) {
             $mensagem = "Já existe um orçamento cadastrado para esta Ordem de Serviço.";
         } else {
-            $sql_insert = "INSERT INTO orcamentos (id_os, valor_pecas, valor_mao_obra, valor_total, aprovado, usuario_responsavel) 
-                           VALUES ($id_os_selecionada, $valor_pecas, $valor_mao_obra, $valor_total, 0, $id_usuario_logado)";
 
-            if (mysqli_query($conn, $sql_insert)) {
-                $id_gerado = mysqli_insert_id($conn);
-                
-                // SALVA AS MÚLTIPLAS PEÇAS NA O.S.
-                if (!empty($_POST['pecas_id']) && is_array($_POST['pecas_id'])) {
-                    foreach ($_POST['pecas_id'] as $index => $id_peca) {
-                        $id_peca = (int)$id_peca;
-                        $qtd = (int)$_POST['pecas_qtd'][$index];
-                        if ($id_peca > 0 && $qtd > 0) {
-                            mysqli_query($conn, "INSERT INTO os_peca (id_os, id_peca, quantidade_usada) VALUES ($id_os_selecionada, $id_peca, $qtd)");
-                        }
+            // Agrupa as peças por id_peca, somando quantidades repetidas
+            // (o JS permite adicionar a mesma peça mais de uma vez na tabela,
+            // mas os_peca tem PRIMARY KEY (id_os, id_peca), então não pode duplicar)
+            $pecas_agrupadas = [];
+            if (!empty($_POST['pecas_id']) && is_array($_POST['pecas_id'])) {
+                foreach ($_POST['pecas_id'] as $index => $id_peca) {
+                    $id_peca = (int)$id_peca;
+                    $qtd = (int)($_POST['pecas_qtd'][$index] ?? 0);
+                    if ($id_peca > 0 && $qtd > 0) {
+                        $pecas_agrupadas[$id_peca] = ($pecas_agrupadas[$id_peca] ?? 0) + $qtd;
                     }
                 }
-                
-                header("Location: editar.php?id=" . $id_gerado . "&msg=criado");
-                exit;
+            }
+
+            // VALIDA ESTOQUE DAS PEÇAS ANTES DE GRAVAR O ORÇAMENTO
+            // (o desconto real do estoque só acontece quando o orçamento for aprovado,
+            // mas não faz sentido gerar um orçamento pedindo mais peças do que existe)
+            $erro_estoque = '';
+            foreach ($pecas_agrupadas as $id_peca => $qtd) {
+                $res_check = mysqli_query($conn, "SELECT descricao, quantidade_disponivel FROM pecas WHERE id_peca = $id_peca");
+                $peca_check = mysqli_fetch_assoc($res_check);
+                if (!$peca_check || $qtd > $peca_check['quantidade_disponivel']) {
+                    $erro_estoque .= "Estoque insuficiente para '" . htmlspecialchars($peca_check['descricao'] ?? '') . "' (disponível: " . ($peca_check['quantidade_disponivel'] ?? 0) . " un). ";
+                }
+            }
+
+            if ($erro_estoque !== '') {
+                $mensagem = $erro_estoque;
             } else {
-                $mensagem = "Erro ao gerar orçamento: " . mysqli_error($conn);
+                $sql_insert = "INSERT INTO orcamentos (id_os, valor_pecas, valor_mao_obra, valor_total, aprovado, usuario_responsavel) 
+                               VALUES ($id_os_selecionada, $valor_pecas, $valor_mao_obra, $valor_total, 0, $id_usuario_logado)";
+
+                if (mysqli_query($conn, $sql_insert)) {
+                    $id_gerado = mysqli_insert_id($conn);
+                    
+                    // SALVA AS PEÇAS NA O.S. (já agrupadas, uma linha por id_peca)
+                    foreach ($pecas_agrupadas as $id_peca => $qtd) {
+                        mysqli_query($conn, "INSERT INTO os_peca (id_os, id_peca, quantidade_usada) VALUES ($id_os_selecionada, $id_peca, $qtd)");
+                    }
+                    
+                    header("Location: editar.php?id=" . $id_gerado . "&msg=criado");
+                    exit;
+                } else {
+                    $mensagem = "Erro ao gerar orçamento: " . mysqli_error($conn);
+                }
             }
         }
     }
