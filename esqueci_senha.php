@@ -173,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label for="email" class="form-label text-white small fw-bold">E-mail de Registo</label>
                         <div class="input-group">
                             <span class="input-group-text bg-dark border-secondary text-white"><i class="bi bi-envelope"></i></span>
-                            <input type="email" class="form-control" id="email" name="email " placeholder= "exemplo@email.com" required>
+                            <input type="email" class="form-control" id="email" name="email" placeholder= "exemplo@email.com" required>
                         </div>
                     </div>
                     
