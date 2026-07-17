@@ -30,21 +30,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_peca'])) {
     $quantidade = (int)$_POST['quantidade'];
 
     if ($id_peca > 0 && $quantidade > 0) {
-        // Insere na O.S.
-        mysqli_query($conn, "INSERT INTO os_peca (id_os, id_peca, quantidade_usada) VALUES ($id_os_vinculada, $id_peca, $quantidade)");
-        
-        // Recalcula o total das peças
-        $calc = mysqli_query($conn, "SELECT SUM(p.valor_unitario * op.quantidade_usada) AS total FROM os_peca op JOIN pecas p ON op.id_peca = p.id_peca WHERE op.id_os = $id_os_vinculada");
-        $row_calc = mysqli_fetch_assoc($calc);
-        $novo_total_pecas = (float)$row_calc['total'];
-        
-        // Atualiza o orçamento com o novo valor
-        $mao_obra_atual = (float)$orc['valor_mao_obra'];
-        $novo_total_geral = $novo_total_pecas + $mao_obra_atual;
-        mysqli_query($conn, "UPDATE orcamentos SET valor_pecas = $novo_total_pecas, valor_total = $novo_total_geral WHERE id_orcamento = $id_orcamento");
-        
-        header("Location: editar.php?id=$id_orcamento&msg=peca_adicionada");
-        exit;
+
+        // Valida se há estoque suficiente para a peça solicitada
+        $res_check = mysqli_query($conn, "SELECT descricao, quantidade_disponivel FROM pecas WHERE id_peca = $id_peca");
+        $peca_check = mysqli_fetch_assoc($res_check);
+
+        if (!$peca_check || $quantidade > $peca_check['quantidade_disponivel']) {
+            $mensagem = "Estoque insuficiente para '" . htmlspecialchars($peca_check['descricao'] ?? '') . "' (disponível: " . ($peca_check['quantidade_disponivel'] ?? 0) . " un).";
+            $tipo_alerta = "warning";
+        } else {
+            // Insere na O.S.; se a peça já estiver na lista (mesma id_os + id_peca),
+            // soma a quantidade em vez de tentar duplicar a chave primária
+            mysqli_query($conn, "INSERT INTO os_peca (id_os, id_peca, quantidade_usada) VALUES ($id_os_vinculada, $id_peca, $quantidade) 
+                                  ON DUPLICATE KEY UPDATE quantidade_usada = quantidade_usada + $quantidade");
+
+            // Se o orçamento já está APROVADO, a peça já sai imediatamente do estoque
+            if ((int)$orc['aprovado'] == 1) {
+                $usuario_resp = $_SESSION['usuario']['id_usuario'] ?? $_SESSION['id_usuario'] ?? 'NULL';
+                mysqli_query($conn, "UPDATE pecas SET quantidade_disponivel = quantidade_disponivel - $quantidade WHERE id_peca = $id_peca");
+                mysqli_query($conn, "INSERT INTO movimentacoes_estoque (id_peca, tipo_movimentacao, quantidade, usuario_responsavel, observacao) VALUES ($id_peca, 'SAIDA', $quantidade, $usuario_resp, 'Uso em O.S. #$id_os_vinculada (orçamento #$id_orcamento já aprovado)')");
+            }
+
+            // Recalcula o total das peças
+            $calc = mysqli_query($conn, "SELECT SUM(p.valor_unitario * op.quantidade_usada) AS total FROM os_peca op JOIN pecas p ON op.id_peca = p.id_peca WHERE op.id_os = $id_os_vinculada");
+            $row_calc = mysqli_fetch_assoc($calc);
+            $novo_total_pecas = (float)$row_calc['total'];
+            
+            // Atualiza o orçamento com o novo valor
+            $mao_obra_atual = (float)$orc['valor_mao_obra'];
+            $novo_total_geral = $novo_total_pecas + $mao_obra_atual;
+            mysqli_query($conn, "UPDATE orcamentos SET valor_pecas = $novo_total_pecas, valor_total = $novo_total_geral WHERE id_orcamento = $id_orcamento");
+            
+            header("Location: editar.php?id=$id_orcamento&msg=peca_adicionada");
+            exit;
+        }
     }
 }
 
@@ -54,22 +73,60 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['editar_orcamento'])) {
     $valor_pecas = (float)$orc['valor_pecas']; // Mantém o que já está salvo via peças
     $valor_total = $valor_mao_obra + $valor_pecas;
     $aprovado = (int)$_POST['aprovado']; 
+    $aprovado_antigo = (int)$orc['aprovado'];
     $id_usuario_logado = $_SESSION['usuario']['id_usuario'] ?? $_SESSION['id_usuario'] ?? 'NULL';
 
-    $sql_update = "UPDATE orcamentos SET valor_mao_obra = $valor_mao_obra, valor_total = $valor_total, aprovado = $aprovado, usuario_responsavel = $id_usuario_logado WHERE id_orcamento = $id_orcamento";
-    
-    if (mysqli_query($conn, $sql_update)) {
-        if ($aprovado == 1) {
-            mysqli_query($conn, "UPDATE ordens_servico SET status = 'EM_REPARO' WHERE id_os = $id_os_vinculada");
-        } elseif ($aprovado == 2) {
-            mysqli_query($conn, "UPDATE ordens_servico SET status = 'CANCELADO' WHERE id_os = $id_os_vinculada");
-        } else {
-            mysqli_query($conn, "UPDATE ordens_servico SET status = 'EM_ANALISE' WHERE id_os = $id_os_vinculada");
+    $erro_estoque = '';
+
+    // PENDENTE/REPROVADO -> APROVADO: dá saída no estoque de todas as peças já alocadas na O.S.
+    if ($aprovado == 1 && $aprovado_antigo != 1) {
+        $res_itens = mysqli_query($conn, "SELECT op.id_peca, p.descricao, p.quantidade_disponivel, SUM(op.quantidade_usada) AS qtd_usada 
+                                           FROM os_peca op JOIN pecas p ON op.id_peca = p.id_peca 
+                                           WHERE op.id_os = $id_os_vinculada 
+                                           GROUP BY op.id_peca, p.descricao, p.quantidade_disponivel");
+        $itens = [];
+        while ($item = mysqli_fetch_assoc($res_itens)) {
+            $itens[] = $item;
+            if ($item['qtd_usada'] > $item['quantidade_disponivel']) {
+                $erro_estoque .= "Estoque insuficiente para '" . htmlspecialchars($item['descricao']) . "' (disponível: {$item['quantidade_disponivel']}, necessário: {$item['qtd_usada']}). ";
+            }
         }
-        header("Location: listar.php?msg=orcamento_atualizado");
-        exit;
+
+        if ($erro_estoque === '') {
+            foreach ($itens as $item) {
+                mysqli_query($conn, "UPDATE pecas SET quantidade_disponivel = quantidade_disponivel - {$item['qtd_usada']} WHERE id_peca = {$item['id_peca']}");
+                mysqli_query($conn, "INSERT INTO movimentacoes_estoque (id_peca, tipo_movimentacao, quantidade, usuario_responsavel, observacao) VALUES ({$item['id_peca']}, 'SAIDA', {$item['qtd_usada']}, $id_usuario_logado, 'Aprovação do orçamento #$id_orcamento (O.S. #$id_os_vinculada)')");
+            }
+        }
+    }
+    // Estava APROVADO e deixou de ser: estorna ao estoque o que tinha sido descontado
+    elseif ($aprovado_antigo == 1 && $aprovado != 1) {
+        $res_itens = mysqli_query($conn, "SELECT id_peca, SUM(quantidade_usada) AS qtd_usada FROM os_peca WHERE id_os = $id_os_vinculada GROUP BY id_peca");
+        while ($item = mysqli_fetch_assoc($res_itens)) {
+            mysqli_query($conn, "UPDATE pecas SET quantidade_disponivel = quantidade_disponivel + {$item['qtd_usada']} WHERE id_peca = {$item['id_peca']}");
+            mysqli_query($conn, "INSERT INTO movimentacoes_estoque (id_peca, tipo_movimentacao, quantidade, usuario_responsavel, observacao) VALUES ({$item['id_peca']}, 'ENTRADA', {$item['qtd_usada']}, $id_usuario_logado, 'Estorno: orçamento #$id_orcamento deixou de estar aprovado (O.S. #$id_os_vinculada)')");
+        }
+    }
+
+    if ($erro_estoque !== '') {
+        $mensagem = $erro_estoque;
+        $tipo_alerta = 'danger';
     } else {
-        $mensagem = "Erro ao atualizar: " . mysqli_error($conn);
+        $sql_update = "UPDATE orcamentos SET valor_mao_obra = $valor_mao_obra, valor_total = $valor_total, aprovado = $aprovado, usuario_responsavel = $id_usuario_logado WHERE id_orcamento = $id_orcamento";
+        
+        if (mysqli_query($conn, $sql_update)) {
+            if ($aprovado == 1) {
+                mysqli_query($conn, "UPDATE ordens_servico SET status = 'EM_REPARO' WHERE id_os = $id_os_vinculada");
+            } elseif ($aprovado == 2) {
+                mysqli_query($conn, "UPDATE ordens_servico SET status = 'CANCELADO' WHERE id_os = $id_os_vinculada");
+            } else {
+                mysqli_query($conn, "UPDATE ordens_servico SET status = 'EM_ANALISE' WHERE id_os = $id_os_vinculada");
+            }
+            header("Location: listar.php?msg=orcamento_atualizado");
+            exit;
+        } else {
+            $mensagem = "Erro ao atualizar: " . mysqli_error($conn);
+        }
     }
 }
 
@@ -95,6 +152,13 @@ include '../includes/header.php';
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'peca_adicionada'): ?>
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">Peça alocada com sucesso! <button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    <?php endif; ?>
+
+    <?php if (!empty($mensagem)): ?>
+        <div class="alert alert-<?php echo $tipo_alerta; ?> alert-dismissible fade show shadow-sm border-0" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <?php echo $mensagem; ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     <?php endif; ?>
 
     <div class="row">
@@ -135,7 +199,7 @@ include '../includes/header.php';
                                         <tr>
                                             <td class="small fw-bold"><?php echo htmlspecialchars($row_p['descricao']); ?></td>
                                             <td class="text-center small"><?php echo $row_p['total_quantidade']; ?></td>
-                                            <td class="text-end small fw-bold text-success">R$ <?php echo number_format($row_p['subtotal'], 2, ',', '.'); ?></td>
+                                            <td class="text-end small fw-bold text-success"><?php echo number_format($row_p['subtotal'], 2, ',', '.'); ?></td>
                                         </tr>
                                     <?php endwhile; ?>
                                 <?php else: ?>
@@ -144,6 +208,10 @@ include '../includes/header.php';
                             </tbody>
                         </table>
                     </div>
+
+                    <?php if ((int)$orc['aprovado'] == 1): ?>
+                        <small class="text-muted d-block mt-2"><i class="bi bi-info-circle me-1"></i>Orçamento já aprovado: peças adicionadas agora saem do estoque imediatamente.</small>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -171,7 +239,7 @@ include '../includes/header.php';
                             <label class="form-label fw-bold text-dark">Situação do Orçamento</label>
                             <select class="form-select fw-bold" name="aprovado">
                                 <option value="0" class="text-warning" <?php echo $orc['aprovado'] == 0 ? 'selected' : ''; ?>>⏳ Pendente (O.S. em Análise)</option>
-                                <option value="1" class="text-success" <?php echo $orc['aprovado'] == 1 ? 'selected' : ''; ?>>✅ APROVADO (O.S. vai para Reparo)</option>
+                                <option value="1" class="text-success" <?php echo $orc['aprovado'] == 1 ? 'selected' : ''; ?>>✅ APROVADO (O.S. vai para Reparo | dá saída no estoque)</option>
                                 <option value="2" class="text-danger" <?php echo $orc['aprovado'] == 2 ? 'selected' : ''; ?>>❌ REPROVADO (O.S. será Cancelada)</option>
                             </select>
                         </div>
