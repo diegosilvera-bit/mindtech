@@ -21,7 +21,8 @@ $mensagem = '';
 $tipo_alerta = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email']);
+
+    $email = trim($_POST['email'] ?? '');
     
     // 1. Verifica se o e-mail existe no Banco de Dados (Usando SELECT *)
     $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ? LIMIT 1");
