@@ -482,7 +482,7 @@ include '../includes/header.php';
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light border"
+                    <button type="button" class="btn btn-danger border"
                         onclick="voltarParaEquipamentos()">Cancelar</button>
                     <button type="submit" class="btn btn-primary fw-bold">Salvar Alterações</button>
                 </div>
