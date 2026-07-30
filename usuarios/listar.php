@@ -224,7 +224,7 @@ include '../includes/header.php';
 
                                                 <?php if ($isAtivo): ?>
                                                     <a href="status.php?id=<?php echo $usuario['id_usuario']; ?>&acao=inativar"
-                                                       class="btn btn-sm btn-warning d-inline-flex align-items-center gap-1" title="Inativar Usuário"
+                                                       class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1" title="Inativar Usuário"
                                                        onclick="return confirm('Deseja inativar o funcionário <?php echo htmlspecialchars($usuario['nome']); ?>? Ele perderá acesso ao sistema.');">
                                                         <i class="bi bi-person-slash"></i> Inativar
                                                     </a>
