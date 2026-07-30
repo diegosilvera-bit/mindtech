@@ -143,7 +143,7 @@ include '../includes/header.php';
                 </div>
 
                 <div class="d-flex justify-content-end gap-2 mt-4">
-                    <a href="listar.php" class="btn btn-light border">Cancelar</a>
+                    <a href="listar.php" class="btn btn-danger border">Cancelar</a>
                     <button class="btn btn-primary fw-bold" type="submit">Guardar Alterações</button>
                 </div>
             </form>

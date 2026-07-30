@@ -90,8 +90,8 @@ include '../includes/header.php';
         <div>
             <h1 class="h3 mb-1 text-gray-800 fw-bold"><i class="bi bi-arrow-left-right text-white me-2"></i>Movimentar Estoque</h1>
         </div>
-        <a href="listar.php" class="btn btn-sm btn-outline-secondary fw-bold px-3">
-            <i class="bi bi-arrow-left me-1"></i> Voltar à Lista
+        <a href="listar.php" class="btn btn-secondary px-3">
+             Voltar à Lista
         </a>
     </div>
 
@@ -146,8 +146,8 @@ include '../includes/header.php';
                 <hr class="my-3 text-muted opacity-20">
                 
                 <div class="d-flex justify-content-end gap-2">
-                    <a href="listar.php" class="btn btn-light border fw-bold px-4" style="border-radius: 8px;">Cancelar</a>
-                    <button class="btn btn-primary fw-bold px-5 shadow-sm" type="submit" style="border-radius: 8px;">
+                    <a href="listar.php" class="btn btn-danger border fw-bold px-4" style="border-radius: 8px;">Cancelar</a>
+                    <button class="btn btn-success fw-bold px-5 shadow-sm" type="submit" style="border-radius: 8px;">
                         <i class="bi bi-check-lg me-2"></i> Confirmar Movimentação
                     </button>
                 </div>

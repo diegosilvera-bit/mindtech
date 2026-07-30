@@ -145,8 +145,8 @@ include '../includes/header.php';
 
                 <hr class="mt-4">
                 <div class="d-flex justify-content-end gap-2">
-                    <a href="listar.php" class="btn btn-light border">Cancelar</a>
-                    <button class="btn btn-danger fw-bold" type="submit">Salvar Alterações</button>
+                    <a href="listar.php" class="btn btn-danger border">Cancelar</a>
+                    <button class="btn btn-success fw-bold" type="submit">Salvar Alterações</button>
                 </div>
 
             </form>

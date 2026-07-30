@@ -250,7 +250,7 @@ include '../includes/header.php';
                         </div>
 
                         <div class="d-flex justify-content-end gap-2">
-                            <a href="listar.php" class="btn btn-light border fw-bold px-4">Cancelar</a>
+                            <a href="listar.php" class="btn btn-danger border fw-bold px-4">Cancelar</a>
                             <button class="btn btn-warning text-dark fw-bold px-5 shadow-sm" type="submit"><i class="bi bi-check-circle-fill me-2"></i> Gravar Alterações</button>
                         </div>
                     </form>

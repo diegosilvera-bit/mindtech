@@ -124,8 +124,8 @@ include '../includes/header.php';
                 <hr class="my-4 text-muted opacity-20">
                 
                 <div class="d-flex justify-content-end gap-2">
-                    <a href="listar.php" class="btn btn-light border fw-bold px-4" style="border-radius: 8px;">Cancelar</a>
-                    <button class="btn btn-dark fw-bold px-5 shadow-sm" type="submit" style="border-radius: 8px;">
+                    <a href="listar.php" class="btn btn-danger border fw-bold px-4" style="border-radius: 8px;">Cancelar</a>
+                    <button class="btn btn-success fw-bold px-5 shadow-sm" type="submit" style="border-radius: 8px;">
                         <i class="bi bi-save me-2"></i> Salvar Alterações
                     </button>
                 </div>

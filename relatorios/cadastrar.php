@@ -72,7 +72,7 @@ include '../includes/header.php';
                 <hr class="my-4 text-muted opacity-20">
                 
                 <div class="d-flex justify-content-end gap-2">
-                    <a href="../dashboard/index.php" class="btn btn-lg btn-light border fw-bold px-4" style="font-size: 0.95rem;">Cancelar</a>
+                    <a href="../dashboard/index.php" class="btn btn-lg btn-danger border fw-bold px-4" style="font-size: 0.95rem;">Cancelar</a>
                     <button class="btn btn-lg btn-success fw-bold px-5 shadow-sm" type="submit" style="font-size: 0.95rem;">
                         <i class="bi bi-printer me-2"></i> Gerar Relatório
                     </button>
