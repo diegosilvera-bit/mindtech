@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $destino_final = $diretorio_destinatario . $novo_nome_foto;
 
                 if (move_uploaded_file($_FILES['foto']['tmp_name'], $destino_final)) {
-                    $caminho_foto = 'uploads/' . $novo_nome_foto;
+                    $caminho_foto = $novo_nome_foto;
                 }
             } else {
                 $mensagem = "Formato de imagem inválido! Apenas JPG, JPEG ou PNG são permitidos.";
