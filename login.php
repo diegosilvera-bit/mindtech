@@ -5,10 +5,31 @@ require_once 'config/conexao.php';
 $erro = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE login = ? AND senha = ?");
-    $stmt->execute([$_POST['login'], $_POST['senha']]);
+    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE login = ?");
+    $stmt->execute([$_POST['login']]);
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $senha_ok = false;
+
     if ($usuario) {
+        $hash_armazenado = $usuario['senha'];
+
+        // Senha já migrada para bcrypt (password_hash)
+        if (password_verify($_POST['senha'], $hash_armazenado)) {
+            $senha_ok = true;
+        }
+        // Senha antiga, ainda em texto puro -> valida e migra na hora
+        elseif ($_POST['senha'] === $hash_armazenado) {
+            $senha_ok = true;
+
+            $novo_hash = password_hash($_POST['senha'], PASSWORD_DEFAULT);
+            $update = $pdo->prepare("UPDATE usuarios SET senha = ? WHERE id_usuario = ?");
+            $update->execute([$novo_hash, $usuario['id_usuario']]);
+            $usuario['senha'] = $novo_hash;
+        }
+    }
+
+    if ($senha_ok) {
         $_SESSION['usuario'] = $usuario;
         header('Location: dashboard/index.php');
         exit;
