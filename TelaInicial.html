@@ -31,7 +31,7 @@
   }
   .btn-gold:hover { background-color: #d6ae3b; color: #121212; transform: translateY(-1px); }
 
-  /* NOVO: Estilo para o Botão Azul de Consulta de Peça */
+  /* Botão Azul de Consulta de Peça */
   .btn-blue { 
     background-color: #1a73e8; 
     color: #ffffff; 
@@ -41,7 +41,7 @@
   }
   .btn-blue:hover { background-color: #1557b0; color: #ffffff; transform: translateY(-1px); }
 
-  /* Círculo de ícones nos perfis de acesso */
+  /* Círculo de ícones nos depoimentos */
   .icon-circle {
     width: 56px; height: 56px;
     display: flex; align-items: center; justify-content: center;
@@ -87,10 +87,10 @@
     <div class="collapse navbar-collapse" id="navMenu">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
         <li class="nav-item"><a class="nav-link" href="#quem-somos">Quem somos</a></li>
-        <li class="nav-item"><a class="nav-link" href="#perfis">Perfis de acesso</a></li>
+        <li class="nav-item"><a class="nav-link" href="#depoimentos">Avaliações</a></li>
       </ul>
       
-      <!-- Botão Alterado: Cor Azul com os Ícones de Lupa e QR Code lado a lado -->
+      <!-- Botão Azul com os Ícones de Lupa e QR Code -->
       <a href="portal_cliente.php" class="btn btn-blue me-2">
         Consulta <i class="bi bi-search ms-1"></i><i class="bi bi-qr-code ms-1"></i>
       </a>
@@ -119,7 +119,6 @@
         <img src="assets/img/logo.png" alt="Logo MindTech" class="img-fluid">
       </div>
       
-      </div>
     </div>
   </div>
 </header>
@@ -147,59 +146,97 @@
   </div>
 </section>
 
-<section id="perfis" class="py-5 border-top border-secondary border-opacity-10">
+<!-- SEÇÃO: DEPOIMENTOS DE CLIENTES -->
+<section id="depoimentos" class="py-5 border-top border-secondary border-opacity-10">
   <div class="container py-4">
-    <h6 class="text-gold text-uppercase fw-bold text-center">Níveis de Permissão</h6>
-    <h2 class="fw-bold text-center text-white mb-5">Segurança e controle de acessos por perfil.</h2>
+    <h6 class="text-gold text-uppercase fw-bold text-center">Depoimentos</h6>
+    <h2 class="fw-bold text-center text-white mb-5">O que dizem os clientes que atendemos</h2>
     <div class="row g-4">
+      
+      <!-- Cliente 1 -->
       <div class="col-md-6 col-lg-3">
         <div class="card h-100 card-dark text-center p-3">
-          <div class="card-body">
-            <div class="icon-circle mx-auto mb-3"><i class="bi bi-tools"></i></div>
-            <span class="badge bg-secondary bg-opacity-25 text-gold mb-2">adminT</span>
-            <h5 class="card-title text-white">Equipe Técnica</h5>
-            <p class="card-text text-secondary small">
-              Acesso focado no inventário de peças e atualização em tempo real de diagnósticos e etapas de reparo em ordens de serviço.
+          <div class="card-body d-flex flex-column align-items-center">
+            <div class="icon-circle mb-3"><i class="bi bi-person-fill"></i></div>
+            <div class="text-gold mb-2">
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+            </div>
+            <h5 class="card-title text-white fs-6 mb-1">Mariana Silva</h5>
+            <span class="badge bg-secondary bg-opacity-25 text-gold mb-3">Troca de Tela & Bateria</span>
+            <p class="card-text text-secondary small fst-italic">
+              "Atendimento impecável! Consegui acompanhar cada etapa do reparo pelo portal com muita transparência. Meu notebook ficou novo."
             </p>
           </div>
         </div>
       </div>
+
+      <!-- Cliente 2 -->
       <div class="col-md-6 col-lg-3">
         <div class="card h-100 card-dark text-center p-3">
-          <div class="card-body">
-            <div class="icon-circle mx-auto mb-3"><i class="bi bi-headset"></i></div>
-            <span class="badge bg-secondary bg-opacity-25 text-gold mb-2">adminA</span>
-            <h5 class="card-title text-white">Atendimento</h5>
-            <p class="card-text text-secondary small">
-              Gerenciamento da carteira de clientes, registros detalhados de equipamentos, abertura de chamados e elaboração de orçamentos.
+          <div class="card-body d-flex flex-column align-items-center">
+            <div class="icon-circle mb-3"><i class="bi bi-person-fill"></i></div>
+            <div class="text-gold mb-2">
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+            </div>
+            <h5 class="card-title text-white fs-6 mb-1">Carlos Eduardo</h5>
+            <span class="badge bg-secondary bg-opacity-25 text-gold mb-3">Upgrade SSD & RAM</span>
+            <p class="card-text text-secondary small fst-italic">
+              "Serviço de altíssima qualidade! Meu computador estava super lento e depois da otimização ficou voando. Atendimento rápido e muito confiável!"
             </p>
           </div>
         </div>
       </div>
+
+      <!-- Cliente 3 -->
       <div class="col-md-6 col-lg-3">
         <div class="card h-100 card-dark text-center p-3">
-          <div class="card-body">
-            <div class="icon-circle mx-auto mb-3"><i class="bi bi-box-seam"></i></div>
-            <span class="badge bg-secondary bg-opacity-25 text-gold mb-2">adminE</span>
-            <h5 class="card-title text-white">Logística & Estoque</h5>
-            <p class="card-text text-secondary small">
-              Monitoramento logístico de insumos, auditoria de níveis críticos de componentes e rastreabilidade de entradas e saídas.
+          <div class="card-body d-flex flex-column align-items-center">
+            <div class="icon-circle mb-3"><i class="bi bi-person-fill"></i></div>
+            <div class="text-gold mb-2">
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+            </div>
+            <h5 class="card-title text-white fs-6 mb-1">Fernanda Souza</h5>
+            <span class="badge bg-secondary bg-opacity-25 text-gold mb-3">Reparo de Placa-Mãe</span>
+            <p class="card-text text-secondary small fst-italic">
+              "Equipe técnica extremamente honesta e atenciosa. Salvaram todos os arquivos da minha empresa. Recomendo de olhos fechados!"
             </p>
           </div>
         </div>
       </div>
+
+      <!-- Cliente 4 -->
       <div class="col-md-6 col-lg-3">
         <div class="card h-100 card-dark text-center p-3">
-          <div class="card-body">
-            <div class="icon-circle mx-auto mb-3"><i class="bi bi-person-badge"></i></div>
-            <span class="badge bg-secondary bg-opacity-25 text-gold mb-2">adminG</span>
-            <h5 class="card-title text-white">Direção & Gerência</h5>
-            <p class="card-text text-secondary small">
-              Acesso irrestrito ao sistema para auditoria, extração de relatórios de faturamento corporativo e controle de permissões.
+          <div class="card-body d-flex flex-column align-items-center">
+            <div class="icon-circle mb-3"><i class="bi bi-person-fill"></i></div>
+            <div class="text-gold mb-2">
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+            </div>
+            <h5 class="card-title text-white fs-6 mb-1">Lucas Mendes</h5>
+            <span class="badge bg-secondary bg-opacity-25 text-gold mb-3">Manutenção Preventiva</span>
+            <p class="card-text text-secondary small fst-italic">
+              "Excelente experiência do atendimento inicial ao momento da entrega. O sistema de consulta de ordens de serviço é muito prático."
             </p>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </section>
@@ -214,3 +251,5 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
+
+<!-- Viado -->
