@@ -51,6 +51,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-left: auto;
             margin-right: auto;
         }
+
+        /* Garante que o texto digitado nos campos fique preto e legível */
+        .form-control {
+            color: #000000 !important;
+        }
     </style>
 </head>
 
@@ -65,8 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <?php if (!empty($erro)): ?>
-            <div class="alert alert-danger border-0 bg-danger bg-opacity-20 text-danger text-center py-2 small mb-3 rounded">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i><?= $erro ?>
+            <!-- MENSAGEM DE ERRO COM LETRA PRETA (text-dark fw-bold) -->
+            <div class="alert alert-danger border-0 bg-danger-subtle text-dark fw-bold text-center py-2 small mb-3 rounded">
+                <i class="bi bi-exclamation-triangle-fill me-2 text-danger"></i><?= $erro ?>
             </div>
         <?php endif; ?>
 
