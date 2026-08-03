@@ -16,7 +16,7 @@ VELOCIDADE = 1.0
 
 try:
     # PASSO 1: LOGIN NO SISTEMA
-    driver.get("http://localhost/mindtech/login.php")
+    driver.get("http://localhost:8080/mindtech/login.php")
     wait.until(EC.visibility_of_element_located((By.NAME, 'login'))).send_keys('admin')
     driver.find_element(By.NAME, 'senha').send_keys('admin')
     time.sleep(VELOCIDADE)
@@ -26,7 +26,7 @@ try:
 
     # PASSO 2: ACESSAR A TELA DE RELATÓRIOS
     # Ajuste o caminho da pasta caso a tela fique em outro diretório
-    driver.get("http://localhost/mindtech/relatorios/cadastrar.php")
+    driver.get("http://localhost:8080/mindtech/relatorios/cadastrar.php")
 
     # PASSO 3: SELECIONAR O TIPO DE RELATÓRIO
     select_tipo_elem = wait.until(EC.visibility_of_element_located((By.NAME, 'tipo_relatorio')))

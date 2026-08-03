@@ -15,7 +15,7 @@ VELOCIDADE = 1.0
 
 try:
     # PASSO 1: LOGIN NO SISTEMA
-    driver.get("http://localhost/mindtech/login.php")
+    driver.get("http://localhost:8080/mindtech/login.php")
     wait.until(EC.visibility_of_element_located((By.NAME, 'login'))).send_keys('admin')
     driver.find_element(By.NAME, 'senha').send_keys('admin')
     time.sleep(VELOCIDADE)
@@ -24,7 +24,7 @@ try:
     time.sleep(VELOCIDADE)
 
     # PASSO 2: ACESSAR A TELA DE ORÇAMENTO
-    driver.get("http://localhost/mindtech/orcamentos/cadastrar.php")
+    driver.get("http://localhost:8080/mindtech/orcamentos/cadastrar.php")
 
     # PASSO 3: SELECIONAR A O.S. EM ABERTO
     select_os_elem = wait.until(EC.visibility_of_element_located((By.NAME, 'id_os')))

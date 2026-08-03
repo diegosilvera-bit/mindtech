@@ -15,7 +15,7 @@ wait = WebDriverWait(driver, 10)
 
 try:
     # PASSO 1: FAZER O LOGIN NO SISTEMA
-    URL_LOGIN = "http://localhost/mindtech/login.php" 
+    URL_LOGIN = "http://localhost:8080/mindtech/login.php" 
     driver.get(URL_LOGIN)
     
     wait.until(EC.visibility_of_element_located((By.NAME, 'login'))).send_keys('admin')
@@ -23,7 +23,7 @@ try:
     driver.find_element(By.XPATH, "//button[@type='submit']").click()
 
     # PASSO 2: ACESSAR A TELA DE CADASTRAR PEÇA
-    URL_PECAS = "http://localhost/mindtech/estoque/cadastrar.php" 
+    URL_PECAS = "http://localhost:8080/mindtech/estoque/cadastrar.php" 
     driver.get(URL_PECAS)
 
     # Aguarda o campo 'codigo' carregar na tela

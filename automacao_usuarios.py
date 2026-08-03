@@ -26,7 +26,7 @@ try:
     time.sleep(VELOCIDADE)
 
     # PASSO 2: ACESSAR A TELA DE NOVO USUÁRIO
-    driver.get("http://localhost/mindtech/usuarios/cadastrar.php")
+    driver.get("http://localhost:8080/mindtech/usuarios/cadastrar.php")
 
     # PASSO 3: PREENCHER NOME COMPLETO E PERFIL
     campo_nome = wait.until(EC.visibility_of_element_located((By.NAME, 'nome')))

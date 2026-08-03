@@ -16,7 +16,7 @@ VELOCIDADE = 1.0
 
 try:
     # 1. LOGIN
-    driver.get("http://localhost/mindtech/login.php")
+    driver.get("http://localhost:8080/mindtech/login.php")
     wait.until(EC.visibility_of_element_located((By.NAME, 'login'))).send_keys('admin')
     driver.find_element(By.NAME, 'senha').send_keys('admin')
     time.sleep(VELOCIDADE)
@@ -25,7 +25,7 @@ try:
     time.sleep(VELOCIDADE)
 
     # 2. ABRE A TELA
-    driver.get("http://localhost/mindtech/fornecedores/cadastrar.php")
+    driver.get("http://localhost:8080/mindtech/fornecedores/cadastrar.php")
 
     # 3. PREENCHIMENTO RÁPIDO COM VISUALIZAÇÃO
     campo_nome = wait.until(EC.visibility_of_element_located((By.NAME, 'nome')))

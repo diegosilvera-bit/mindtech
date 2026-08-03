@@ -16,7 +16,7 @@ wait = WebDriverWait(driver, 10)
 
 try:
     # PASSO 1: FAZER O LOGIN NO SISTEMA
-    URL_LOGIN = "http://localhost/mindtech/login.php" 
+    URL_LOGIN = "http://localhost:8080/mindtech/login.php" 
     driver.get(URL_LOGIN)
     
     # Usando o wait para garantir que a página carregou
@@ -25,7 +25,7 @@ try:
     driver.find_element(By.XPATH, "//button[@type='submit']").click()
 
     # PASSO 2: ABRIR A LISTA DE CLIENTES E O 1º MODAL
-    URL_LISTA = "http://localhost/mindtech/clientes/listar.php" 
+    URL_LISTA = "http://localhost:8080/mindtech/clientes/listar.php" 
     driver.get(URL_LISTA)
 
     # Clicar no botão da tabela. Buscamos pelo atributo 'title' que está no seu PHP

@@ -10,7 +10,7 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
 try:
     # PASSO 1: FAZER O LOGIN NO SISTEMA
-    URL_LOGIN = "http://localhost/mindtech/login.php" 
+    URL_LOGIN = "http://localhost:8080/mindtech/login.php" 
     driver.get(URL_LOGIN)
     time.sleep(2)
     
@@ -24,7 +24,7 @@ try:
     time.sleep(3) # Aguarda o redirecionamento para a dashboard
 
     # PASSO 2: ACESSAR A TELA DE CADASTRO
-    URL_CADASTRO = "http://localhost/mindtech/clientes/cadastrar.php" 
+    URL_CADASTRO = "http://localhost:8080/mindtech/clientes/cadastrar.php" 
     driver.get(URL_CADASTRO)
     time.sleep(2)
 
