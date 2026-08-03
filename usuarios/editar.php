@@ -23,7 +23,7 @@ if ($id_usuario <= 0) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
-    // Captura o E-mail também
+    // Captura os dados do formulário
     $nome = mysqli_real_escape_string($conn, trim($_POST['nome']));
     $email = mysqli_real_escape_string($conn, trim($_POST['email']));
     $login = mysqli_real_escape_string($conn, trim($_POST['login']));
@@ -34,15 +34,46 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $mensagem = "Por favor, preencha todos os campos obrigatórios.";
         $tipo_alerta = "warning";
     } else {
-        // Atualiza a query para salvar o e-mail alterado
-        $sql_update = "UPDATE usuarios SET nome='$nome', email='$email', login='$login', senha='$senha', perfil='$perfil' WHERE id_usuario=$id_usuario";
-        
-        if (mysqli_query($conn, $sql_update)) {
-            $mensagem = "Informações do usuário atualizadas com sucesso!";
-            $tipo_alerta = "success";
-        } else {
-            $mensagem = "Erro ao atualizar dados: " . mysqli_error($conn);
-            $tipo_alerta = "danger";
+        $caminho_foto = null;
+
+        // Processamento do upload da foto (se enviada)
+        if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+            $extensao = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
+            $extensoes_permitidas = ['jpg', 'jpeg', 'png'];
+
+            if (in_array($extensao, $extensoes_permitidas)) {
+                $diretorio_destinatario = '../uploads/';
+                if (!is_dir($diretorio_destinatario)) {
+                    mkdir($diretorio_destinatario, 0755, true);
+                }
+
+                $novo_nome_foto = 'usuario_' . time() . '_' . uniqid() . '.' . $extensao;
+                $destino_final = $diretorio_destinatario . $novo_nome_foto;
+
+                if (move_uploaded_file($_FILES['foto']['tmp_name'], $destino_final)) {
+                    $caminho_foto = 'uploads/' . $novo_nome_foto;
+                }
+            } else {
+                $mensagem = "Formato de imagem inválido! Apenas JPG, JPEG ou PNG são permitidos.";
+                $tipo_alerta = "danger";
+            }
+        }
+
+        if (empty($mensagem)) {
+            if ($caminho_foto) {
+                $caminho_foto_esc = mysqli_real_escape_string($conn, $caminho_foto);
+                $sql_update = "UPDATE usuarios SET nome='$nome', email='$email', login='$login', senha='$senha', perfil='$perfil', foto='$caminho_foto_esc' WHERE id_usuario=$id_usuario";
+            } else {
+                $sql_update = "UPDATE usuarios SET nome='$nome', email='$email', login='$login', senha='$senha', perfil='$perfil' WHERE id_usuario=$id_usuario";
+            }
+            
+            if (mysqli_query($conn, $sql_update)) {
+                $mensagem = "Informações do usuário atualizadas com sucesso!";
+                $tipo_alerta = "success";
+            } else {
+                $mensagem = "Erro ao atualizar dados: " . mysqli_error($conn);
+                $tipo_alerta = "danger";
+            }
         }
     }
 }
@@ -82,7 +113,7 @@ include '../includes/header.php';
 
     <div class="card shadow-sm border-0 border-start border-4 border-dark">
         <div class="card-body p-4">
-            <form method="POST" action="editar.php?id=<?php echo $id_usuario; ?>">
+            <form method="POST" action="editar.php?id=<?php echo $id_usuario; ?>" enctype="multipart/form-data">
                 
                 <div class="row">
                     <div class="col-md-8 mb-3">
@@ -113,11 +144,20 @@ include '../includes/header.php';
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Nome de Login *</label>
                         <input type="text" class="form-control" name="login" value="<?php echo htmlspecialchars($usuario['login'] ?? ''); ?>" required style="border-radius: 8px;">
+                        <small class="text-muted">Utilizado para efetuar o login no painel.</small>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Senha de Acesso *</label>
                         <input type="text" class="form-control" name="senha" value="<?php echo htmlspecialchars($usuario['senha'] ?? ''); ?>" required style="border-radius: 8px;">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label fw-bold">Foto de Perfil</label>
+                        <input type="file" class="form-control" name="foto" accept="image/png, image/jpeg, image/jpg" style="border-radius: 8px;">
+                        <small class="text-muted">Formatos aceitos: JPG, JPEG ou PNG.</small>
                     </div>
                 </div>
 

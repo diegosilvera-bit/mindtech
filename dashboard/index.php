@@ -10,12 +10,47 @@ require_once __DIR__ . '/../includes/functions.php';
 require_once '../includes/auth.php'; 
 require_once '../config/conexao.php'; 
 
-// Define o fuso horário correto[cite: 6]
+// Define o fuso horário correto
 date_default_timezone_set('America/Sao_Paulo');
 $perfil = $_SESSION['usuario']['perfil'] ?? '';
 
 // =========================================================================
-// LÓGICA DO GRÁFICO: Contar O.S. por Status[cite: 6]
+// INÍCIO: DADOS DO USUÁRIO LOGADO E TRATAMENTO DA FOTO (CAMINHO RELATIVO)
+// =========================================================================
+$nomeUser = $_SESSION['usuario']['nome'] ?? $_SESSION['usuario_nome'] ?? 'Usuário';
+$fotoRaw  = $_SESSION['usuario']['foto'] ?? $_SESSION['usuario_foto'] ?? '';
+
+// Ícone SVG padrão (embutido) caso a imagem não exista ou falhe no carregamento
+$avatarPadrao = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='42' height='42' fill='%23ecc245' class='bi bi-person-circle' viewBox='0 0 16 16'><path d='M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z'/><path fill-rule='evenodd' d='M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z'/></svg>";
+
+if (!empty($fotoRaw)) {
+    if (strpos($fotoRaw, 'http') === 0 || strpos($fotoRaw, 'data:') === 0) {
+        $fotoUser = $fotoRaw;
+    } else {
+        $fotoLimpa = ltrim(str_replace('../', '', $fotoRaw), '/');
+        
+        if (strpos($fotoLimpa, '/') === false) {
+            $fotoLimpa = 'uploads/' . $fotoLimpa;
+        }
+
+        $fotoUser = '../' . $fotoLimpa;
+    }
+} else {
+    $fotoUser = $avatarPadrao;
+}
+
+// Traduz a sigla do perfil para o nome amigável do cargo
+$mapaCargos = [
+    'G' => 'Gerente',
+    'A' => 'Administrador',
+    'T' => 'Técnico',
+    'E' => 'Estoque'
+];
+$cargoUser = $mapaCargos[$perfil] ?? ($_SESSION['usuario_nivel'] ?? 'Membro');
+// =========================================================================
+
+// =========================================================================
+// LÓGICA DO GRÁFICO: Contar O.S. por Status
 // =========================================================================
 $contagem = [
     'analise' => 0,
@@ -44,7 +79,7 @@ if ($resultado_status && mysqli_num_rows($resultado_status) > 0) {
 }
 
 // =========================================================================
-// BUSCA DA TABELA DE ALERTA: O.S. com status 'AGUARDANDO_PECA'[cite: 6]
+// BUSCA DA TABELA DE ALERTA: O.S. com status 'AGUARDANDO_PECA'
 // =========================================================================
 $sql_aguardando_peca = "SELECT os.id_os, os.data_entrada, 
                                c.nome AS nome_cliente, 
@@ -68,7 +103,7 @@ $res_reposicao = mysqli_query($conn, $sql_reposicao);
 $total_reposicao = ($res_reposicao) ? mysqli_num_rows($res_reposicao) : 0;
 
 // =========================================================================
-// LÓGICA DO GRÁFICO DE RENDAS (SEMANAL, MENSAL, ANUAL) - O.S FINALIZADAS[cite: 6]
+// LÓGICA DO GRÁFICO DE RENDAS (SEMANAL, MENSAL, ANUAL) - O.S FINALIZADAS
 // =========================================================================
 $dados_grafico = [
     'semanal' => ['labels' => [], 'valores' => []],
@@ -128,7 +163,7 @@ $tem_dados_grafico = count($dados_grafico['mensal']['valores']) > 0 || count($da
 $json_dados_grafico = json_encode($dados_grafico);
 
 // =========================================================================
-// LÓGICA DO NOVO GRÁFICO (COLUNAS) - VALORES POR STATUS DA O.S[cite: 6]
+// LÓGICA DO GRÁFICO (COLUNAS) - VALORES POR STATUS DA O.S
 // =========================================================================
 $sql_status_valor = "SELECT 
                         o.status, 
@@ -326,6 +361,26 @@ include '../includes/header.php';
             </div>
 
             <div class="offcanvas-body d-md-flex flex-column py-3 pe-3 ps-0 bg-original h-100">
+                
+                <!-- INÍCIO: IDENTIFICAÇÃO DO USUÁRIO LOGADO NA SIDEBAR -->
+                <div class="d-flex align-items-center mb-4 px-3 ms-2" style="gap: 12px; background-color: rgba(255,255,255,0.03); padding: 10px; border-radius: 10px; border: 1px solid #2d2d35;">
+                    <img 
+                        src="<?= htmlspecialchars($fotoUser, ENT_QUOTES, 'UTF-8') ?>" 
+                        alt="Foto do usuário" 
+                        onerror="this.onerror=null; this.src='<?= $avatarPadrao ?>';"
+                        style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #ecc245; background-color: #2b2b36;"
+                    >
+                    <div class="d-flex flex-column">
+                        <span class="text-white fw-bold m-0" style="font-size: 0.95rem; line-height: 1.2;">
+                            👤 <?= htmlspecialchars($nomeUser, ENT_QUOTES, 'UTF-8') ?>
+                        </span>
+                        <span class="text-gold" style="font-size: 0.8rem; opacity: 0.9; color: #ecc245;">
+                            (<?= htmlspecialchars($cargoUser, ENT_QUOTES, 'UTF-8') ?>)
+                        </span>
+                    </div>
+                </div>
+                <!-- FIM: IDENTIFICAÇÃO DO USUÁRIO LOGADO -->
+
                 <ul class="nav flex-column pe-2 ps-0 w-100">
                     <li class="nav-item"><a class="nav-link" href="/mindtech/dashboard/index.php"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
                     
@@ -630,7 +685,7 @@ include '../includes/header.php';
             </div>
 
             <!-- ========================================================= -->
-            <!-- NOVA TABELA: SOLICITAÇÕES DE REPOSIÇÃO DE ESTOQUE         -->
+            <!-- TABELA: SOLICITAÇÕES DE REPOSIÇÃO DE ESTOQUE              -->
             <!-- ========================================================= -->
             <div class="card shadow-sm border-0 border-start border-4 border-primary mb-4">
                 <div class="card-header bg-white py-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center border-0 gap-2">
@@ -742,7 +797,6 @@ function marcarPedidoComprado(idPedido, btnEl) {
     });
 }
 
-// Atualiza o contador de pedidos pendentes e mostra a mensagem de "tudo em ordem" quando zerar
 function atualizarBadgePedidos() {
     const badge = document.getElementById('badge-total-reposicao');
     const tbody = badge.closest('.card').querySelector('tbody');
