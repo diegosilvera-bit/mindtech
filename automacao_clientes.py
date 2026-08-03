@@ -16,10 +16,9 @@ try:
     driver.get(URL_LOGIN)
     time.sleep(2)
     
-    # CORRIGIDO: Agora buscando pelo name="login" e name="senha"
-    # Lembre-se de colocar o login e a senha reais que estão no seu banco de dados
-    driver.find_element(By.NAME, 'login').send_keys('admin') # Substitua 'admin' pelo seu usuário real
-    driver.find_element(By.NAME, 'senha').send_keys('admin') # Substitua pela sua senha real
+    #  senha e login
+    driver.find_element(By.NAME, 'login').send_keys('admin') 
+    driver.find_element(By.NAME, 'senha').send_keys('admin') 
     
     # Clicar no botão de entrar
     driver.find_element(By.XPATH, "//button[@type='submit']").click()
