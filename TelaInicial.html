@@ -103,17 +103,7 @@ if (session_status() === PHP_SESSION_NONE) {
       
       <?php if (isset($_SESSION['usuario_nome'])): ?>
         <!-- INÍCIO: Exibição do Usuário Logado -->
-        <div class="d-flex align-items-center ms-2" style="gap: 12px; background-color: rgba(255,255,255,0.05); padding: 5px 12px; border-radius: 50px; border: 1px solid #2d2d35;">
-          <img 
-            src="<?php echo !empty($_SESSION['usuario_foto']) ? htmlspecialchars($_SESSION['usuario_foto']) : 'assets/img/avatar.png'; ?>" 
-            alt="Foto do usuário" 
-            style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid #ecc245;"
-          >
-          <span class="text-white m-0" style="font-size: 0.95rem; font-weight: 500;">
-            👤 <?php echo htmlspecialchars($_SESSION['usuario_nome']); ?> 
-            <span class="text-gold" style="font-size: 0.85rem; font-weight: 400;">(<?php echo htmlspecialchars($_SESSION['usuario_nivel'] ?? 'Usuário'); ?>)</span>
-          </span>
-        </div>
+        
         <!-- FIM: Exibição do Usuário Logado -->
       <?php else: ?>
         <!-- Botão Original caso não esteja logado -->
