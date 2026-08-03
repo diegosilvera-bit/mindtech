@@ -5,10 +5,31 @@ require_once 'config/conexao.php';
 $erro = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE login = ? AND senha = ?");
-    $stmt->execute([$_POST['login'], $_POST['senha']]);
+    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE login = ?");
+    $stmt->execute([$_POST['login']]);
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $senha_ok = false;
+
     if ($usuario) {
+        $hash_armazenado = $usuario['senha'];
+
+        // Senha já migrada para bcrypt (password_hash)
+        if (password_verify($_POST['senha'], $hash_armazenado)) {
+            $senha_ok = true;
+        }
+        // Senha antiga, ainda em texto puro -> valida e migra na hora
+        elseif ($_POST['senha'] === $hash_armazenado) {
+            $senha_ok = true;
+
+            $novo_hash = password_hash($_POST['senha'], PASSWORD_DEFAULT);
+            $update = $pdo->prepare("UPDATE usuarios SET senha = ? WHERE id_usuario = ?");
+            $update->execute([$novo_hash, $usuario['id_usuario']]);
+            $usuario['senha'] = $novo_hash;
+        }
+    }
+
+    if ($senha_ok) {
         $_SESSION['usuario'] = $usuario;
         header('Location: dashboard/index.php');
         exit;
@@ -51,6 +72,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-left: auto;
             margin-right: auto;
         }
+
+        /* Garante que o texto digitado nos campos fique preto e legível */
+        .form-control {
+            color: #000000 !important;
+        }
     </style>
 </head>
 
@@ -65,8 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <?php if (!empty($erro)): ?>
-            <div class="alert alert-danger border-0 bg-danger bg-opacity-20 text-danger text-center py-2 small mb-3 rounded">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i><?= $erro ?>
+            <!-- MENSAGEM DE ERRO COM LETRA PRETA (text-dark fw-bold) -->
+            <div class="alert alert-danger border-0 bg-danger-subtle text-dark fw-bold text-center py-2 small mb-3 rounded">
+                <i class="bi bi-exclamation-triangle-fill me-2 text-danger"></i><?= $erro ?>
             </div>
         <?php endif; ?>
 
