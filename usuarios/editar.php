@@ -70,6 +70,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (mysqli_query($conn, $sql_update)) {
                 $mensagem = "Informações do usuário atualizadas com sucesso!";
                 $tipo_alerta = "success";
+
+                // Se o usuário editado é o mesmo que está logado, atualiza a sessão
+                // para refletir a mudança (foto, nome, etc.) sem precisar deslogar.
+                $id_logado = $_SESSION['usuario']['id'] ?? $_SESSION['usuario']['id_usuario'] ?? 0;
+                if ($id_usuario == $id_logado) {
+                    $_SESSION['usuario']['nome']   = $nome;
+                    $_SESSION['usuario']['email']  = $email;
+                    $_SESSION['usuario']['login']  = $login;
+                    $_SESSION['usuario']['perfil'] = $perfil;
+                    if ($caminho_foto) {
+                        $_SESSION['usuario']['foto'] = $caminho_foto;
+                    }
+                }
             } else {
                 $mensagem = "Erro ao atualizar dados: " . mysqli_error($conn);
                 $tipo_alerta = "danger";
