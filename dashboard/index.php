@@ -2,18 +2,20 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 <!-- Biblioteca do Chart.js para o Gráfico de Rendas -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Biblioteca do SweetAlert2 para os Pop-ups -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <?php 
 require_once __DIR__ . '/../includes/functions.php'; 
 require_once '../includes/auth.php'; 
 require_once '../config/conexao.php'; 
 
-// Define o fuso horário correto
+// Define o fuso horário correto[cite: 6]
 date_default_timezone_set('America/Sao_Paulo');
 $perfil = $_SESSION['usuario']['perfil'] ?? '';
 
 // =========================================================================
-// LÓGICA DO GRÁFICO: Contar O.S. por Status
+// LÓGICA DO GRÁFICO: Contar O.S. por Status[cite: 6]
 // =========================================================================
 $contagem = [
     'analise' => 0,
@@ -42,7 +44,7 @@ if ($resultado_status && mysqli_num_rows($resultado_status) > 0) {
 }
 
 // =========================================================================
-// BUSCA DA TABELA DE ALERTA: O.S. com status 'AGUARDANDO_PECA'
+// BUSCA DA TABELA DE ALERTA: O.S. com status 'AGUARDANDO_PECA'[cite: 6]
 // =========================================================================
 $sql_aguardando_peca = "SELECT os.id_os, os.data_entrada, 
                                c.nome AS nome_cliente, 
@@ -56,7 +58,17 @@ $sql_aguardando_peca = "SELECT os.id_os, os.data_entrada,
 $res_aguardando = mysqli_query($conn, $sql_aguardando_peca);
 
 // =========================================================================
-// LÓGICA DO GRÁFICO DE RENDAS (SEMANAL, MENSAL, ANUAL) - O.S FINALIZADAS
+// BUSCA DA TABELA DE ALERTA: PEDIDOS DE REPOSIÇÃO (NOVO VÍNCULO)
+// =========================================================================
+$sql_reposicao = "SELECT id_pedido, nome_peca, quantidade, observacoes, data_pedido 
+                  FROM pedidos_reposicao 
+                  WHERE status = 'PENDENTE' 
+                  ORDER BY data_pedido DESC"; 
+$res_reposicao = mysqli_query($conn, $sql_reposicao);
+$total_reposicao = ($res_reposicao) ? mysqli_num_rows($res_reposicao) : 0;
+
+// =========================================================================
+// LÓGICA DO GRÁFICO DE RENDAS (SEMANAL, MENSAL, ANUAL) - O.S FINALIZADAS[cite: 6]
 // =========================================================================
 $dados_grafico = [
     'semanal' => ['labels' => [], 'valores' => []],
@@ -116,7 +128,7 @@ $tem_dados_grafico = count($dados_grafico['mensal']['valores']) > 0 || count($da
 $json_dados_grafico = json_encode($dados_grafico);
 
 // =========================================================================
-// LÓGICA DO NOVO GRÁFICO (COLUNAS) - VALORES POR STATUS DA O.S
+// LÓGICA DO NOVO GRÁFICO (COLUNAS) - VALORES POR STATUS DA O.S[cite: 6]
 // =========================================================================
 $sql_status_valor = "SELECT 
                         o.status, 
@@ -124,7 +136,7 @@ $sql_status_valor = "SELECT
                      FROM ordens_servico o 
                      LEFT JOIN orcamentos orcs ON orcs.id_os = o.id_os 
                      GROUP BY o.status 
-                     ORDER BY total_valor DESC"; // Ordena do maior valor para o menor
+                     ORDER BY total_valor DESC"; 
 $res_status_valor = mysqli_query($conn, $sql_status_valor);
 
 $labels_status = [];
@@ -135,24 +147,22 @@ if ($res_status_valor && mysqli_num_rows($res_status_valor) > 0) {
     while ($row = mysqli_fetch_assoc($res_status_valor)) {
         $status_raw = strtoupper(trim($row['status']));
         
-        // Remove os underlines e deixa bonitinho
         $status_nome = str_replace('_', ' ', $status_raw);
         $labels_status[] = $status_nome;
         $valores_status[] = (float) $row['total_valor'];
         
-        // Define uma cor específica para cada coluna baseado no status
         if (strpos($status_raw, 'FINALIZADO') !== false || strpos($status_raw, 'CONCLUIDO') !== false) {
-            $cores_status[] = 'rgba(25, 135, 84, 0.7)'; // Verde (Sucesso/Realizado)
+            $cores_status[] = 'rgba(25, 135, 84, 0.7)'; 
         } elseif (strpos($status_raw, 'CANCELADO') !== false || strpos($status_raw, 'RECUSADO') !== false) {
-            $cores_status[] = 'rgba(220, 53, 69, 0.7)'; // Vermelho (Perdido)
+            $cores_status[] = 'rgba(220, 53, 69, 0.7)'; 
         } elseif (strpos($status_raw, 'ANALISE') !== false) {
-            $cores_status[] = 'rgba(13, 110, 253, 0.7)'; // Azul (Em orçamento)
+            $cores_status[] = 'rgba(13, 110, 253, 0.7)'; 
         } elseif (strpos($status_raw, 'REPARO') !== false || strpos($status_raw, 'ANDAMENTO') !== false) {
-            $cores_status[] = 'rgba(255, 193, 7, 0.7)'; // Amarelo (Garantido, em execução)
+            $cores_status[] = 'rgba(255, 193, 7, 0.7)'; 
         } elseif (strpos($status_raw, 'AGUARDANDO') !== false) {
-            $cores_status[] = 'rgba(253, 126, 20, 0.7)'; // Laranja (Pausado/Aguardando)
+            $cores_status[] = 'rgba(253, 126, 20, 0.7)'; 
         } else {
-            $cores_status[] = 'rgba(108, 117, 125, 0.7)'; // Cinza (Outros)
+            $cores_status[] = 'rgba(108, 117, 125, 0.7)'; 
         }
     }
 }
@@ -166,11 +176,6 @@ include '../includes/header.php';
 ?>
 
 <style>
-    /* =======================================================
-       NOVO TRAVAMENTO ABSOLUTO (HEADER E BARRA LATERAL)
-       ======================================================= */
-    
-    /* 1. Trava a Barra Superior (Nav) no topo da tela */
     .navbar {
         position: fixed !important;
         top: 0;
@@ -179,29 +184,25 @@ include '../includes/header.php';
         z-index: 1050;
     }
 
-    /* 2. Empurra o corpo do site para não ficar por baixo da Navbar fixa */
     body {
-        padding-top: 56px !important; /* Altura padrão da barra do topo */
+        padding-top: 56px !important; 
     }
 
     @media (min-width: 768px) {
-        /* 3. Trava a Barra Lateral de forma fixa e permanente */
         .sidebar {
             position: fixed !important;
-            top: 56px; /* Cola exatamente embaixo da navbar */
+            top: 56px; 
             left: 0;
-            width: 25%; /* Mesma largura do col-md-3 */
-            height: calc(100vh - 56px) !important; /* Altura da tela menos o topo */
+            width: 25%; 
+            height: calc(100vh - 56px) !important; 
             z-index: 1040;
-            overflow-y: auto; /* Rola internamente apenas se tiver muitos botões */
+            overflow-y: auto; 
         }
         
-        /* 4. Empurra o painel principal para a direita, para não sumir atrás da barra */
         .painel-direito {
             margin-left: 25% !important;
         }
 
-        /* Customização da barrinha de rolagem invisível para a barra lateral */
         .sidebar::-webkit-scrollbar { width: 4px; }
         .sidebar::-webkit-scrollbar-track { background: transparent; }
         .sidebar::-webkit-scrollbar-thumb { background-color: #333333; border-radius: 10px; }
@@ -210,22 +211,16 @@ include '../includes/header.php';
 
     @media (min-width: 992px) {
         .sidebar {
-            width: 16.666667% !important; /* Mesma largura do col-lg-2 */
+            width: 16.666667% !important; 
         }
         .painel-direito {
             margin-left: 16.666667% !important;
         }
     }
 
-    /* ======================================================= */
-
-    /* Manter a cor de fundo original do projeto */
     .bg-original { background-color: #1e1e24 !important; }
-
-    /* Estilos Menu Lateral Originais */
     .sidebar { background-color: #1e1e24 !important; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
     
-    /* ======== ESTÉTICA PREMIUM PARA OS BOTÕES ======== */
     .sidebar .nav-link { 
         position: relative; 
         color: #a0a0a0; 
@@ -276,7 +271,6 @@ include '../includes/header.php';
         box-shadow: 0 4px 10px rgba(236, 194, 69, 0.25); 
     }
 
-    /* Estilos do Fluxo de Processo */
     .fluxo-container {
         display: flex;
         justify-content: space-between;
@@ -589,7 +583,7 @@ include '../includes/header.php';
                                                     label: 'Valor Total (R$)',
                                                     data: <?= $json_valores_status ?>,
                                                     backgroundColor: <?= $json_cores_status ?>,
-                                                    borderColor: <?= $json_cores_status ?>.map(color => color.replace('0.7', '1')), // Borda com cor sólida
+                                                    borderColor: <?= $json_cores_status ?>.map(color => color.replace('0.7', '1')), 
                                                     borderWidth: 1,
                                                     borderRadius: 4
                                                 }]
@@ -598,7 +592,7 @@ include '../includes/header.php';
                                                 responsive: true,
                                                 maintainAspectRatio: false,
                                                 plugins: {
-                                                    legend: { display: false }, // Oculta a legenda, pois as cores já representam o status
+                                                    legend: { display: false }, 
                                                     tooltip: {
                                                         callbacks: {
                                                             label: function(context) {
@@ -613,7 +607,6 @@ include '../includes/header.php';
                                                         beginAtZero: true,
                                                         ticks: {
                                                             callback: function(value) {
-                                                                // Retira casas decimais no eixo Y para ficar mais limpo
                                                                 return 'R$ ' + value.toLocaleString('pt-BR'); 
                                                             }
                                                         }
@@ -636,8 +629,135 @@ include '../includes/header.php';
                 <!-- ========================================================= -->
             </div>
 
+            <!-- ========================================================= -->
+            <!-- NOVA TABELA: SOLICITAÇÕES DE REPOSIÇÃO DE ESTOQUE         -->
+            <!-- ========================================================= -->
+            <div class="card shadow-sm border-0 border-start border-4 border-primary mb-4">
+                <div class="card-header bg-white py-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center border-0 gap-2">
+                    <h5 class="fw-bold text-primary mb-0 fs-6 fs-md-5">
+                        <i class="bi bi-cart-plus me-2"></i>Chamados para Reposição de Estoque
+                    </h5>
+                    <span class="badge bg-primary fs-6 rounded-pill align-self-start align-self-sm-auto" id="badge-total-reposicao">
+                        <?= $total_reposicao ?> Pedido(s) Pendente(s)
+                    </span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 text-nowrap">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3 ps-md-4">Data do Pedido</th>
+                                    <th>Peça Solicitada</th>
+                                    <th class="text-center">Quantidade</th>
+                                    <th>Observações do Técnico</th>
+                                    <th class="text-center pe-3 pe-md-4">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                if ($res_reposicao && $total_reposicao > 0) {
+                                    while ($rep = mysqli_fetch_assoc($res_reposicao)) { 
+                                        $data_pedido = date('d/m/Y H:i', strtotime($rep['data_pedido']));
+                                ?>
+                                    <tr id="linha-pedido-<?= $rep['id_pedido'] ?>">
+                                        <td class="ps-3 ps-md-4 text-muted"><?= $data_pedido ?></td>
+                                        <td class="fw-bold text-dark"><?= htmlspecialchars($rep['nome_peca']) ?></td>
+                                        <td class="text-center fw-bold fs-5 text-primary"><?= $rep['quantidade'] ?></td>
+                                        <td class="text-muted text-truncate" style="max-width: 300px;" title="<?= htmlspecialchars($rep['observacoes']) ?>">
+                                            <?= htmlspecialchars($rep['observacoes']) ?: '<span class="fst-italic opacity-50">Nenhuma observação</span>' ?>
+                                        </td>
+                                        <td class="text-center pe-3 pe-md-4">
+                                            <button class="btn btn-sm btn-outline-success fw-bold" onclick="marcarPedidoComprado(<?= $rep['id_pedido'] ?>, this)">
+                                                <i class="bi bi-check2-square me-1"></i> Marcar Comprado
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <?php 
+                                    }
+                                } else { 
+                                ?>
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4 text-muted text-wrap">
+                                            <i class="bi bi-box-seam me-2 fs-5"></i>Nenhum pedido de reposição de peças no momento. Tudo em ordem!
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- ========================================================= -->
+
         </div> 
     </div> 
 </div> 
+
+<script>
+function marcarPedidoComprado(idPedido, btnEl) {
+    Swal.fire({
+        title: 'Confirmar compra?',
+        text: 'Deseja marcar este pedido de reposição como comprado?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#198754',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '<i class="bi bi-check2-square"></i> Sim, marcar como comprado',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (!result.isConfirmed) return;
+
+        btnEl.disabled = true;
+        btnEl.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Enviando...';
+
+        fetch('marcar_pedido_comprado.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'id_pedido=' + encodeURIComponent(idPedido)
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            if (data.sucesso) {
+                Swal.fire({
+                    title: 'Comprado!',
+                    text: 'Pedido finalizado com sucesso.',
+                    icon: 'success',
+                    confirmButtonColor: '#198754'
+                }).then(() => {
+                    const linha = document.getElementById('linha-pedido-' + idPedido);
+                    if (linha) linha.remove();
+                    atualizarBadgePedidos();
+                });
+            } else {
+                btnEl.disabled = false;
+                btnEl.innerHTML = '<i class="bi bi-check2-square me-1"></i> Marcar Comprado';
+                Swal.fire('Erro', data.mensagem || 'Não foi possível concluir a compra.', 'error');
+            }
+        })
+        .catch(() => {
+            btnEl.disabled = false;
+            btnEl.innerHTML = '<i class="bi bi-check2-square me-1"></i> Marcar Comprado';
+            Swal.fire('Erro de Conexão', 'Não foi possível falar com o servidor. Tente novamente.', 'error');
+        });
+    });
+}
+
+// Atualiza o contador de pedidos pendentes e mostra a mensagem de "tudo em ordem" quando zerar
+function atualizarBadgePedidos() {
+    const badge = document.getElementById('badge-total-reposicao');
+    const tbody = badge.closest('.card').querySelector('tbody');
+    const linhasRestantes = tbody.querySelectorAll('tr[id^="linha-pedido-"]').length;
+
+    badge.textContent = linhasRestantes + ' Pedido(s) Pendente(s)';
+
+    if (linhasRestantes === 0) {
+        tbody.innerHTML = `<tr>
+            <td colspan="5" class="text-center py-4 text-muted text-wrap">
+                <i class="bi bi-box-seam me-2 fs-5"></i>Nenhum pedido de reposição de peças no momento. Tudo em ordem!
+            </td>
+        </tr>`;
+    }
+}
+</script>
 
 <?php include '../includes/footer.php'; ?>

@@ -70,7 +70,14 @@ if ($res_equipamentos && mysqli_num_rows($res_equipamentos) > 0) {
     }
 }
 
-$sql_tecnicos = "SELECT id_usuario, nome FROM usuarios WHERE perfil = 'T' ORDER BY nome ASC";
+$sql_tecnicos = "SELECT u.id_usuario, u.nome, 
+                         COUNT(os.id_os) AS total_os
+                  FROM usuarios u
+                  LEFT JOIN ordens_servico os ON os.id_usuario_responsavel = u.id_usuario 
+                         AND os.status NOT IN ('FINALIZADO', 'CANCELADO')
+                  WHERE u.perfil = 'T'
+                  GROUP BY u.id_usuario, u.nome
+                  ORDER BY u.nome ASC";
 $res_tecnicos = mysqli_query($conn, $sql_tecnicos);
 
 include '../includes/header.php'; 
@@ -119,7 +126,7 @@ include '../includes/header.php';
                     </div>
                 </div>
 
-                <div class="row bg-light p-3 rounded mb-4">
+                 <div class="row bg-light p-3 rounded mb-4">
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-bold">Técnico Responsável</label>
                         <select class="form-select" name="id_tecnico" id="id_tecnico" style="border-radius: 8px;">
@@ -127,7 +134,8 @@ include '../includes/header.php';
                             <?php 
                             if ($res_tecnicos && mysqli_num_rows($res_tecnicos) > 0) {
                                 while ($tec = mysqli_fetch_assoc($res_tecnicos)) {
-                                    echo "<option value='{$tec['id_usuario']}'>" . htmlspecialchars($tec['nome']) . "</option>";
+                                    $qtd_os = (int) $tec['total_os'];
+                                    echo "<option value='{$tec['id_usuario']}'>" . htmlspecialchars($tec['nome']) . " ({$qtd_os} O.S. em andamento)</option>";
                                 }
                             }
                             ?>

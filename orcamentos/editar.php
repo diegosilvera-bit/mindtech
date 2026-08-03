@@ -1,5 +1,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<!-- Importando o SweetAlert2 para os Pop-ups -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <?php 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -131,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['editar_orcamento'])) {
 }
 
 // Busca as peças disponíveis no estoque
-$res_pecas = mysqli_query($conn, "SELECT id_peca, descricao, valor_unitario FROM pecas ORDER BY descricao ASC");
+$res_pecas = mysqli_query($conn, "SELECT id_peca, descricao, valor_unitario, quantidade_disponivel FROM pecas ORDER BY descricao ASC");
 
 // Busca as peças já vinculadas à O.S. deste orçamento
 $sql_os_pecas = "SELECT p.descricao, p.valor_unitario, SUM(op.quantidade_usada) AS total_quantidade, (SUM(op.quantidade_usada) * p.valor_unitario) AS subtotal FROM os_peca op JOIN pecas p ON op.id_peca = p.id_peca WHERE op.id_os = $id_os_vinculada GROUP BY p.id_peca, p.descricao, p.valor_unitario";
@@ -168,20 +170,24 @@ include '../includes/header.php';
                 <div class="card-header bg-white py-3 fw-bold"><i class="bi bi-tools me-2"></i>Peças e Componentes</div>
                 <div class="card-body">
                     
-                    <form method="POST" class="row gx-2 gy-2 align-items-end mb-4 bg-light p-2 rounded">
+                    <form method="POST" id="form-adicionar-peca" class="row gx-2 gy-2 align-items-end mb-4 bg-light p-2 rounded">
                         <input type="hidden" name="adicionar_peca" value="1">
                         <div class="col-md-7">
                             <label class="form-label small fw-bold">Adicionar Peça</label>
-                            <select name="id_peca" class="form-select form-select-sm" required>
+                            <select name="id_peca" id="select_peca_editar" class="form-select form-select-sm" required>
                                 <option value="" disabled selected>Escolha...</option>
                                 <?php while ($p = mysqli_fetch_assoc($res_pecas)): ?>
-                                    <option value="<?php echo $p['id_peca']; ?>"><?php echo htmlspecialchars($p['descricao']); ?></option>
+                                    <option value="<?php echo $p['id_peca']; ?>"
+                                            data-nome="<?php echo htmlspecialchars($p['descricao']); ?>"
+                                            data-estoque="<?php echo $p['quantidade_disponivel']; ?>">
+                                        <?php echo htmlspecialchars($p['descricao']); ?> (Estoque: <?php echo $p['quantidade_disponivel']; ?>)
+                                    </option>
                                 <?php endwhile; ?>
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label small fw-bold">Qtd.</label>
-                            <input type="number" name="quantidade" class="form-control form-control-sm" value="1" min="1" required>
+                            <input type="number" name="quantidade" id="qtd_peca_editar" class="form-control form-control-sm" value="1" min="1" required>
                         </div>
                         <div class="col-md-3">
                             <button type="submit" class="btn btn-success btn-sm w-100 fw-bold">+ Add</button>
@@ -260,7 +266,164 @@ include '../includes/header.php';
     </div>
 </div>
 
+<!-- INÍCIO DO MODAL DE PEDIDO DE COMPRA -->
+<div class="modal fade" id="modalPedidoPeca" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title fw-bold text-dark"><i class="bi bi-cart-plus me-2"></i>Solicitar Reposição de Peça</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="form-pedido-peca">
+            <div class="mb-3">
+                <label class="fw-bold text-muted">Peça Necessária:</label>
+                <input type="text" class="form-control" id="nome-peca-modal" readonly>
+                <input type="hidden" id="id-peca-modal">
+            </div>
+            <div class="mb-3">
+                <label class="fw-bold text-muted">Quantidade a Solicitar:</label>
+                <input type="number" class="form-control" id="qtd-peca-modal" min="1" value="1">
+            </div>
+            <div class="mb-3">
+                <label class="fw-bold text-muted">Observações para o setor de compras:</label>
+                <textarea class="form-control" id="obs-peca-modal" rows="2" placeholder="Ex: Peça urgente para orçamento aguardando..."></textarea>
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="btn-enviar-pedido" onclick="enviarPedidoReposicao()">
+            <i class="bi bi-send me-1"></i> Enviar Pedido
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- FIM DO MODAL -->
+
 <script>
+// ATUALIZADO: mesmo esquema de checagem de estoque usado em cadastrar.php
+document.addEventListener('DOMContentLoaded', function() {
+    const formAdicionar = document.getElementById('form-adicionar-peca');
+
+    formAdicionar.addEventListener('submit', function(e) {
+        const select = document.getElementById('select_peca_editar');
+        const qtdInput = document.getElementById('qtd_peca_editar');
+        const option = select.options[select.selectedIndex];
+
+        if (!option || !option.value) return; // deixa o required nativo agir
+
+        const estoque = parseInt(option.getAttribute('data-estoque')) || 0;
+        const qtdDesejada = parseInt(qtdInput.value) || 0;
+
+        // LÓGICA ESTOQUE ZERO OU INSUFICIENTE
+        if (estoque === 0 || qtdDesejada > estoque) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Estoque Insuficiente!',
+                text: `Não há peças suficientes no estoque (disponível: ${estoque}). Você pode solicitar a reposição ou tentar adicionar mesmo assim.`,
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '<i class="bi bi-cart"></i> Fazer Pedido da Peça',
+                cancelButtonText: 'Continuar Mesmo Assim'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    abrirModalPedido(option.getAttribute('data-nome'), option.value, qtdDesejada);
+                } else {
+                    formAdicionar.submit();
+                }
+            });
+            return;
+
+        // LÓGICA ESTOQUE BAIXO (RESTAM 2 OU MENOS)
+        } else if (estoque <= 2) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Atenção: Estoque Baixo!',
+                text: `Restam apenas ${estoque} unidades desta peça no estoque.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '<i class="bi bi-cart"></i> Pedir Reposição',
+                cancelButtonText: 'Apenas Adicionar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    abrirModalPedido(option.getAttribute('data-nome'), option.value, qtdDesejada);
+                }
+                // Independente da resposta, a peça segue sendo adicionada pois ainda há estoque
+                formAdicionar.submit();
+            });
+            return;
+        }
+        // Se tem estoque de sobra, segue o submit normal do formulário
+    });
+});
+
+// Função de apoio para abrir o modal de pedido do Bootstrap
+function abrirModalPedido(nomePeca, idPeca, qtdSugerida) {
+    document.getElementById('nome-peca-modal').value = nomePeca;
+    document.getElementById('id-peca-modal').value = idPeca;
+    document.getElementById('qtd-peca-modal').value = qtdSugerida && qtdSugerida > 0 ? qtdSugerida : 1;
+    document.getElementById('obs-peca-modal').value = '';
+    var modalJS = new bootstrap.Modal(document.getElementById('modalPedidoPeca'));
+    modalJS.show();
+}
+
+// Envia o pedido de reposição de fato para o backend (salvar_pedido_peca.php)
+function enviarPedidoReposicao() {
+    const idPeca = document.getElementById('id-peca-modal').value;
+    const qtd = document.getElementById('qtd-peca-modal').value;
+    const obs = document.getElementById('obs-peca-modal').value;
+    const btn = document.getElementById('btn-enviar-pedido');
+
+    if (!idPeca || !qtd || qtd <= 0) {
+        Swal.fire('Atenção', 'Informe uma quantidade válida para o pedido.', 'warning');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Enviando...';
+
+    const formData = new FormData();
+    formData.append('id_peca', idPeca);
+    formData.append('quantidade', qtd);
+    formData.append('observacoes', obs);
+
+    fetch('salvar_pedido_peca.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(resp => resp.json())
+    .then(data => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-send me-1"></i> Enviar Pedido';
+
+        var modalEl = document.getElementById('modalPedidoPeca');
+        var modalJS = bootstrap.Modal.getInstance(modalEl);
+
+        if (data.sucesso) {
+            modalJS.hide();
+            Swal.fire({
+                title: 'Pedido Enviado!',
+                text: 'O pedido de reposição foi registrado e já aparecerá no Dashboard, na área de Chamados para Reposição de Estoque.',
+                icon: 'success',
+                confirmButtonColor: '#3085d6'
+            });
+        } else {
+            Swal.fire('Erro ao enviar pedido', data.mensagem || 'Tente novamente.', 'error');
+        }
+    })
+    .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-send me-1"></i> Enviar Pedido';
+        Swal.fire('Erro de Conexão', 'Não foi possível enviar o pedido. Verifique sua conexão e tente novamente.', 'error');
+    });
+}
+
 function calcularTotal() {
     var maoObra = parseFloat(document.getElementById('valor_mao_obra').value) || 0;
     var pecas = parseFloat(document.getElementById('valor_pecas').value) || 0;
