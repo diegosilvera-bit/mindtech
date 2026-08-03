@@ -12,7 +12,7 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 wait = WebDriverWait(driver, 10)
 
 # Tempo de pausa entre cada etapa (0.5 segundos é o ideal para o olho humano acompanhar)
-VELOCIDADE = 0.5
+VELOCIDADE = 1.0
 
 try:
     # 1. LOGIN

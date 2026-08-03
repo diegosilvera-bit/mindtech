@@ -11,12 +11,10 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 wait = WebDriverWait(driver, 10)
 
 # Tempo de pausa entre as etapas para você conseguir visualizar
-VELOCIDADE = 0.5 
+VELOCIDADE = 1.0 
 
 try:
-    # ==========================================
     # PASSO 1: LOGIN NO SISTEMA
-    # ==========================================
     driver.get("http://localhost/mindtech/login.php")
     wait.until(EC.visibility_of_element_located((By.NAME, 'login'))).send_keys('admin')
     driver.find_element(By.NAME, 'senha').send_keys('admin')
@@ -25,15 +23,10 @@ try:
     driver.find_element(By.XPATH, "//button[@type='submit']").click()
     time.sleep(VELOCIDADE)
 
-    # ==========================================
     # PASSO 2: ACESSAR A TELA DE ORÇAMENTO
-    # ==========================================
-    # Ajuste a URL para a pasta correta onde fica o orçamento
     driver.get("http://localhost/mindtech/orcamentos/cadastrar.php")
 
-    # ==========================================
     # PASSO 3: SELECIONAR A O.S. EM ABERTO
-    # ==========================================
     select_os_elem = wait.until(EC.visibility_of_element_located((By.NAME, 'id_os')))
     select_os = Select(select_os_elem)
     
@@ -44,9 +37,7 @@ try:
     else:
         print("Aviso: Nenhuma Ordem de Serviço em aberto disponível para orçamento.")
 
-    # ==========================================
     # PASSO 4: ADICIONAR PEÇA DINAMICAMENTE
-    # ==========================================
     select_peca_elem = driver.find_element(By.ID, 'select_peca')
     select_peca = Select(select_peca_elem)
     
@@ -66,9 +57,7 @@ try:
         btn_add_peca.click()
         time.sleep(VELOCIDADE)
 
-    # ==========================================
     # PASSO 5: INFORMAR MÃO DE OBRA
-    # ==========================================
     campo_mao_obra = driver.find_element(By.ID, 'valor_mao_obra')
     campo_mao_obra.clear()
     
@@ -77,9 +66,7 @@ try:
     campo_mao_obra.send_keys(valor_mao_obra_falso)
     time.sleep(VELOCIDADE)
 
-    # ==========================================
     # PASSO 6: GRAVAR O ORÇAMENTO
-    # ==========================================
     btn_gravar = driver.find_element(By.XPATH, "//button[@type='submit']")
     btn_gravar.click()
     

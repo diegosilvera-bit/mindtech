@@ -12,12 +12,10 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 wait = WebDriverWait(driver, 10)
 
 # Tempo de pausa entre as etapas para acompanhamento visual
-VELOCIDADE = 0.5 
+VELOCIDADE = 1.0
 
 try:
-    # ==========================================
     # PASSO 1: LOGIN NO SISTEMA
-    # ==========================================
     driver.get("http://localhost/mindtech/login.php")
     wait.until(EC.visibility_of_element_located((By.NAME, 'login'))).send_keys('admin')
     driver.find_element(By.NAME, 'senha').send_keys('admin')
@@ -26,15 +24,11 @@ try:
     driver.find_element(By.XPATH, "//button[@type='submit']").click()
     time.sleep(VELOCIDADE)
 
-    # ==========================================
     # PASSO 2: ACESSAR A TELA DE RELATÓRIOS
-    # ==========================================
     # Ajuste o caminho da pasta caso a tela fique em outro diretório
     driver.get("http://localhost/mindtech/relatorios/cadastrar.php")
 
-    # ==========================================
     # PASSO 3: SELECIONAR O TIPO DE RELATÓRIO
-    # ==========================================
     select_tipo_elem = wait.until(EC.visibility_of_element_located((By.NAME, 'tipo_relatorio')))
     select_tipo = Select(select_tipo_elem)
     
@@ -45,9 +39,7 @@ try:
     select_tipo.select_by_value(opcao_escolhida)
     time.sleep(VELOCIDADE)
 
-    # ==========================================
     # PASSO 4: DEFINIR O INTERVALO DE DATAS
-    # ==========================================
     # Define início como 30 dias atrás e fim como a data atual
     hoje = datetime.now()
     inicio = hoje - timedelta(days=30)
@@ -64,9 +56,7 @@ try:
     campo_fim.send_keys(data_fim_str)
     time.sleep(VELOCIDADE)
 
-    # ==========================================
     # PASSO 5: GERAR RELATÓRIO
-    # ==========================================
     btn_gerar = driver.find_element(By.XPATH, "//button[@type='submit']")
     btn_gerar.click()
     

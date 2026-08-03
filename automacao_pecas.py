@@ -14,9 +14,7 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 wait = WebDriverWait(driver, 10)
 
 try:
-    # ==========================================
     # PASSO 1: FAZER O LOGIN NO SISTEMA
-    # ==========================================
     URL_LOGIN = "http://localhost/mindtech/login.php" 
     driver.get(URL_LOGIN)
     
@@ -24,10 +22,7 @@ try:
     driver.find_element(By.NAME, 'senha').send_keys('admin') 
     driver.find_element(By.XPATH, "//button[@type='submit']").click()
 
-    # ==========================================
     # PASSO 2: ACESSAR A TELA DE CADASTRAR PEÇA
-    # ==========================================
-    # Ajuste o caminho da pasta onde fica o cadastro de peças
     URL_PECAS = "http://localhost/mindtech/estoque/cadastrar.php" 
     driver.get(URL_PECAS)
 
@@ -47,9 +42,7 @@ try:
     ]
     driver.find_element(By.NAME, 'descricao').send_keys(random.choice(descricoes))
 
-    # ==========================================
     # PASSO 3: LIDAR COM O TOMSELECT (FORNECEDOR)
-    # ==========================================
     # Clica na div de controle do TomSelect para abrir o menu
     caixa_tomselect = driver.find_element(By.CSS_SELECTOR, ".ts-control")
     caixa_tomselect.click()
@@ -60,9 +53,7 @@ try:
     input_tomselect.send_keys(Keys.ARROW_DOWN)
     input_tomselect.send_keys(Keys.ENTER)
 
-    # ==========================================
     # PASSO 4: PREENCHER QUANTIDADES E VALORES
-    # ==========================================
     driver.find_element(By.NAME, 'quantidade_disponivel').send_keys(str(random.randint(10, 50)))
     
     # Preencher o Valor Unitário: enviamos apenas números contínuos. 
