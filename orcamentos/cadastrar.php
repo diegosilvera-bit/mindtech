@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             // NOVA LÓGICA DE ESTOQUE E STATUS DA OS
-            $status_os_final = 'EM_ANALISE'; // Status padrão se tiver tudo no estoque
+            $status_os_final = 'EM_ANALISE'; 
 
             foreach ($pecas_agrupadas as $id_peca => $qtd) {
                 $res_check = mysqli_query($conn, "SELECT quantidade_disponivel FROM pecas WHERE id_peca = $id_peca");
@@ -98,7 +98,6 @@ if ($id_os_url > 0) {
 }
 $res_os = mysqli_query($conn, $sql_os);
 
-// ATUALIZADO: Buscando também a quantidade disponível no banco
 $sql_pecas = "SELECT id_peca, descricao, valor_unitario, quantidade_disponivel FROM pecas ORDER BY descricao ASC";
 $res_pecas = mysqli_query($conn, $sql_pecas);
 
@@ -125,7 +124,7 @@ include '../includes/header.php';
             <form method="POST" action="cadastrar.php">
                 
                 <div class="mb-4">
-                    <label class="form-label fw-bold">Ordem de Serviço / Cliente *</label>
+                    <label class="form-label fw-bold">Ordem de Serviço / Cliente </label>
                     <select class="form-select border-2" name="id_os" required style="border-radius: 8px;">
                         <option value="" disabled selected>Selecione a O.S. em aberto...</option>
                         <?php 
@@ -148,7 +147,6 @@ include '../includes/header.php';
                             <select id="select_peca" class="form-select form-select-sm">
                                 <option value="" disabled selected>Selecione uma peça...</option>
                                 <?php while ($p = mysqli_fetch_assoc($res_pecas)): ?>
-                                    <!-- ATUALIZADO: Inserido o data-estoque no HTML -->
                                     <option value="<?= $p['id_peca'] ?>" 
                                             data-nome="<?= htmlspecialchars($p['descricao']) ?>" 
                                             data-valor="<?= $p['valor_unitario'] ?>"
