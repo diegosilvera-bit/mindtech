@@ -84,18 +84,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $mostrar_formulario) {
             border-radius: 12px;
             box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.4);
         }
+
+        /* Estilização dos Inputs */
         .form-control {
-            background-color: #2b2b2b;
-            border: 1px solid #3d3d3d;
-            color: #fff;
+            background-color: #2b2b2b !important;
+            border: 1px solid #3d3d3d !important;
+            color: #ffffff !important;
+        }
+        .form-control::placeholder {
+            color: #777777 !important;
+            opacity: 1;
+        }
+        .input-group-text {
+            background-color: #252525 !important;
+            border: 1px solid #3d3d3d !important;
+            color: #ecc245 !important;
         }
         
-        /* Correções de foco para manter o estilo MindTech (dourado) */
+        /* Foco dos Inputs */
         .form-control:focus {
             border-color: #ecc245 !important;
             box-shadow: none !important;
-            background-color: #2b2b2b;
-            color: #fff;
+            background-color: #2b2b2b !important;
+            color: #ffffff !important;
         }
         .input-group:focus-within {
             box-shadow: 0 0 0 0.25rem rgba(236, 194, 69, 0.25) !important;
@@ -106,7 +117,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $mostrar_formulario) {
             border-color: #ecc245 !important;
         }
 
+        /* Cores e Botões */
         .text-brand { color: #ecc245; }
+        .text-subtle { color: #b0b0b0 !important; }
         .btn-brand {
             background-color: #ecc245;
             color: #121212;
@@ -116,7 +129,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $mostrar_formulario) {
             background-color: #d4ad3c;
             color: #000;
         }
-        .hover-white:hover { color: #fff !important; }
+        .hover-white { 
+            color: #b0b0b0 !important; 
+            transition: color 0.2s;
+        }
+        .hover-white:hover { color: #ffffff !important; }
+
+        /* Evita que o Autofill do navegador deixe o fundo branco */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus {
+            -webkit-text-fill-color: #ffffff !important;
+            -webkit-box-shadow: 0 0 0px 1000px #2b2b2b inset !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
     </style>
 </head>
 <body class="d-flex align-items-center justify-content-center">
@@ -128,9 +154,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $mostrar_formulario) {
             <div class="card login-card p-4 p-sm-5 text-center">
                 <div class="mb-4">
                     <h2 class="text-brand fw-bold mb-3"><i class="bi bi-shield-lock-fill me-2"></i>MINDTECH</h2>
-                    <h4 class="mb-2">Nova Palavra-passe</h4>
+                    <h4 class="mb-2 text-white">Nova Palavra-passe</h4>
                     <?php if ($mostrar_formulario): ?>
-                        <p class="text-muted small">Crie uma nova palavra-passe segura para a sua conta.</p>
+                        <p class="text-subtle small">Crie uma nova palavra-passe segura para a sua conta.</p>
                     <?php endif; ?>
                 </div>
 
@@ -143,17 +169,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $mostrar_formulario) {
                 <?php if ($mostrar_formulario): ?>
                     <form method="POST" action="">
                         <div class="mb-3 text-start">
-                            <label for="nova_senha" class="form-label text-muted small fw-bold">Nova Palavra-passe</label>
+                            <label for="nova_senha" class="form-label text-white small fw-bold">Nova Palavra-passe</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-key"></i></span>
+                                <span class="input-group-text"><i class="bi bi-key"></i></span>
                                 <input type="password" class="form-control" id="nova_senha" name="nova_senha" placeholder="Digite a nova senha" required minlength="6">
                             </div>
                         </div>
 
                         <div class="mb-4 text-start">
-                            <label for="confirmar_senha" class="form-label text-muted small fw-bold">Confirmar Palavra-passe</label>
+                            <label for="confirmar_senha" class="form-label text-white small fw-bold">Confirmar Palavra-passe</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-key-fill"></i></span>
+                                <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
                                 <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" placeholder="Repita a senha" required minlength="6">
                             </div>
                         </div>
@@ -165,7 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $mostrar_formulario) {
                 <?php endif; ?>
 
                 <div class="mt-2">
-                    <a href="login.php" class="text-muted small text-decoration-none hover-white">
+                    <a href="login.php" class="hover-white small text-decoration-none">
                         <i class="bi bi-box-arrow-in-right me-1"></i>Ir para o Login
                     </a>
                 </div>
