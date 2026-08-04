@@ -1,8 +1,8 @@
 <?php
 session_start();
-require_once 'config/conexao.php'; // Usa o seu arquivo que tem o $pdo
+require_once 'config/conexao.php'; // Inclui a conexão $pdo
 
-// Mostrar erros na tela para facilitar testes (quando o sistema for ao ar, pode apagar estas 3 linhas)
+// Mostrar erros na tela para facilitarmos o teste local
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -24,19 +24,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $email = trim($_POST['email'] ?? '');
     
-    // 1. Verifica se o e-mail existe no Banco de Dados (Usando SELECT *)
-    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ? LIMIT 1");
-    $stmt->execute([$email]);
+    // 1. Procura o utilizador tanto pela coluna 'email' quanto pela coluna 'login'
+    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE (email = ? OR login = ?) AND ativo = 1 LIMIT 1");
+    $stmt->execute([$email, $email]);
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($usuario) {
-        // 2. Gera um Token Único e Seguro e a data de expiração (1 hora a partir de agora)
+        // Se o e-mail da conta estiver nulo na tabela, usa o e-mail digitado no formulário
+        $email_destino = !empty($usuario['email']) ? $usuario['email'] : $email;
+
+        // 2. Gera um Token Único e a data de expiração (1 hora)
         $token = bin2hex(random_bytes(50));
         $expiracao = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
-        // 3. Salva o token no banco de dados do utilizador
-        $stmt_update = $pdo->prepare("UPDATE usuarios SET token_recuperacao = ?, token_expiracao = ? WHERE email = ?");
-        $stmt_update->execute([$token, $expiracao, $email]);
+        // 3. Salva o token no banco de dados para o utilizador encontrado
+        $stmt_update = $pdo->prepare("UPDATE usuarios SET token_recuperacao = ?, token_expiracao = ? WHERE id_usuario = ?");
+        $stmt_update->execute([$token, $expiracao, $usuario['id_usuario']]);
 
         // 4. Prepara o link de recuperação
         $link_recuperacao = "http://localhost:8080/mindtech/redefinir.php?token=" . $token;
@@ -49,31 +52,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
             $mail->Username   = 'themindtechservices@gmail.com';
-            $mail->Password   = 'pbltfrlpgbrwsudf'; // Senha de App do Google
+            $mail->Password   = 'oqzcaislslvjqcjv'; // Senha de App do Google
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = 587;
 
+            // RESOLVE O PROBLEMA DE CERTIFICADO SSL NO XAMPP / LOCALHOST
+            $mail->SMTPOptions = array(
+                'ssl' => array(
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true
+                )
+            );
+
             // Remetente e Destinatário
             $mail->setFrom('themindtechservices@gmail.com', 'Sistema MindTech');
-            $mail->addAddress($email); 
+            $mail->addAddress($email_destino, $usuario['nome']); 
 
             // Conteúdo do E-mail
             $mail->isHTML(true);
-            $mail->Subject = 'Recuperacao de Palavra-passe - MindTech';
+            $mail->CharSet = 'UTF-8';
+            $mail->Subject = 'Recuperação de Palavra-passe - MindTech';
             $mail->Body    = "
-                <h3>Olá!</h3>
+                <h3>Olá, {$usuario['nome']}!</h3>
                 <p>Recebemos um pedido para redefinir a palavra-passe da sua conta no sistema MindTech.</p>
-                <p>Para criar uma nova senha, clique no link abaixo:</p>
+                <p>Para criar uma nova senha, clique no botão abaixo:</p>
                 <p><a href='{$link_recuperacao}' style='padding: 10px 15px; background-color: #ecc245; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold;'>Redefinir Minha Senha</a></p>
                 <br>
                 <p><i>Se o botão não funcionar, copie e cole o link abaixo no seu navegador:</i><br>
                 {$link_recuperacao}</p>
                 <br>
-                <p><small>Este link é válido por 1 hora. Se não foi você que pediu, pode ignorar este e-mail.</small></p>
+                <p><small>Este link é válido por 1 hora. Se não foi você quem pediu, pode ignorar este e-mail.</small></p>
             ";
 
             $mail->send();
-            $mensagem = "Enviámos um e-mail com as instruções para redefinir a sua senha. Verifique também a pasta de SPAM.";
+            $mensagem = "Enviámos um e-mail com as instruções para redefinir a sua senha. Verifique também a sua pasta de SPAM!";
             $tipo_alerta = "success";
             
         } catch (Exception $e) {
@@ -81,9 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tipo_alerta = "danger";
         }
     } else {
-        // Por motivos de segurança, se o e-mail não existir, mostramos a mesma mensagem de sucesso
-        $mensagem = "Se este e-mail estiver registado, receberá as instruções em breve.";
-        $tipo_alerta = "success";
+        $mensagem = "Nenhum utilizador ativo foi encontrado com este e-mail ou login.";
+        $tipo_alerta = "warning";
     }
 }
 ?>
@@ -113,17 +125,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 1px solid #3d3d3d;
             color: #fff;
         }
-        
-        /* Correção global para focar com dourado em vez de azul */
-        .form-control:focus, 
-        .form-select:focus, 
-        .btn:focus {
+        .form-control:focus, .form-select:focus, .btn:focus {
             border-color: #ecc245 !important;
             box-shadow: 0 0 0 0.25rem rgba(236, 194, 69, 0.25) !important;
             outline: none !important;
         }
-
-        /* Correção específica para campos com ícone (Input Groups) */
         .input-group:focus-within .form-control {
             border-color: #ecc245 !important;
             box-shadow: none !important;
@@ -135,7 +141,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .input-group:focus-within .input-group-text {
             border-color: #ecc245 !important;
         }
-
         .text-brand { color: #ecc245; }
         .btn-brand {
             background-color: #ecc245;
@@ -159,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-4">
                     <h2 class="text-brand fw-bold mb-3"><i class="bi bi-cpu-fill me-2"></i>MINDTECH</h2>
                     <h4 class="mb-2 text-white">Recuperar Palavra-passe</h4>
-                    <p class="text-white small">Digite o e-mail associado à sua conta e enviar-lhe-emos instruções para redefinir a sua senha.</p>
+                    <p class="text-white small">Digite o e-mail associado à sua conta para receber o link de redefinição.</p>
                 </div>
 
                 <?php if (!empty($mensagem)): ?>
@@ -170,10 +175,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <form method="POST" action="">
                     <div class="mb-4 text-start">
-                        <label for="email" class="form-label text-white small fw-bold">E-mail de Registo</label>
+                        <label for="email" class="form-label text-white small fw-bold">E-mail ou Login de Registo</label>
                         <div class="input-group">
                             <span class="input-group-text bg-dark border-secondary text-white"><i class="bi bi-envelope"></i></span>
-                            <input type="email" class="form-control" id="email" name="email" placeholder= "exemplo@email.com" required>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="exemplo@email.com" required>
                         </div>
                     </div>
                     
