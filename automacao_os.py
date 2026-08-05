@@ -10,6 +10,10 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import (
+    ElementClickInterceptedException,
+    StaleElementReferenceException
+)
 from datetime import datetime, timedelta
 import random
 import time
@@ -46,6 +50,36 @@ class TesteAutomatizadoOrdemServico:
 
         self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
         time.sleep(1)
+
+    def clicar_com_seguranca(self, elemento, tentativas=3):
+        """Leva o elemento até o centro da tela e clica. Se o clique for
+        interceptado (comum em dropdowns do TomSelect ainda em animação),
+        tenta de novo e usa clique via JavaScript como último recurso.
+        """
+        ultimo_erro = None
+
+        for _ in range(tentativas):
+            try:
+                self.driver.execute_script(
+                    "arguments[0].scrollIntoView({block: 'center', inline: 'center'});",
+                    elemento
+                )
+                time.sleep(0.3)
+                elemento.click()
+                return
+            except ElementClickInterceptedException as erro:
+                ultimo_erro = erro
+                try:
+                    self.driver.execute_script("arguments[0].click();", elemento)
+                    return
+                except Exception:
+                    time.sleep(0.5)
+            except StaleElementReferenceException as erro:
+                ultimo_erro = erro
+                time.sleep(0.5)
+
+        if ultimo_erro:
+            raise ultimo_erro
 
     def tirar_screenshot(self, nome_arquivo):
         caminho = os.path.join(self.diretorio_teste, nome_arquivo)
@@ -149,7 +183,7 @@ class TesteAutomatizadoOrdemServico:
                 ts_cliente = self.wait.until(EC.element_to_be_clickable(
                     (By.XPATH, "//select[@id='id_cliente']/following-sibling::div//div[contains(@class, 'ts-control')]")
                 ))
-                ts_cliente.click()
+                self.clicar_com_seguranca(ts_cliente)
                 time.sleep(0.5)
 
                 opcoes_clientes = self.driver.find_elements(
@@ -164,12 +198,18 @@ class TesteAutomatizadoOrdemServico:
                 total_clientes = len(opcoes_clientes)
                 cliente_selecionado = False
 
-                for index in range(total_clientes):
-                    if index > 0:
+                # Embaralha a ordem dos índices para não tentar sempre o
+                # mesmo cliente primeiro (antes, começava sempre pelo
+                # índice 0, que sempre acabava sendo o mesmo cliente).
+                indices_clientes = list(range(total_clientes))
+                random.shuffle(indices_clientes)
+
+                for posicao, index in enumerate(indices_clientes):
+                    if posicao > 0:
                         ts_cliente = self.driver.find_element(
                             By.XPATH, "//select[@id='id_cliente']/following-sibling::div//div[contains(@class, 'ts-control')]"
                         )
-                        ts_cliente.click()
+                        self.clicar_com_seguranca(ts_cliente)
                         time.sleep(0.5)
 
                     opcoes_atuais = self.driver.find_elements(
@@ -182,7 +222,7 @@ class TesteAutomatizadoOrdemServico:
                     cliente_elem = opcoes_atuais[index]
                     nome_cliente = cliente_elem.text.strip()
                     print(f"🔄 Testando cliente ({index + 1}/{total_clientes}): {nome_cliente}")
-                    cliente_elem.click()
+                    self.clicar_com_seguranca(cliente_elem)
 
                     time.sleep(1.5)
 
@@ -190,7 +230,7 @@ class TesteAutomatizadoOrdemServico:
                     ts_equip = self.driver.find_element(
                         By.XPATH, "//select[@id='id_equipamento']/following-sibling::div//div[contains(@class, 'ts-control')]"
                     )
-                    ts_equip.click()
+                    self.clicar_com_seguranca(ts_equip)
                     time.sleep(0.5)
 
                     opcoes_equip = self.driver.find_elements(
@@ -200,7 +240,7 @@ class TesteAutomatizadoOrdemServico:
                     if len(opcoes_equip) > 0:
                         equip_elem = random.choice(opcoes_equip)
                         nome_equip = equip_elem.text.strip()
-                        equip_elem.click()
+                        self.clicar_com_seguranca(equip_elem)
                         print(f"🎯 Equipamento selecionado: {nome_equip}")
                         cliente_selecionado = True
                         detalhe_teste = f"Cliente: {nome_cliente} | Equip: {nome_equip}"
@@ -218,14 +258,14 @@ class TesteAutomatizadoOrdemServico:
                 ts_tec = self.driver.find_element(
                     By.XPATH, "//select[@id='id_tecnico']/following-sibling::div//div[contains(@class, 'ts-control')]"
                 )
-                ts_tec.click()
+                self.clicar_com_seguranca(ts_tec)
                 time.sleep(0.5)
 
                 opcoes_tec = self.driver.find_elements(
                     By.XPATH, "//select[@id='id_tecnico']/following-sibling::div//div[contains(@class, 'option') and not(contains(@class, 'disabled'))]"
                 )
                 if opcoes_tec:
-                    random.choice(opcoes_tec).click()
+                    self.clicar_com_seguranca(random.choice(opcoes_tec))
                 else:
                     input_tec = self.driver.find_element(By.XPATH, "//select[@id='id_tecnico']/following-sibling::div//input")
                     input_tec.send_keys(Keys.ARROW_DOWN)
@@ -263,7 +303,7 @@ class TesteAutomatizadoOrdemServico:
                 # --- F. SALVAR O.S. ---
                 print("💾 Salvando Ordem de Serviço...")
                 btn_salvar = self.driver.find_element(By.XPATH, "//button[@type='submit']")
-                btn_salvar.click()
+                self.clicar_com_seguranca(btn_salvar)
                 time.sleep(1.5)
 
                 status = "Sucesso"
