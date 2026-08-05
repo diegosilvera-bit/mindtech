@@ -7,20 +7,19 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 import random
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-wait = WebDriverWait(driver, 10)
-
-# Velocidade de 1 segundo de intervalo entre cada etapa
-VELOCIDADE = 1.0 
-
-# ==========================================
-# PERGUNTA A QUANTIDADE DE TESTES
-# ==========================================
+# 1. PERGUNTA NO TERMINAL (ANTES DE ABRIR O NAVEGADOR)
 try:
     qtd_testes = int(input("Quantos testes gostaria de cadastrar? "))
 except ValueError:
     print("Valor inválido! Executando 1 teste por padrão.")
     qtd_testes = 1
+
+# 2. INICIALIZAÇÃO DO NAVEGADOR E FERRAMENTAS
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+wait = WebDriverWait(driver, 10)
+
+# Velocidade de 1 segundo de intervalo entre cada etapa
+VELOCIDADE = 1.0 
 
 try:
     # PASSO 1: LOGIN NO SISTEMA (Apenas 1 vez no início)
