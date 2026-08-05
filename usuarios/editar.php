@@ -21,13 +21,23 @@ if ($id_usuario <= 0) {
     exit;
 }
 
+// Carrega os dados atuais do usuário para comparação e exibição
+$sql_busca = "SELECT * FROM usuarios WHERE id_usuario = $id_usuario";
+$result_busca = mysqli_query($conn, $sql_busca);
+$usuario = mysqli_fetch_assoc($result_busca);
+
+if (!$usuario) {
+    header("Location: listar.php");
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
-    // Captura os dados do formulário
-    $nome = mysqli_real_escape_string($conn, trim($_POST['nome']));
-    $email = mysqli_real_escape_string($conn, trim($_POST['email']));
-    $login = mysqli_real_escape_string($conn, trim($_POST['login']));
-    $senha = mysqli_real_escape_string($conn, trim($_POST['senha']));
+    // Captura e sanitiza os dados do formulário
+    $nome   = mysqli_real_escape_string($conn, trim($_POST['nome']));
+    $email  = mysqli_real_escape_string($conn, trim($_POST['email']));
+    $login  = mysqli_real_escape_string($conn, trim($_POST['login']));
+    $senha  = mysqli_real_escape_string($conn, trim($_POST['senha']));
     $perfil = mysqli_real_escape_string($conn, trim($_POST['perfil']));
 
     if (empty($nome) || empty($email) || empty($login) || empty($senha) || empty($perfil)) {
@@ -38,11 +48,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Processamento do upload da foto (se enviada)
         if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+            $tmp_name = $_FILES['foto']['tmp_name'];
             $extensao = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
-            $extensoes_permitidas = ['jpg', 'jpeg', 'png'];
+            
+            // Extensões e Tipos MIME permitidos
+            $extensoes_permitidas = ['jpg', 'jpeg', 'png', 'webp', 'jfif'];
+            $mimes_permitidos     = ['image/jpeg', 'image/pjpeg', 'image/png', 'image/webp'];
 
-            if (in_array($extensao, $extensoes_permitidas)) {
+            // Verifica o tipo MIME real da imagem
+            $mime_real = mime_content_type($tmp_name);
+            $eh_imagem_valida = getimagesize($tmp_name) !== false;
+
+            if (in_array($extensao, $extensoes_permitidas) && in_array($mime_real, $mimes_permitidos) && $eh_imagem_valida) {
                 $diretorio_destinatario = '../uploads/';
+                
                 if (!is_dir($diretorio_destinatario)) {
                     mkdir($diretorio_destinatario, 0755, true);
                 }
@@ -50,11 +69,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $novo_nome_foto = 'usuario_' . time() . '_' . uniqid() . '.' . $extensao;
                 $destino_final = $diretorio_destinatario . $novo_nome_foto;
 
-                if (move_uploaded_file($_FILES['foto']['tmp_name'], $destino_final)) {
+                if (move_uploaded_file($tmp_name, $destino_final)) {
                     $caminho_foto = $novo_nome_foto;
+
+                    // Remove a foto antiga do servidor para economizar espaço
+                    if (!empty($usuario['foto']) && file_exists($diretorio_destinatario . $usuario['foto'])) {
+                        @unlink($diretorio_destinatario . $usuario['foto']);
+                    }
+                } else {
+                    $mensagem = "Erro ao mover o arquivo para a pasta de destino.";
+                    $tipo_alerta = "danger";
                 }
             } else {
-                $mensagem = "Formato de imagem inválido! Apenas JPG, JPEG ou PNG são permitidos.";
+                $mensagem = "Formato de imagem inválido! Apenas arquivos JPG, JPEG, PNG ou WEBP são permitidos.";
                 $tipo_alerta = "danger";
             }
         }
@@ -71,8 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $mensagem = "Informações do usuário atualizadas com sucesso!";
                 $tipo_alerta = "success";
 
-                // Se o usuário editado é o mesmo que está logado, atualiza a sessão
-                // para refletir a mudança (foto, nome, etc.) sem precisar deslogar.
+                // Atualiza os dados da sessão se o usuário alterado for o usuário logado
                 $id_logado = $_SESSION['usuario']['id'] ?? $_SESSION['usuario']['id_usuario'] ?? 0;
                 if ($id_usuario == $id_logado) {
                     $_SESSION['usuario']['nome']   = $nome;
@@ -83,22 +109,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $_SESSION['usuario']['foto'] = $caminho_foto;
                     }
                 }
+
+                // Atualiza o array $usuario com os novos dados gravados
+                $usuario['nome']   = $nome;
+                $usuario['email']  = $email;
+                $usuario['login']  = $login;
+                $usuario['senha']  = $senha;
+                $usuario['perfil'] = $perfil;
+                if ($caminho_foto) {
+                    $usuario['foto'] = $caminho_foto;
+                }
             } else {
                 $mensagem = "Erro ao atualizar dados: " . mysqli_error($conn);
                 $tipo_alerta = "danger";
             }
         }
     }
-}
-
-// Carrega os dados atuais para o formulário
-$sql_busca = "SELECT * FROM usuarios WHERE id_usuario = $id_usuario";
-$result_busca = mysqli_query($conn, $sql_busca);
-$usuario = mysqli_fetch_assoc($result_busca);
-
-if (!$usuario) {
-    header("Location: listar.php");
-    exit;
 }
 
 include '../includes/header.php'; 
@@ -137,10 +163,10 @@ include '../includes/header.php';
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-bold">Perfil de Acesso *</label>
                         <select class="form-select" name="perfil" required style="border-radius: 8px;">
-                            <option value="A" <?php echo $usuario['perfil'] == 'A' ? 'selected' : ''; ?>>Atendimento (Recepção)</option>
-                            <option value="T" <?php echo $usuario['perfil'] == 'T' ? 'selected' : ''; ?>>Técnico (Laboratório)</option>
-                            <option value="E" <?php echo $usuario['perfil'] == 'E' ? 'selected' : ''; ?>>Estoquista (Peças)</option>
-                            <option value="G" <?php echo $usuario['perfil'] == 'G' ? 'selected' : ''; ?>>Gerente (Acesso Total)</option>
+                            <option value="A" <?php echo ($usuario['perfil'] ?? '') == 'A' ? 'selected' : ''; ?>>Atendimento (Recepção)</option>
+                            <option value="T" <?php echo ($usuario['perfil'] ?? '') == 'T' ? 'selected' : ''; ?>>Técnico (Laboratório)</option>
+                            <option value="E" <?php echo ($usuario['perfil'] ?? '') == 'E' ? 'selected' : ''; ?>>Estoquista (Peças)</option>
+                            <option value="G" <?php echo ($usuario['perfil'] ?? '') == 'G' ? 'selected' : ''; ?>>Gerente (Acesso Total)</option>
                         </select>
                     </div>
                 </div>
@@ -169,8 +195,14 @@ include '../includes/header.php';
                 <div class="row">
                     <div class="col-md-12 mb-3">
                         <label class="form-label fw-bold">Foto de Perfil</label>
-                        <input type="file" class="form-control" name="foto" accept="image/png, image/jpeg, image/jpg" style="border-radius: 8px;">
-                        <small class="text-muted">Formatos aceitos: JPG, JPEG ou PNG.</small>
+                        <?php if (!empty($usuario['foto'])): ?>
+                            <div class="mb-2 d-flex align-items-center gap-2">
+                                <img src="../uploads/<?php echo htmlspecialchars($usuario['foto']); ?>" alt="Foto Atual" class="rounded-circle object-fit-cover" width="48" height="48">
+                                <span class="small text-muted">Foto atual salva no sistema</span>
+                            </div>
+                        <?php endif; ?>
+                        <input type="file" class="form-control" name="foto" accept="image/png, image/jpeg, image/jpg, image/webp" style="border-radius: 8px;">
+                        <small class="text-muted">Formatos aceitos: JPG, JPEG, PNG ou WEBP.</small>
                     </div>
                 </div>
 
