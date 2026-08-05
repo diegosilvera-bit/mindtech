@@ -16,9 +16,7 @@ if ($busca !== '') {
     $whereBusca = "WHERE f.nome LIKE '%$buscaEsc%'";
 }
 
-// =========================================================================
 // BUSCA REAL COM CONTAGEM DE PEÇAS (Une fornecedores às suas peças vinculadas)
-// =========================================================================
 $sql = "SELECT f.id_fornecedor, f.nome, f.cnpj, f.email, f.telefone, 
                COUNT(p.id_peca) AS total_pecas
         FROM fornecedores f
@@ -115,21 +113,38 @@ include '../includes/header.php';
         </h1>
         <div class="topo-pagina__acoes">
             <div class="campo-busca-wrap">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-search"></i></span>
-                        <input type="text" name="busca" id="campoBusca" class="form-control" placeholder="Pesquisar por fornecedor..." value="<?php echo htmlspecialchars($busca); ?>" autocomplete="off">
-                        <?php if ($busca !== ''): ?>
-                            <a href="listar.php" class="btn btn-outline-secondary" title="Limpar"><i class="bi bi-x-lg"></i></a>
-                        <?php endif; ?>
-                    </div>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="busca" id="campoBusca" class="form-control" placeholder="Pesquisar por fornecedor..." value="<?php echo htmlspecialchars($busca); ?>" autocomplete="off">
+                    <?php if ($busca !== ''): ?>
+                        <a href="listar.php" class="btn btn-outline-secondary" title="Limpar"><i class="bi bi-x-lg"></i></a>
+                    <?php endif; ?>
+                </div>
             </div>
             <a href="../dashboard/index.php" class="btn btn-secondary"> Dashboard</a>
             <a href="cadastrar.php" class="btn btn-success">+ Novo Fornecedor</a>
         </div>
     </div>
 
-    <?php if (!empty($erro)): ?>
-        <div class="alert alert-danger fw-bold shadow-sm"><?= $erro ?></div>
+    <!-- MENSAGENS DE FEEDBACK (SUCESSO OU ERRO AO EXCLUIR/CONSULTAR) -->
+    <?php if (isset($_GET['status']) && $_GET['status'] === 'sucesso_delecao'): ?>
+        <div class="alert alert-success alert-dismissible fade show shadow-sm fw-semibold mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> Fornecedor excluído com sucesso!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+    <?php endif; ?>
+
+    <?php 
+    $mensagemErro = $erro;
+    if (isset($_GET['erro'])) {
+        $mensagemErro = $_GET['erro'];
+    }
+    ?>
+    <?php if (!empty($mensagemErro)): ?>
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm fw-semibold mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <?= htmlspecialchars($mensagemErro) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
     <?php endif; ?>
 
     <div class="card shadow-sm border-0 border-start border-4 border-success">
