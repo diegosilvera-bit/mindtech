@@ -7,19 +7,20 @@ from selenium.webdriver.support import expected_conditions as EC
 from faker import Faker
 import time
 
+# 1. PERGUNTA NO TERMINAL (ANTES DE ABRIR O NAVEGADOR)
+try:
+    qtd_testes = int(input("Quantos testes gostaria de cadastrar? "))
+except ValueError:
+    print("Valor inválido! Executando 1 teste por padrão.")
+    qtd_testes = 1
+
+# 2. INICIALIZAÇÃO DO NAVEGADOR E FERRAMENTAS
 fake = Faker('pt_BR')
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 wait = WebDriverWait(driver, 10)
 
 # Velocidade de 1 segundo de intervalo entre cada etapa
 VELOCIDADE = 1.0
-
-# PERGUNTA A QUANTIDADE DE TESTES
-try:
-    qtd_testes = int(input("Quantos testes gostaria de cadastrar? "))
-except ValueError:
-    print("Valor inválido! Executando 1 teste por padrão.")
-    qtd_testes = 1
 
 try:
     # PASSO 1: FAZER O LOGIN NO SISTEMA (Apenas 1 vez no início)
