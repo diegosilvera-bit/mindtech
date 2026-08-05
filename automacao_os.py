@@ -1,149 +1,303 @@
+"""
+TESTE AUTOMATIZADO - ABERTURA DE ORDEM DE SERVIÇO (VERSÃO DASHBOARD)
+Sistema: Mindtech
+Ferramenta: Selenium WebDriver com Python
+"""
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 from datetime import datetime, timedelta
 import random
 import time
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import Select, WebDriverWait
-from webdriver_manager.chrome import ChromeDriverManager
+import os
+import webbrowser
 
-# 1. PERGUNTA NO TERMINAL (ANTES DE ABRIR O NAVEGADOR)
-try:
-    qtd_testes = int(input("Quantos testes gostaria de cadastrar? "))
-except ValueError:
-    print("Valor inválido! Executando 1 teste por padrão.")
-    qtd_testes = 1
+class TesteAutomatizadoOrdemServico:
+    def __init__(self, url_base="http://localhost:8080/mindtech"):
+        self.url_base = url_base
+        self.diretorio_teste = "TesteOrdemServico"
+        
+        # Cria a pasta se não existir
+        if not os.path.exists(self.diretorio_teste):
+            os.makedirs(self.diretorio_teste)
+            
+        # Lista para armazenar resultados do relatório
+        self.resultados_testes = []
 
-# 2. INICIALIZAÇÃO DO NAVEGADOR E FERRAMENTAS
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-wait = WebDriverWait(driver, 10)
+        chrome_options = Options()
+        chrome_options.add_argument("--start-maximized")
+        
+        self.driver = webdriver.Chrome(options=chrome_options)
+        self.wait = WebDriverWait(self.driver, 10)
+        
+        print("✓ Ambiente preparado e pasta 'TesteOrdemServico' verificada!")
 
-# Velocidade de 1 segundo de intervalo entre cada etapa
-VELOCIDADE = 1.0 
+    def realizar_login(self, usuario="admin", senha="admin"):
+        print("\n🔐 Realizando login no sistema...")
+        self.driver.get(f"{self.url_base}/login.php")
+        
+        self.wait.until(EC.visibility_of_element_located((By.NAME, 'login'))).send_keys(usuario)
+        self.driver.find_element(By.NAME, 'senha').send_keys(senha)
+        self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
 
-try:
-    # PASSO 1: FAZER O LOGIN NO SISTEMA (Apenas 1 vez no início)
-    driver.get("http://localhost:8080/mindtech/login.php")
-    wait.until(EC.visibility_of_element_located((By.NAME, 'login'))).send_keys('admin')
-    driver.find_element(By.NAME, 'senha').send_keys('admin')
-    time.sleep(VELOCIDADE)
-    
-    driver.find_element(By.XPATH, "//button[@type='submit']").click()
-    time.sleep(VELOCIDADE)
+        self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        time.sleep(1)
 
-    # PASSO 2: LOOP DE REPETIÇÃO DOS TESTES
-    for i in range(1, qtd_testes + 1):
-        print(f"\n--- Executando Abertura de O.S. {i} de {qtd_testes} ---")
+    def tirar_screenshot(self, nome_arquivo):
+        caminho = os.path.join(self.diretorio_teste, nome_arquivo)
+        self.driver.save_screenshot(caminho)
+        return nome_arquivo
 
-        # Acesse a tela de abertura de O.S.
-        driver.get("http://localhost:8080/mindtech/ordens_servico/cadastrar.php")
+    def gerar_relatorio_html(self):
+        caminho_html = os.path.join(self.diretorio_teste, "dashboard.html")
+        
+        # Contagem para o resumo
+        sucessos = sum(1 for r in self.resultados_testes if r['status'] == 'Sucesso')
+        falhas = len(self.resultados_testes) - sucessos
 
-        # 1. BUSCA UM CLIENTE QUE POSSUA EQUIPAMENTO CADASTRADO
-        ts_cliente_control = wait.until(EC.element_to_be_clickable(
-            (By.XPATH, "//select[@id='id_cliente']/following-sibling::div//div[contains(@class, 'ts-control')]")
-        ))
-        ts_cliente_control.click()
-        time.sleep(0.5)
+        html_content = f"""
+        <!DOCTYPE html>
+        <html lang="pt-br">
+        <head>
+            <meta charset="UTF-8">
+            <title>Dashboard de Testes - Mindtech O.S.</title>
+            <style>
+                body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 20px; }}
+                .container {{ max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+                h1 {{ color: #004a80; text-align: center; }}
+                .summary {{ display: flex; justify-content: space-around; margin-bottom: 30px; padding: 15px; background: #e9ecef; border-radius: 5px; }}
+                .card {{ text-align: center; }}
+                .card h2 {{ margin: 0; font-size: 2em; }}
+                .status-sucesso {{ color: #28a745; }}
+                .status-falha {{ color: #dc3545; }}
+                table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
+                th, td {{ padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }}
+                th {{ background-color: #004a80; color: white; }}
+                .img-link {{ color: #007bff; text-decoration: none; font-weight: bold; }}
+                tr:hover {{ background-color: #f1f1f1; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Relatório de Automação de Abertura de O.S.</h1>
+                <div class="summary">
+                    <div class="card"><h3>Total</h3><h2>{len(self.resultados_testes)}</h2></div>
+                    <div class="card"><h3 class="status-sucesso">Sucessos</h3><h2>{sucessos}</h2></div>
+                    <div class="card"><h3 class="status-falha">Falhas</h3><h2>{falhas}</h2></div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente / Detalhes</th>
+                            <th>Status</th>
+                            <th>Evidência</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        """
+        
+        for r in self.resultados_testes:
+            cor_status = "status-sucesso" if r['status'] == 'Sucesso' else "status-falha"
+            html_content += f"""
+                <tr>
+                    <td>{r['id']}</td>
+                    <td>{r['detalhes']}</td>
+                    <td class="{cor_status}">{r['status']}</td>
+                    <td><a class="img-link" href="{r['screenshot']}" target="_blank">Visualizar Screenshot</a></td>
+                </tr>
+            """
 
-        # Mapeia quantas opções de clientes existem no TomSelect
-        opcoes_clientes = driver.find_elements(
-            By.XPATH, "//select[@id='id_cliente']/following-sibling::div//div[contains(@class, 'option')]"
-        )
-        total_clientes = len(opcoes_clientes)
+        html_content += """
+                    </tbody>
+                </table>
+            </div>
+        </body>
+        </html>
+        """
 
-        cliente_encontrado = False
+        with open(caminho_html, "w", encoding="utf-8") as f:
+            f.write(html_content)
+        
+        return caminho_html
 
-        for idx in range(total_clientes):
-            # Se não for o primeiro da lista, reabre o TomSelect de clientes
-            if idx > 0:
-                ts_cliente_control = driver.find_element(
-                    By.XPATH, "//select[@id='id_cliente']/following-sibling::div//div[contains(@class, 'ts-control')]"
-                )
-                ts_cliente_control.click()
+    def executar_teste_completo(self, quantidade):
+        # Passo prévio: realizar login no sistema
+        try:
+            self.realizar_login()
+        except Exception as e:
+            print(f"❌ Falha crítica ao tentar realizar login: {e}")
+            self.driver.quit()
+            return
+
+        for i in range(1, quantidade + 1):
+            print(f"\n🚀 Executando Abertura de O.S. {i} de {quantidade}...")
+            status = "Falha"
+            detalhe_teste = "Não identificado"
+
+            try:
+                self.driver.get(f"{self.url_base}/ordens_servico/cadastrar.php")
+                self.wait.until(EC.presence_of_element_located((By.ID, "id_cliente")))
+                time.sleep(1)
+
+                # --- A. SELECIONAR CLIENTE (CLIQUE REAL NO TOMSELECT) ---
+                print("🔍 Abrindo lista de clientes...")
+                ts_cliente = self.wait.until(EC.element_to_be_clickable(
+                    (By.XPATH, "//select[@id='id_cliente']/following-sibling::div//div[contains(@class, 'ts-control')]")
+                ))
+                ts_cliente.click()
                 time.sleep(0.5)
 
-            # Re-busca as opções para evitar elementos obsoletos (Stale Element)
-            opcoes = driver.find_elements(
-                By.XPATH, "//select[@id='id_cliente']/following-sibling::div//div[contains(@class, 'option')]"
-            )
-            
-            if idx < len(opcoes):
-                opcoes[idx].click()
-                time.sleep(VELOCIDADE) # Aguarda o JavaScript 'filtrarEquipamentos()' rodar
+                opcoes_clientes = self.driver.find_elements(
+                    By.XPATH, "//select[@id='id_cliente']/following-sibling::div//div[contains(@class, 'option') and not(contains(@class, 'disabled'))]"
+                )
 
-            # Abre o TomSelect de Equipamentos para verificar se o cliente tem aparelhos
-            ts_equip_control = driver.find_element(
-                By.XPATH, "//select[@id='id_equipamento']/following-sibling::div//div[contains(@class, 'ts-control')]"
-            )
-            ts_equip_control.click()
-            time.sleep(0.5)
+                if not opcoes_clientes:
+                    print("❌ Nenhuma opção de cliente foi encontrada no sistema.")
+                    detalhe_teste = "Sem clientes disponíveis"
+                    raise Exception("Sem clientes disponíveis")
 
-            opcoes_equip = driver.find_elements(
-                By.XPATH, "//select[@id='id_equipamento']/following-sibling::div//div[contains(@class, 'option')]"
-            )
+                total_clientes = len(opcoes_clientes)
+                cliente_selecionado = False
 
-            # Se houver pelo menos 1 equipamento, seleciona o primeiro e segue o fluxo
-            if len(opcoes_equip) > 0:
-                opcoes_equip[0].click()
-                cliente_encontrado = True
-                time.sleep(VELOCIDADE)
-                break
-            else:
-                print(f"⚠️ Cliente {idx + 1} não tem equipamento cadastrado. Testando o próximo...")
+                for index in range(total_clientes):
+                    if index > 0:
+                        ts_cliente = self.driver.find_element(
+                            By.XPATH, "//select[@id='id_cliente']/following-sibling::div//div[contains(@class, 'ts-control')]"
+                        )
+                        ts_cliente.click()
+                        time.sleep(0.5)
 
-        if not cliente_encontrado:
-            print("❌ Nenhum cliente da lista possui equipamentos cadastrados!")
-            print("💡 Dica: Execute o script 'automacao_equipamentos.py' para cadastrar aparelhos primeiro.")
-            break
+                    opcoes_atuais = self.driver.find_elements(
+                        By.XPATH, "//select[@id='id_cliente']/following-sibling::div//div[contains(@class, 'option') and not(contains(@class, 'disabled'))]"
+                    )
 
-        # 2. SELECIONAR TÉCNICO (TomSelect)
-        ts_tecnico = driver.find_element(
-            By.XPATH, "//select[@id='id_tecnico']/following-sibling::div//div[contains(@class, 'ts-control')]"
-        )
-        ts_tecnico.click()
-        time.sleep(0.3)
+                    if index >= len(opcoes_atuais):
+                        break
+
+                    cliente_elem = opcoes_atuais[index]
+                    nome_cliente = cliente_elem.text.strip()
+                    print(f"🔄 Testando cliente ({index + 1}/{total_clientes}): {nome_cliente}")
+                    cliente_elem.click()
+
+                    time.sleep(1.5)
+
+                    # --- B. VERIFICAR EQUIPAMENTOS ---
+                    ts_equip = self.driver.find_element(
+                        By.XPATH, "//select[@id='id_equipamento']/following-sibling::div//div[contains(@class, 'ts-control')]"
+                    )
+                    ts_equip.click()
+                    time.sleep(0.5)
+
+                    opcoes_equip = self.driver.find_elements(
+                        By.XPATH, "//select[@id='id_equipamento']/following-sibling::div//div[contains(@class, 'option') and not(contains(@class, 'disabled'))]"
+                    )
+
+                    if len(opcoes_equip) > 0:
+                        equip_elem = random.choice(opcoes_equip)
+                        nome_equip = equip_elem.text.strip()
+                        equip_elem.click()
+                        print(f"🎯 Equipamento selecionado: {nome_equip}")
+                        cliente_selecionado = True
+                        detalhe_teste = f"Cliente: {nome_cliente} | Equip: {nome_equip}"
+                        time.sleep(0.5)
+                        break
+                    else:
+                        print(f"⚠️ O cliente '{nome_cliente}' não possui equipamentos. Tentando o próximo...")
+
+                if not cliente_selecionado:
+                    detalhe_teste = "Nenhum cliente com equipamento"
+                    raise Exception("Nenhum cliente com equipamento cadastrado localizado")
+
+                # --- C. SELECIONAR TÉCNICO ---
+                print("👨‍🔧 Selecionando técnico...")
+                ts_tec = self.driver.find_element(
+                    By.XPATH, "//select[@id='id_tecnico']/following-sibling::div//div[contains(@class, 'ts-control')]"
+                )
+                ts_tec.click()
+                time.sleep(0.5)
+
+                opcoes_tec = self.driver.find_elements(
+                    By.XPATH, "//select[@id='id_tecnico']/following-sibling::div//div[contains(@class, 'option') and not(contains(@class, 'disabled'))]"
+                )
+                if opcoes_tec:
+                    random.choice(opcoes_tec).click()
+                else:
+                    input_tec = self.driver.find_element(By.XPATH, "//select[@id='id_tecnico']/following-sibling::div//input")
+                    input_tec.send_keys(Keys.ARROW_DOWN)
+                    input_tec.send_keys(Keys.ENTER)
+                time.sleep(0.5)
+
+                # --- D. STATUS E PREVISÃO DE ENTREGA ---
+                print("📅 Preenchendo status e data...")
+                self.driver.execute_script("""
+                    var select = document.querySelector("select[name='status']");
+                    if(select) { select.value = 'EM_ANALISE'; }
+                """)
+
+                dias = random.randint(3, 10)
+                data_futura = (datetime.now() + timedelta(days=dias)).strftime("%d%m%Y")
+                
+                campo_data = self.driver.find_element(By.NAME, 'data_prevista_entrega')
+                campo_data.clear()
+                campo_data.send_keys(data_futura)
+
+                # --- E. OBSERVAÇÕES ---
+                print("📝 Escrevendo observações...")
+                problemas = [
+                    "Aparelho não liga após sofrer uma queda. Cliente solicita orçamento prévio.",
+                    "Tela trincada com falha no touch. Aparelho liga e emite sons normalmente.",
+                    "Bateria descarregando muito rápido e esquentando durante o uso.",
+                    "Conector de carga danificado. Não reconhece o cabo do carregador."
+                ]
+                campo_obs = self.driver.find_element(By.NAME, 'observacoes')
+                campo_obs.clear()
+                campo_obs.send_keys(random.choice(problemas))
+
+                time.sleep(1)
+
+                # --- F. SALVAR O.S. ---
+                print("💾 Salvando Ordem de Serviço...")
+                btn_salvar = self.driver.find_element(By.XPATH, "//button[@type='submit']")
+                btn_salvar.click()
+                time.sleep(1.5)
+
+                status = "Sucesso"
+                print(f"✅ Ordem de Serviço {i} cadastrada com sucesso!")
+
+            except Exception as e:
+                print(f"✗ Erro no processo: {e}")
+
+            # Captura de screenshot e registro dos resultados
+            nome_print = self.tirar_screenshot(f"ordem_servico_{i}.png")
+            self.resultados_testes.append({
+                "id": i,
+                "detalhes": detalhe_teste,
+                "status": status,
+                "screenshot": nome_print
+            })
+
+        # Finalização e relatório
+        caminho_report = self.gerar_relatorio_html()
+        self.driver.quit()
         
-        input_ts_tec = driver.find_element(By.XPATH, "//select[@id='id_tecnico']/following-sibling::div//input")
-        input_ts_tec.send_keys(Keys.ARROW_DOWN)
-        input_ts_tec.send_keys(Keys.ENTER)
-        time.sleep(VELOCIDADE)
+        print(f"\n✅ Testes finalizados! Relatório gerado em: {caminho_report}")
+        webbrowser.open('file://' + os.path.realpath(caminho_report))
 
-        # 3. STATUS INICIAL E PREVISÃO DE ENTREGA
-        select_status = Select(driver.find_element(By.NAME, 'status'))
-        select_status.select_by_value("EM_ANALISE")
-        time.sleep(VELOCIDADE)
 
-        data_futura = (datetime.now() + timedelta(days=5)).strftime("%d%m%Y")
-        campo_data = driver.find_element(By.NAME, 'data_prevista_entrega')
-        campo_data.send_keys(data_futura)
-        time.sleep(VELOCIDADE)
-
-        # 4. DESCREVER O PROBLEMA RELATADO
-        problemas_comuns = [
-            "Aparelho não liga após sofrer uma queda. Cliente solicita orçamento prévio.",
-            "Tela trincada com falha no touch. Aparelho liga e emite sons normalmente.",
-            "Bateria descarregando muito rápido e esquentando durante o uso.",
-            "Conector de carga danificado. Não reconhece o cabo do carregador.",
-            "Limpeza preventiva e troca de pasta térmica. Equipamento desligando por superaquecimento."
-        ]
-        
-        campo_obs = driver.find_element(By.NAME, 'observacoes')
-        campo_obs.send_keys(random.choice(problemas_comuns))
-        time.sleep(VELOCIDADE)
-
-        # 5. GRAVAR A O.S.
-        btn_salvar = driver.find_element(By.XPATH, "//button[@type='submit']")
-        btn_salvar.click()
-        
-        print(f"✅ Ordem de Serviço {i} criada com sucesso!")
-        time.sleep(VELOCIDADE)
-
-    print("\n🎉 Processo de Abertura de O.S. finalizado!")
-
-except Exception as e:
-    print(f"❌ Ocorreu um erro durante a execução: {e}")
-
-finally:
-    driver.quit()
+if __name__ == "__main__":
+    print("--- SISTEMA DE AUTOMAÇÃO MINDTECH - ABERTURA DE O.S. ---")
+    try:
+        qtd = int(input("Quantas Ordens de Serviço você deseja cadastrar hoje? "))
+        if qtd > 0:
+            URL_LOCAL = "http://localhost:8080/mindtech"
+            teste = TesteAutomatizadoOrdemServico(url_base=URL_LOCAL)
+            teste.executar_teste_completo(qtd)
+        else:
+            print("Quantidade inválida.")
+    except ValueError:
+        print("Por favor, digite apenas números inteiros.")
