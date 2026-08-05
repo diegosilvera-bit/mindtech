@@ -1,27 +1,26 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import Select, WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from datetime import datetime, timedelta
-import time
 import random
+import time
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select, WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-wait = WebDriverWait(driver, 10)
-
-# Velocidade de 1 segundo de intervalo entre cada etapa
-VELOCIDADE = 1.0 
-
-# ==========================================
-# PERGUNTA A QUANTIDADE DE TESTES
-# ==========================================
+# 1. PERGUNTA NO TERMINAL (ANTES DE ABRIR O NAVEGADOR)
 try:
     qtd_testes = int(input("Quantos testes gostaria de executar? "))
 except ValueError:
     print("Valor inválido! Executando 1 teste por padrão.")
     qtd_testes = 1
+
+# 2. INICIALIZAÇÃO DO NAVEGADOR E FERRAMENTAS
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+wait = WebDriverWait(driver, 10)
+
+# Velocidade de 1 segundo de intervalo entre cada etapa
+VELOCIDADE = 1.0 
 
 try:
     # PASSO 1: FAZER O LOGIN NO SISTEMA (Apenas 1 vez no início)
