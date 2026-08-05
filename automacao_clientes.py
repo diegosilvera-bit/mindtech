@@ -7,53 +7,71 @@ import time
 
 fake = Faker('pt_BR')
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+wait = WebDriverWait(driver, 10)
+
+# Velocidade de 1 segundo de intervalo entre cada etapa
+VELOCIDADE = 1.0
+
+# PERGUNTA A QUANTIDADE DE TESTES
+try:
+    qtd_testes = int(input("Quantos testes gostaria de cadastrar? "))
+except ValueError:
+    print("Valor inválido! Executando 1 teste por padrão.")
+    qtd_testes = 1
 
 try:
-    # PASSO 1: FAZER O LOGIN NO SISTEMA
+    # PASSO 1: FAZER O LOGIN NO SISTEMA (Apenas 1 vez no início)
     URL_LOGIN = "http://localhost:8080/mindtech/login.php" 
     driver.get(URL_LOGIN)
-    time.sleep(2)
     
-    #  senha e login
-    driver.find_element(By.NAME, 'login').send_keys('admin') 
+    campo_login = wait.until(EC.visibility_of_element_located((By.NAME, 'login')))
+    campo_login.send_keys('admin') 
     driver.find_element(By.NAME, 'senha').send_keys('admin') 
     
-    # Clicar no botão de entrar
     driver.find_element(By.XPATH, "//button[@type='submit']").click()
-    
-    time.sleep(3) # Aguarda o redirecionamento para a dashboard
+    time.sleep(VELOCIDADE)
 
-    # PASSO 2: ACESSAR A TELA DE CADASTRO
-    URL_CADASTRO = "http://localhost:8080/mindtech/clientes/cadastrar.php" 
-    driver.get(URL_CADASTRO)
-    time.sleep(2)
+    # PASSO 2: LOOP DE REPETIÇÃO DOS TESTES
+    for i in range(1, qtd_testes + 1):
+        print(f"\n--- Executando Cadastro de Cliente {i} de {qtd_testes} ---")
 
-    # 1. Preencher os dados usando os atributos 'name' mapeados
-    driver.find_element(By.NAME, 'nome').send_keys(fake.name())
-    
-    data_falsa = fake.date_of_birth(minimum_age=18, maximum_age=80).strftime('%d/%m/%Y')
-    driver.find_element(By.NAME, 'data_nascimento').send_keys(data_falsa)
-    
-    # 2. Preencher os campos com máscara
-    driver.find_element(By.NAME, 'cpf').send_keys(fake.cpf())
-    driver.find_element(By.NAME, 'rg').send_keys(fake.rg())
-    
-    telefone_falso = fake.cellphone_number()
-    driver.find_element(By.NAME, 'telefone').send_keys(telefone_falso)
-    
-    # 3. Preencher endereço
-    driver.find_element(By.NAME, 'endereco').send_keys(fake.street_address())
-    
-    time.sleep(1) 
-    
-    # 4. Clicar no botão de Salvar da tela de cadastro
-    driver.find_element(By.XPATH, "//button[@type='submit']").click()
-    
-    print("Login e Cadastro de Cliente realizados com sucesso!")
-    time.sleep(3)
+        URL_CADASTRO = "http://localhost:8080/mindtech/clientes/cadastrar.php" 
+        driver.get(URL_CADASTRO)
+
+        # 1. Preencher Nome
+        campo_nome = wait.until(EC.visibility_of_element_located((By.NAME, 'nome')))
+        campo_nome.send_keys(fake.name())
+        time.sleep(VELOCIDADE)
+
+        # 2. Preencher Data de Nascimento
+        data_falsa = fake.date_of_birth(minimum_age=18, maximum_age=80).strftime('%d/%m/%Y')
+        driver.find_element(By.NAME, 'data_nascimento').send_keys(data_falsa)
+        time.sleep(VELOCIDADE)
+
+        # 3. Preencher CPF e RG
+        driver.find_element(By.NAME, 'cpf').send_keys(fake.cpf())
+        time.sleep(VELOCIDADE)
+
+        driver.find_element(By.NAME, 'rg').send_keys(fake.rg())
+        time.sleep(VELOCIDADE)
+
+        # 4. Preencher Telefone
+        driver.find_element(By.NAME, 'telefone').send_keys(fake.cellphone_number())
+        time.sleep(VELOCIDADE)
+
+        # 5. Preencher Endereço
+        driver.find_element(By.NAME, 'endereco').send_keys(fake.street_address())
+        time.sleep(VELOCIDADE)
+
+        # 6. Clicar no botão Salvar
+        driver.find_element(By.XPATH, "//button[@type='submit']").click()
+        print(f"✅ Cliente {i} cadastrado com sucesso!")
+        time.sleep(VELOCIDADE)
+
+    print("\n🎉 Todos os cadastros de clientes foram finalizados com sucesso!")
 
 except Exception as e:
-    print(f"Ocorreu um erro: {e}")
+    print(f"❌ Ocorreu um erro: {e}")
 
 finally:
     driver.quit()
