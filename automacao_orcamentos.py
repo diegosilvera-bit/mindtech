@@ -243,7 +243,23 @@ class TesteAutomatizadoOrcamento:
                     })
                     break
 
-                select_os.select_by_index(1)
+                os_disponiveis = [
+                    idx for idx, opcao in enumerate(select_os.options)
+                    if idx != 0 and not opcao.get_attribute("disabled")
+                ]
+
+                if not os_disponiveis:
+                    print("⚠️ Nenhuma Ordem de Serviço habilitada disponível para orçamento.")
+                    self.resultados_testes.append({
+                        "id": i + 1,
+                        "os": "Sem O.S. habilitada",
+                        "valor_mao_obra": "-",
+                        "status": "Falha",
+                        "screenshot": self.tirar_screenshot(f"orcamento_{i + 1}.png")
+                    })
+                    break
+
+                select_os.select_by_index(random.choice(os_disponiveis))
                 os_selecionada = select_os.first_selected_option.text
                 time.sleep(1)
 
@@ -254,17 +270,24 @@ class TesteAutomatizadoOrcamento:
                 select_peca = Select(select_peca_elem)
 
                 if len(select_peca.options) > 1:
-                    select_peca.select_by_index(1)
-                    time.sleep(1)
+                    opcoes_disponiveis = [
+                        idx for idx, opcao in enumerate(select_peca.options)
+                        if idx != 0 and not opcao.get_attribute("disabled")
+                    ]
 
-                    self.preencher_campo(By.ID, "qtd_peca", "2")
-                    time.sleep(1)
+                    if opcoes_disponiveis:
+                        indice_peca = random.choice(opcoes_disponiveis)
+                        select_peca.select_by_index(indice_peca)
+                        time.sleep(1)
 
-                    self.clicar_seguro(
-                        By.XPATH,
-                        "//button[contains(normalize-space(.), '+ Add')]"
-                    )
-                    time.sleep(1)
+                        self.preencher_campo(By.ID, "qtd_peca", "2")
+                        time.sleep(1)
+
+                        self.clicar_seguro(
+                            By.XPATH,
+                            "//button[contains(normalize-space(.), '+ Add')]"
+                        )
+                        time.sleep(1)
 
                 # 3. Informar Mão de Obra
                 campo_mao_obra = self.wait.until(
